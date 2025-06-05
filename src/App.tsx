@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { generateWithOpenAI, generateWithClaude } from './services/aiService';
+import { analyzeBrief, enhanceGeneratedOutput, EnhancedGeneratedOutput, BriefAnalysis } from './services/enhancementService';
 import { ShoppingMoments } from './components/ShoppingMoments';
 import { AdminPanel } from './components/AdminPanel';
+import { BriefEnhancement } from './components/BriefEnhancement';
 import { TerritoryOutput } from './components/TerritoryOutput';
 import { BriefInput } from './components/BriefInput';
 
@@ -43,13 +45,14 @@ const BreadApp: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [showOutput, setShowOutput] = useState<boolean>(false);
   const [showAdmin, setShowAdmin] = useState<boolean>(false);
-  const [generatedOutput, setGeneratedOutput] = useState<GeneratedOutput | null>(null);
+  const [generatedOutput, setGeneratedOutput] = useState<EnhancedGeneratedOutput | null>(null);
   const [error, setError] = useState<string>('');
   const [apiKeys, setApiKeys] = useState<ApiKeys>({
     openai: '',
     claude: ''
   });
   const [apiKeysSaved, setApiKeysSaved] = useState<boolean>(false);
+  const [showBriefAnalysis, setShowBriefAnalysis] = useState<boolean>(false);
 
   const [prompts, setPrompts] = useState<Prompts>({
     systemInstructions: `You are BREAD®, a creative AI platform designed to generate high-quality advertising territories and headlines for Everyday Rewards, Australia's largest loyalty program.
@@ -108,6 +111,29 @@ Territory themes should explore:
 - Recommended disclaimers if needed`
   });
 
+  // Real-time brief analysis
+  const briefAnalysis: BriefAnalysis = useMemo(() => {
+    if (brief.trim().length < 10) {
+      return {
+        score: 0,
+        suggestions: [],
+        strengths: [],
+        warnings: [],
+        marketInsights: []
+      };
+    }
+    return analyzeBrief(brief);
+  }, [brief]);
+
+  // Show analysis when brief has content and user is typing
+  useEffect(() => {
+    if (brief.trim().length > 20 && !showOutput) {
+      setShowBriefAnalysis(true);
+    } else {
+      setShowBriefAnalysis(false);
+    }
+  }, [brief, showOutput]);
+
   // Load API keys from localStorage on component mount
   useEffect(() => {
     const savedOpenAI = localStorage.getItem('bread_openai_key');
@@ -156,6 +182,7 @@ Territory themes should explore:
     setIsGenerating(true);
     setError('');
     setShowOutput(false);
+    setShowBriefAnalysis(false);
 
     try {
       // Construct full prompt
@@ -180,7 +207,10 @@ Please provide a structured response with territories, headlines, and compliance
         result = await generateWithClaude(fullPrompt, requiredKey);
       }
 
-      setGeneratedOutput(result);
+      // Enhance the output with confidence scoring
+      const enhancedResult = enhanceGeneratedOutput(result, brief);
+      
+      setGeneratedOutput(enhancedResult);
       setShowOutput(true);
     } catch (err) {
       setError(`Failed to generate content with ${selectedAI === 'openai' ? 'OpenAI' : 'Claude'}. Please check your API key and try again.`);
@@ -233,7 +263,7 @@ Please provide a structured response with territories, headlines, and compliance
                     }
                   </div>
                   <div className="text-xs">
-                    Demo Mode • {new Date().toLocaleDateString()}
+                    Smart Analysis • {new Date().toLocaleDateString()}
                   </div>
                 </div>
               </div>
@@ -269,6 +299,16 @@ Please provide a structured response with territories, headlines, and compliance
             onGenerate={handleGenerate}
             onMomentSelect={handleMomentSelect}
           />
+
+          {/* Smart Brief Analysis */}
+          {showBriefAnalysis && (
+            <div className="mt-6">
+              <BriefEnhancement 
+                analysis={briefAnalysis}
+                isVisible={showBriefAnalysis}
+              />
+            </div>
+          )}
         </div>
 
         {/* Output Section */}
@@ -279,6 +319,7 @@ Please provide a structured response with territories, headlines, and compliance
               setShowOutput(false);
               setBrief('');
               setGeneratedOutput(null);
+              setShowBriefAnalysis(false);
             }}
           />
         )}
