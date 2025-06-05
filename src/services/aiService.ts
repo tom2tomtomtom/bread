@@ -2,13 +2,13 @@ import OpenAI from 'openai';
 import Anthropic from '@anthropic-ai/sdk';
 import { GeneratedOutput } from '../App';
 
-// Mock response for demo purposes
+// Mock response for demo purposes - enhanced with more realistic data
 const mockResponse = (): GeneratedOutput => ({
   territories: [
     {
       id: '001',
       title: 'Everyday Advantage',
-      positioning: 'While others wait for sales events, Everyday Rewards members enjoy benefits year-round.',
+      positioning: 'While others wait for sales events, Everyday Rewards members enjoy benefits year-round with consistent value.',
       tone: 'Confident, relatable',
       headlines: [
         'Every day is your day with Everyday Rewards.',
@@ -19,18 +19,18 @@ const mockResponse = (): GeneratedOutput => ({
     {
       id: '002',
       title: 'Smart Shoppers Club',
-      positioning: 'Everyday Rewards turns every shop into a win for savvy Australians.',
+      positioning: 'Everyday Rewards turns every shop into a win for savvy Australians who value consistency over chaos.',
       tone: 'Premium, self-aware',
       headlines: [
         'Join the club where every shop counts.',
         'Smart shopping, everyday rewards.',
-        'Your everyday essentials, rewarded.'
+        'Your everyday essentials, properly rewarded.'
       ]
     },
     {
       id: '003',
       title: 'No FOMO Zone',
-      positioning: 'Skip the sales pressure and enjoy consistent rewards without the rush.',
+      positioning: 'Skip the sales pressure and enjoy consistent rewards without the rush, stress, or limited-time anxiety.',
       tone: 'Calm, anti-FOMO',
       headlines: [
         'No countdown clocks. Just everyday savings.',
@@ -40,8 +40,8 @@ const mockResponse = (): GeneratedOutput => ({
     },
     {
       id: '004',
-      title: 'Aussie Value',
-      positioning: 'Celebrating Australian shoppers with rewards that reflect our values.',
+      title: 'True Blue Value',
+      positioning: 'Celebrating Australian shoppers with rewards that reflect our values of fairness and community.',
       tone: 'Patriotic, inclusive',
       headlines: [
         'Rewards as reliable as a true blue mate.',
@@ -51,11 +51,11 @@ const mockResponse = (): GeneratedOutput => ({
     },
     {
       id: '005',
-      title: 'Stack & Save',
-      positioning: 'Smart members quietly accumulate value while others chase one-off deals.',
+      title: 'Steady Wins',
+      positioning: 'Smart members quietly accumulate genuine value while others chase one-off deals and flash sales.',
       tone: 'Wry, confident',
       headlines: [
-        'They saved $20 once. You save every time.',
+        'They saved twenty dollars once. You save every time.',
         'Stacking rewards while others chase sales.',
         'The maths always works in your favour.'
       ]
@@ -63,7 +63,7 @@ const mockResponse = (): GeneratedOutput => ({
     {
       id: '006',
       title: 'Any Day Advantage',
-      positioning: 'Every day is the perfect day to earn rewards with Everyday Rewards.',
+      positioning: 'Every day is the perfect day to earn rewards with Everyday Rewards - no special occasion required.',
       tone: 'Direct, everyday',
       headlines: [
         'Today\'s deal? The same as every day.',
@@ -75,15 +75,17 @@ const mockResponse = (): GeneratedOutput => ({
   compliance: {
     powerBy: [
       'Everyday Rewards Messaging Matrix',
-      'T&Cs on owned assets',
-      'Relevant ACCC obligations'
+      'Terms and Conditions on owned assets',
+      'Relevant ACCC advertising obligations'
     ],
-    output: 'All messaging complies with Australian Consumer Law and ACCC advertising guidelines. Claims are substantiated and terms clearly disclosed.',
+    output: 'All messaging complies with Australian Consumer Law and ACCC advertising guidelines. Claims are substantiated with program benefits and terms are clearly disclosed where required.',
     notes: [
-      'Claims substantiated with program benefits',
-      'Terms clearly disclosed in all materials',
-      'ACCC guidelines followed for comparative claims',
-      'No misleading or deceptive statements identified'
+      'Claims substantiated with actual program benefits',
+      'Terms clearly disclosed in all marketing materials',
+      'ACCC guidelines followed for comparative advertising claims',
+      'No misleading or deceptive statements identified',
+      'Australian cultural references used appropriately',
+      'Value propositions align with program offerings'
     ]
   }
 });
@@ -92,10 +94,18 @@ const mockResponse = (): GeneratedOutput => ({
 const parseAIResponse = (text: string): GeneratedOutput => {
   try {
     // Try to parse as JSON first
-    return JSON.parse(text);
+    const parsed = JSON.parse(text);
+    
+    // Validate the structure
+    if (parsed.territories && Array.isArray(parsed.territories) && parsed.compliance) {
+      return parsed;
+    }
+    
+    // If structure is invalid, return mock response
+    return mockResponse();
   } catch {
-    // If not JSON, return mock response for now
-    // In production, you'd parse the text response
+    // If not JSON or parsing fails, return mock response for now
+    // In production, you'd parse the text response more intelligently
     return mockResponse();
   }
 };
@@ -112,7 +122,27 @@ export const generateWithOpenAI = async (prompt: string, apiKey: string): Promis
       messages: [
         {
           role: "system",
-          content: "You are BREAD®, a creative AI platform. Always respond with structured JSON containing territories and compliance data. Each territory should have: id, title, positioning, tone, and headlines array with 3 items."
+          content: `You are BREAD®, a creative AI platform. Always respond with structured JSON containing territories and compliance data. 
+
+Structure your response exactly like this:
+{
+  "territories": [
+    {
+      "id": "001",
+      "title": "Territory Name",
+      "positioning": "Clear positioning statement...",
+      "tone": "Tone description",
+      "headlines": ["Headline 1", "Headline 2", "Headline 3"]
+    }
+  ],
+  "compliance": {
+    "powerBy": ["Item 1", "Item 2", "Item 3"],
+    "output": "Compliance summary...",
+    "notes": ["Note 1", "Note 2", "Note 3"]
+  }
+}
+
+Generate exactly 6 territories, each with 3 headlines. Focus on Australian market relevance and ensure compliance with ACCC standards.`
         },
         {
           role: "user",
@@ -120,7 +150,7 @@ export const generateWithOpenAI = async (prompt: string, apiKey: string): Promis
         }
       ],
       temperature: 0.8,
-      max_tokens: 3000
+      max_tokens: 4000
     });
 
     const response = completion.choices[0]?.message?.content;
@@ -131,7 +161,7 @@ export const generateWithOpenAI = async (prompt: string, apiKey: string): Promis
     return parseAIResponse(response);
   } catch (error) {
     console.error('OpenAI API Error:', error);
-    // Return mock response for demo
+    // Return mock response for demo - in production, you'd handle this differently
     return mockResponse();
   }
 };
@@ -141,17 +171,39 @@ export const generateWithClaude = async (prompt: string, apiKey: string): Promis
     const anthropic = new Anthropic({
       apiKey: apiKey,
       // Note: Anthropic SDK doesn't support browser usage by default
-      // This is for demo purposes only
+      // This is for demo purposes only - in production, use server-side
     });
 
     const message = await anthropic.messages.create({
       model: "claude-3-sonnet-20240229",
-      max_tokens: 3000,
+      max_tokens: 4000,
       temperature: 0.8,
       messages: [
         {
           role: "user",
-          content: `You are BREAD®, a creative AI platform. Always respond with structured JSON containing territories and compliance data. Each territory should have: id, title, positioning, tone, and headlines array with 3 items.\n\n${prompt}`
+          content: `You are BREAD®, a creative AI platform. Always respond with structured JSON containing territories and compliance data.
+
+Structure your response exactly like this:
+{
+  "territories": [
+    {
+      "id": "001",
+      "title": "Territory Name",
+      "positioning": "Clear positioning statement...",
+      "tone": "Tone description",
+      "headlines": ["Headline 1", "Headline 2", "Headline 3"]
+    }
+  ],
+  "compliance": {
+    "powerBy": ["Item 1", "Item 2", "Item 3"],
+    "output": "Compliance summary...",
+    "notes": ["Note 1", "Note 2", "Note 3"]
+  }
+}
+
+Generate exactly 6 territories, each with 3 headlines. Focus on Australian market relevance and ensure compliance with ACCC standards.
+
+${prompt}`
         }
       ]
     });
@@ -164,7 +216,7 @@ export const generateWithClaude = async (prompt: string, apiKey: string): Promis
     return parseAIResponse(response);
   } catch (error) {
     console.error('Claude API Error:', error);
-    // Return mock response for demo
+    // Return mock response for demo - in production, you'd handle this differently
     return mockResponse();
   }
 };
