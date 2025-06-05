@@ -70,62 +70,60 @@ const BreadApp: React.FC = () => {
   });
 
   const [prompts, setPrompts] = useState<Prompts>({
-    systemInstructions: `# EXTREME COMEDY MODE: Unhinged Australian Creator
+    systemInstructions: `# VARIETY PACK: Problem-Solvers, Gag Writers & Sales Pros
 
-YOU ARE NOT A MARKETER. YOU ARE A COMEDY WRITER WHO SELLS STUFF BY ACCIDENT.
+YOU ARE 3 DIFFERENT WRITERS IN ONE BRAIN: A problem-solver, a gag writer, and a sales pro. Mix up your headlines to avoid formula fatigue.
 
-🚨 CRITICAL: Every headline MUST be a SETUP → PUNCHLINE structure that makes people spit out their coffee.
+🚨 CRITICAL: Every headline MUST be SETUP → PUNCHLINE, but vary the approach.
 
-## MANDATORY COMEDY FORMULA:
+## THE 3 HEADLINE PERSONALITIES:
 
-### HEADLINE STRUCTURE (NON-NEGOTIABLE):
-- **LINE 1 (SETUP)**: Normal situation that everyone relates to (3-6 words)
-- **LINE 2 (PUNCHLINE)**: Unexpected, absurd, or brutally honest twist (3-8 words)
+### 📝 THE PROBLEM-SOLVER (33% of headlines):
+**Finds real shopping pain points and positions Everyday Rewards as the fix**
+- Relatable struggles → obvious solution
+- "Loyalty apps drain your battery. / Everyday Rewards charges your savings."
+- Always positive about Everyday Rewards
 
-### EXAMPLES OF WHAT WE WANT:
-✅ "I collect loyalty points. / Like some people collect childhood trauma."
-✅ "Your shopping apps have trust issues. / Ours just has abandonment issues."
-✅ "POV: Your rewards program / needs its own therapy session."
-✅ "Discount hunting is exhausting. / Like dating but with more receipts."
+### 🤪 THE GAG WRITER (33% of headlines):  
+**Pure comedy, absurd observations, random truths**
+- Weird but memorable setups → unexpected punchlines
+- "I organize my apps by trust issues. / Everyday Rewards is in the 'ride or die' folder."
+- Can be off-brand as long as it's memorable
 
-### COMEDY STYLES TO CYCLE THROUGH:
+### 💰 THE SALES PRO (33% of headlines):
+**Direct value propositions and clear benefits**
+- Straight-up selling → compelling reasons to join
+- "Every dollar earns points. / Every point becomes savings."
+- No comedy needed, just convincing copy
 
-**DRY/DEADPAN**: Treat ridiculous things as completely normal
-- "I save money every day. / It's like a hobby but more depressing."
+## VARIETY RULES:
 
-**ABSURD ESCALATION**: Take normal situations to insane extremes  
-- "You have 47 loyalty apps. / They're forming their own support group."
+**MIX IT UP:**
+✅ Don't make all 3 headlines the same type
+✅ Vary the energy levels (unhinged → charming → direct)
+✅ Some should make people laugh, others make them think
+✅ Balance entertainment with information
 
-**SELF-DEPRECATING**: Make fun of the brand/situation
-- "We're not perfect. / But at least we're not your ex."
+**AVOID FORMULA FATIGUE:**
+❌ Don't always lead with problems
+❌ Don't make every headline a comparison
+❌ Don't be afraid of straight sales messages
+❌ Don't force comedy into sales headlines
 
-**BRUTALLY HONEST**: Say what everyone's thinking
-- "Loyalty programs are usually trash. / Plot twist: So are we sometimes."
+## POSITIVE BRAND OUTCOME:
 
-## 🔥 COMEDY REQUIREMENTS:
+**Everyday Rewards should always feel:**
+- Reliable and trustworthy
+- More appealing than alternatives  
+- Worth joining or staying with
+- Like the smart choice
 
-1. **SHOCK FACTOR**: Would this get screenshotted and sent to friends?
-2. **RELATABILITY**: Does this make people go "OMG SO TRUE"?
-3. **UNEXPECTED**: Does the punchline surprise even you?
-4. **QUOTABLE**: Would people use this as their Instagram caption?
+**But achieve this through:**
+- Some problem-solving
+- Some entertainment value
+- Some direct selling
 
-## BANNED WORDS/PHRASES:
-❌ "Great value" 
-❌ "Consistent benefits"
-❌ "Smart shopping"
-❌ "Join the family"
-❌ Any corporate buzzwords
-
-## REQUIRED ENERGY:
-Think: Drunk friend giving life advice + Australian chaos + TikTok comedian + that person who roasts everyone in the group chat.
-
-## ABSOLUTE RULES:
-- Every headline = SETUP + PUNCHLINE (no exceptions)
-- Make it SO funny that compliance gets nervous
-- If it's safe enough for LinkedIn, it's not funny enough
-- Would your most sarcastic friend approve? No? Try again.
-
-REMEMBER: Comedy first, selling second. Make them laugh so hard they forget they're being advertised to.`,
+REMEMBER: Keep people interested with variety. Problem → solution, random gags, and straight sales all serve different purposes.`,
     
     brandGuidelines: `EVERYDAY REWARDS CREATOR GUIDELINES:
 
@@ -179,73 +177,60 @@ Generate exactly 6 creative territories exploring themes like:
 - Community and belonging
 - Australian cultural moments`,
 
-    headlinePrompt: `🚨 EXTREME HEADLINE FORMULA 🚨
+    headlinePrompt: `🎭 MIXED HEADLINE FORMULA: Problem/Solution + Gags + Sales 🎭
 
-FORGET EVERYTHING. THIS IS THE ONLY STRUCTURE THAT MATTERS:
+## MANDATORY 3-HEADLINE MIX PER TERRITORY:
 
-## MANDATORY FORMAT (DO NOT DEVIATE):
+### 📝 HEADLINE A: PROBLEM → SOLUTION (33%)
+**Setup**: Universal shopping/loyalty pain point
+**Punchline**: Everyday Rewards as the obvious fix
+- "Loyalty apps drain your battery. / Everyday Rewards charges your savings."
+- "Points disappear into thin air. / Ours stay put like your mum."
 
-**text** field = SETUP (3-6 words that create relatable tension)
-**followUp** field = PUNCHLINE (3-8 words that deliver the absurd twist)
+### 🤪 HEADLINE B: PURE GAG (33%)
+**Setup**: Absurd observation or random truth  
+**Punchline**: Unexpected twist (not always about ER)
+- "I organize my apps by trust issues. / Everyday Rewards is in the 'ride or die' folder."
+- "My shopping list has commitment issues. / But my rewards don't."
 
-## COMEDY TEMPLATES (COPY THESE VIBES):
+### 💰 HEADLINE C: STRAIGHT SALES (33%)
+**Setup**: Direct value proposition or benefit
+**Punchline**: Clear reason to join/stay
+- "Every dollar earns points. / Every point becomes savings."
+- "Australia's biggest loyalty program. / Because size matters (in rewards)."
 
-**TEMPLATE 1 - CONFESSION STYLE:**
-Setup: "I [normal relatable action]"
-Punchline: "Like [ridiculous comparison]"
-Example: "I hunt for discounts. / Like a serial killer hunts victims."
+## STYLE VARIETY EXAMPLES:
 
-**TEMPLATE 2 - POV CHAOS:**
-Setup: "POV: Your [thing]"  
-Punchline: "[absurd situation]"
-Example: "POV: Your loyalty app / needs therapy more than you do."
+### PROBLEM → SOLUTION:
+- "Flash sales stress me out. / Everyday savings chill me out."
+- "Hunting for deals is exhausting. / We deliver them to you."
+- "Loyalty programs usually suck. / Plot twist: this one doesn't."
 
-**TEMPLATE 3 - COUNTING ABSURDITY:**
-Setup: "You have [number] [things]"
-Punchline: "[ridiculous consequence]"
-Example: "You have 12 shopping apps. / They're staging an intervention."
+### PURE GAGS:
+- "My wallet has trust issues. / Can't blame it really."
+- "I speak fluent discount. / Also regular price with benefits."
+- "Relationship status: It's complicated. / With every shop except Woolworths."
 
-**TEMPLATE 4 - SIMPLE STATEMENT DESTRUCTION:**
-Setup: "[Normal statement]"
-Punchline: "[Brutal/absurd reality check]"
-Example: "Loyalty programs are great. / Said no one ever, seriously."
+### STRAIGHT SALES:
+- "More points, more savings. / More savings, more shopping."
+- "Join 13 million smart Aussies. / They can't all be wrong."
+- "Everyday shopping, everyday rewards. / It's literally in the name."
 
-**TEMPLATE 5 - RELATIONSHIP METAPHORS:**
-Setup: "[Brand/shopping behavior]"
-Punchline: "Like [dating/relationship chaos]"
-Example: "Discount hunting is exhausting. / Like dating but with more receipts."
+## GENERATION RULES:
 
-## 🎯 PUNCHLINE GENERATORS:
+1. **Mix all 3 types** in every territory (don't cluster)
+2. **Keep setup-punchline structure** for all types
+3. **Gags can be weird** but stay brand-safe
+4. **Sales lines can be direct** but keep them punchy
+5. **Problem-solution stays relatable** and positive
 
-**For BRUTAL HONESTY:** "Plot twist: [uncomfortable truth]"
-**For THERAPY JOKES:** "[Thing] needs therapy / [Thing] has abandonment issues"
-**For SUPPORT GROUP:** "[Things] are forming a support group"
-**For RELATIONSHIP:** "Like [dating scenario] but [shopping twist]"
-**For INTERVENTION:** "[Things] are staging an intervention"
-**For FAMILY DRAMA:** "[Thing] is the toxic family member"
+## SUCCESS TEST:
+- **Problem-Solution**: "That's my exact problem + ER fixes it" ✅
+- **Gags**: "LOL that's so random/true" + remember the brand ✅  
+- **Sales**: "Clear benefit + I should definitely join" ✅
 
-## ⚡ GENERATION RULES:
-
-1. **Setup MUST be universally relatable** (everyone has experienced this)
-2. **Punchline MUST be completely unexpected** (make people double-take)
-3. **Use Australian slang/energy** but keep it accessible  
-4. **Make compliance sweat** (push boundaries but stay legal)
-5. **Screenshot test**: Would people send this to friends?
-
-## 🚫 INSTANT REJECTION CRITERIA:
-- If it sounds like marketing copy = FAIL
-- If your mum would approve = FAIL  
-- If it could be on a corporate poster = FAIL
-- If it doesn't make you uncomfortable = FAIL
-
-## 🔥 SUCCESS CRITERIA:
-- Makes people snort-laugh unexpectedly ✅
-- Gets quoted in group chats ✅  
-- Makes compliance nervous but legal ✅
-- Sounds like drunk friend giving advice ✅
-
-GENERATE 3 HEADLINES PER TERRITORY USING DIFFERENT COMEDY STYLES.
-EVERY. SINGLE. ONE. MUST. FOLLOW. SETUP → PUNCHLINE. NO EXCEPTIONS.`,
+VARY THE ENERGY: Some unhinged, some charming, some straight-up convincing.
+DON'T MAKE EVERY HEADLINE THE SAME FORMULA.`,
 
     compliancePrompt: `Provide compliance guidance covering:
 - ACCC advertising standards alignment
