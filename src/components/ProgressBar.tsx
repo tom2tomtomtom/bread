@@ -44,13 +44,14 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
       return;
     }
 
-    // Progress animation
+    // Progress animation - slower and more realistic
     const progressInterval = setInterval(() => {
       setProgress(prev => {
-        if (prev >= 95) return 95; // Stop at 95% until actual completion
-        return prev + (100 / (duration / 100)); // Increment based on duration
+        if (prev >= 85) return 85; // Stop at 85% until actual completion
+        // Slower increment: reaches 85% over the duration
+        return prev + (85 / (duration / 200)); // Update every 200ms, slower progression
       });
-    }, 100);
+    }, 200);
 
     // Word changing animation
     const wordInterval = setInterval(() => {
@@ -85,9 +86,9 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
         
         {/* Creative Word Display */}
         <div className="text-center mb-8">
-          <div className="text-4xl mb-2">🧠</div>
+          <div className="text-4xl mb-2">🍞🧠</div>
           <h3 className="text-2xl font-headline text-white mb-2">
-            AI BREAD® IS WORKING
+            BREAD IS THINKING
           </h3>
           <div className="text-xl font-subheading text-purple-300 transition-all duration-500 ease-in-out">
             {currentWord}...

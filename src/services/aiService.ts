@@ -185,21 +185,58 @@ const mockResponse = (): GeneratedOutput => ({
 
 // Parse AI response into structured format
 const parseAIResponse = (text: string): GeneratedOutput => {
+  console.log('🔍 Attempting to parse AI response...');
+  console.log('Response type:', typeof text);
+  console.log('Response length:', text?.length);
+  
   try {
-    // Try to parse as JSON first
-    const parsed = JSON.parse(text);
+    // Clean the text - sometimes AI includes markdown code blocks
+    let cleanText = text.trim();
+    
+    // Remove markdown code blocks if present
+    if (cleanText.startsWith('```json')) {
+      cleanText = cleanText.replace(/```json\s*/, '').replace(/\s*```$/, '');
+    } else if (cleanText.startsWith('```')) {
+      cleanText = cleanText.replace(/```\s*/, '').replace(/\s*```$/, '');
+    }
+    
+    console.log('🧹 Cleaned text for parsing:', cleanText.substring(0, 200) + '...');
+    
+    // Try to parse as JSON
+    const parsed = JSON.parse(cleanText);
+    console.log('✅ Successfully parsed JSON');
+    console.log('📊 Parsed structure:', {
+      hasTerritories: !!parsed.territories,
+      territoriesLength: parsed.territories?.length,
+      hasCompliance: !!parsed.compliance,
+      keys: Object.keys(parsed)
+    });
     
     // Validate the structure
     if (parsed.territories && Array.isArray(parsed.territories) && parsed.compliance) {
+      console.log('✅ Structure validation passed');
       return parsed;
     }
     
-    // If structure is invalid, return mock response
-    return mockResponse();
-  } catch {
-    // If not JSON or parsing fails, return mock response for now
-    // In production, you'd parse the text response more intelligently
-    return mockResponse();
+    console.warn('⚠️ Structure validation failed - using mock response');
+    console.log('Expected: territories array + compliance object');
+    console.log('Got:', {
+      territories: parsed.territories ? `${parsed.territories.length} items` : 'missing',
+      compliance: parsed.compliance ? 'present' : 'missing'
+    });
+    
+    // If structure is invalid, throw error to see what's happening
+    throw new Error(`Invalid structure from OpenAI. Got: ${JSON.stringify({
+      territories: parsed.territories ? `${parsed.territories.length} items` : 'missing',
+      compliance: parsed.compliance ? 'present' : 'missing',
+      keys: Object.keys(parsed)
+    })}`);
+  } catch (error) {
+    console.error('❌ JSON parsing failed:', error);
+    console.log('Raw text that failed to parse:', text.substring(0, 500) + '...');
+    // Throw error to see what OpenAI actually returned
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Failed to parse OpenAI response: ${errorMessage}. Raw response: ${text.substring(0, 200)}...`);
   }
 };
 
@@ -207,6 +244,10 @@ export const generateWithOpenAI = async (prompt: string, apiKey: string): Promis
   console.log('🔄 Starting OpenAI API call...');
   console.log('API Key present:', !!apiKey);
   console.log('Prompt length:', prompt.length);
+  console.log('📄 Full prompt being sent to OpenAI:');
+  console.log('='.repeat(80));
+  console.log(prompt);
+  console.log('='.repeat(80));
   
   try {
     const openai = new OpenAI({
@@ -220,7 +261,7 @@ export const generateWithOpenAI = async (prompt: string, apiKey: string): Promis
       messages: [
         {
           role: "system",
-          content: `You are BREAD®, a creative AI platform. Always respond with structured JSON containing territories and compliance data. 
+          content: `Always respond with structured JSON containing territories and compliance data. 
 
 Structure your response exactly like this:
 {
@@ -251,9 +292,7 @@ Generate exactly 6 territories, each with 3 headlines. For each headline, provid
 - text: The main headline
 - followUp: A supporting line that reinforces the message
 - reasoning: Strategic explanation of why this headline works
-- confidence: Numerical score 1-100 based on market fit and effectiveness
-
-Focus on Australian market relevance and ensure compliance with ACCC standards.`
+- confidence: Numerical score 1-100 based on market fit and effectiveness`
         },
         {
           role: "user",
@@ -266,6 +305,10 @@ Focus on Australian market relevance and ensure compliance with ACCC standards.`
 
     const response = completion.choices[0]?.message?.content;
     console.log('✅ OpenAI API response received:', !!response);
+    console.log('📄 Raw OpenAI response:');
+    console.log('='.repeat(80));
+    console.log(response);
+    console.log('='.repeat(80));
     
     if (!response) {
       throw new Error('No response from OpenAI');

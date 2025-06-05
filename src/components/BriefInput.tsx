@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ApiKeys } from '../App';
 import { ShoppingMoments } from './ShoppingMoments';
+import { BriefBuilder } from './BriefBuilder';
 
 interface BriefInputProps {
   brief: string;
@@ -21,11 +22,38 @@ export const BriefInput: React.FC<BriefInputProps> = ({
   onGenerate,
   onMomentSelect
 }) => {
+  const [inputMode, setInputMode] = useState<'text' | 'builder'>('text');
   return (
     <div className="backdrop-blur-xl bg-yellow-400/10 border border-yellow-400/20 rounded-3xl p-8 shadow-2xl mb-8">
-      <h2 className="text-3xl font-subheading mb-6 text-yellow-400 drop-shadow-lg">
-        CLIENT BRIEF
-      </h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-subheading text-yellow-400 drop-shadow-lg">
+          CLIENT BRIEF
+        </h2>
+        
+        {/* Input Mode Toggle */}
+        <div className="flex bg-white/10 rounded-xl p-1">
+          <button
+            onClick={() => setInputMode('text')}
+            className={`px-4 py-2 rounded-lg text-sm font-subheading transition-all duration-300 ${
+              inputMode === 'text' 
+                ? 'bg-yellow-400 text-black' 
+                : 'text-gray-300 hover:text-white'
+            }`}
+          >
+            📝 Text Input
+          </button>
+          <button
+            onClick={() => setInputMode('builder')}
+            className={`px-4 py-2 rounded-lg text-sm font-subheading transition-all duration-300 ${
+              inputMode === 'builder' 
+                ? 'bg-yellow-400 text-black' 
+                : 'text-gray-300 hover:text-white'
+            }`}
+          >
+            🏗️ Brief Builder
+          </button>
+        </div>
+      </div>
       
       {/* OpenAI Status */}
       <div className="mb-6">
@@ -45,38 +73,47 @@ export const BriefInput: React.FC<BriefInputProps> = ({
         )}
       </div>
 
-      {/* Brief Input */}
-      <div className="bg-gradient-to-br from-yellow-400 via-yellow-300 to-yellow-500 text-black p-8 rounded-2xl mb-8 shadow-2xl shadow-yellow-400/20">
-        <div className="flex justify-between items-start mb-4">
-          <label className="text-sm font-subheading text-gray-800">CAMPAIGN BRIEF</label>
-          <div className="text-xs text-gray-600 bg-white/20 px-2 py-1 rounded font-body normal-case">
-            {brief.length}/2000 characters
+      {/* Brief Input - Conditional Rendering */}
+      {inputMode === 'text' ? (
+        <div className="bg-gradient-to-br from-yellow-400 via-yellow-300 to-yellow-500 text-black p-8 rounded-2xl mb-8 shadow-2xl shadow-yellow-400/20">
+          <div className="flex justify-between items-start mb-4">
+            <label className="text-sm font-subheading text-gray-800">CAMPAIGN BRIEF</label>
+            <div className="text-xs text-gray-600 bg-white/20 px-2 py-1 rounded font-body normal-case">
+              {brief.length}/2000 characters
+            </div>
           </div>
+          <textarea
+            value={brief}
+            onChange={(e) => setBrief(e.target.value)}
+            placeholder="Describe your campaign objective, target audience, key messaging, and competitive context..."
+            className="w-full h-40 bg-transparent text-black placeholder-gray-700 font-body font-normal text-lg resize-none outline-none normal-case"
+            maxLength={2000}
+          />
+          {brief && (
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={() => setBrief('')}
+                className="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full transition-colors font-body normal-case"
+              >
+                Clear
+              </button>
+              <button
+                onClick={() => setBrief('Black Friday is approaching. Generate creative territories for Everyday Rewards to position everyday value against limited-time sales events. Focus on consistent benefits vs one-off deals.')}
+                className="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full transition-colors font-body normal-case"
+              >
+                Sample Brief
+              </button>
+            </div>
+          )}
         </div>
-        <textarea
-          value={brief}
-          onChange={(e) => setBrief(e.target.value)}
-          placeholder="Describe your campaign objective, target audience, key messaging, and competitive context..."
-          className="w-full h-40 bg-transparent text-black placeholder-gray-700 font-body font-normal text-lg resize-none outline-none normal-case"
-          maxLength={2000}
-        />
-        {brief && (
-          <div className="mt-4 flex gap-2">
-            <button
-              onClick={() => setBrief('')}
-              className="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full transition-colors font-body normal-case"
-            >
-              Clear
-            </button>
-            <button
-              onClick={() => setBrief('Black Friday is approaching. Generate creative territories for Everyday Rewards to position everyday value against limited-time sales events. Focus on consistent benefits vs one-off deals.')}
-              className="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full transition-colors font-body normal-case"
-            >
-              Sample Brief
-            </button>
-          </div>
-        )}
-      </div>
+      ) : (
+        <div className="mb-8">
+          <BriefBuilder 
+            onBriefChange={setBrief}
+            initialBrief={brief}
+          />
+        </div>
+      )}
 
       {/* Shopping Moments Calendar */}
       <ShoppingMoments onMomentSelect={onMomentSelect} />

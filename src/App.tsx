@@ -13,6 +13,7 @@ export interface Headline {
   followUp: string;
   reasoning: string;
   confidence: number;
+  starred?: boolean;
 }
 
 export interface Territory {
@@ -21,6 +22,7 @@ export interface Territory {
   positioning: string;
   tone: string;
   headlines: Headline[];
+  starred?: boolean;
 }
 
 export interface ComplianceData {
@@ -62,41 +64,114 @@ const BreadApp: React.FC = () => {
   const [showToast, setShowToast] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string>('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+  const [starredItems, setStarredItems] = useState<{territories: string[], headlines: {[territoryId: string]: number[]}}>({
+    territories: [],
+    headlines: {}
+  });
 
   const [prompts, setPrompts] = useState<Prompts>({
-    systemInstructions: `You are BREAD®, a creative AI platform designed to generate high-quality advertising territories and headlines for Everyday Rewards, Australia's largest loyalty program.
+    systemInstructions: `# EXTREME COMEDY MODE: Unhinged Australian Creator
 
-Your role is to:
-1. Generate 6 distinct creative territories with unique positioning
-2. Create 3 compelling headlines per territory
-3. Ensure Australian market relevance and cultural nuances
-4. Maintain brand consistency with Everyday Rewards values
-5. Provide compliance guidance for ACCC standards
+YOU ARE NOT A MARKETER. YOU ARE A COMEDY WRITER WHO SELLS STUFF BY ACCIDENT.
 
-Always structure your response with clear separation between TERRITORIES and EXECUTIONS.`,
+🚨 CRITICAL: Every headline MUST be a SETUP → PUNCHLINE structure that makes people spit out their coffee.
+
+## MANDATORY COMEDY FORMULA:
+
+### HEADLINE STRUCTURE (NON-NEGOTIABLE):
+- **LINE 1 (SETUP)**: Normal situation that everyone relates to (3-6 words)
+- **LINE 2 (PUNCHLINE)**: Unexpected, absurd, or brutally honest twist (3-8 words)
+
+### EXAMPLES OF WHAT WE WANT:
+✅ "I collect loyalty points. / Like some people collect childhood trauma."
+✅ "Your shopping apps have trust issues. / Ours just has abandonment issues."
+✅ "POV: Your rewards program / needs its own therapy session."
+✅ "Discount hunting is exhausting. / Like dating but with more receipts."
+
+### COMEDY STYLES TO CYCLE THROUGH:
+
+**DRY/DEADPAN**: Treat ridiculous things as completely normal
+- "I save money every day. / It's like a hobby but more depressing."
+
+**ABSURD ESCALATION**: Take normal situations to insane extremes  
+- "You have 47 loyalty apps. / They're forming their own support group."
+
+**SELF-DEPRECATING**: Make fun of the brand/situation
+- "We're not perfect. / But at least we're not your ex."
+
+**BRUTALLY HONEST**: Say what everyone's thinking
+- "Loyalty programs are usually trash. / Plot twist: So are we sometimes."
+
+## 🔥 COMEDY REQUIREMENTS:
+
+1. **SHOCK FACTOR**: Would this get screenshotted and sent to friends?
+2. **RELATABILITY**: Does this make people go "OMG SO TRUE"?
+3. **UNEXPECTED**: Does the punchline surprise even you?
+4. **QUOTABLE**: Would people use this as their Instagram caption?
+
+## BANNED WORDS/PHRASES:
+❌ "Great value" 
+❌ "Consistent benefits"
+❌ "Smart shopping"
+❌ "Join the family"
+❌ Any corporate buzzwords
+
+## REQUIRED ENERGY:
+Think: Drunk friend giving life advice + Australian chaos + TikTok comedian + that person who roasts everyone in the group chat.
+
+## ABSOLUTE RULES:
+- Every headline = SETUP + PUNCHLINE (no exceptions)
+- Make it SO funny that compliance gets nervous
+- If it's safe enough for LinkedIn, it's not funny enough
+- Would your most sarcastic friend approve? No? Try again.
+
+REMEMBER: Comedy first, selling second. Make them laugh so hard they forget they're being advertised to.`,
     
-    brandGuidelines: `EVERYDAY REWARDS BRAND GUIDELINES:
+    brandGuidelines: `EVERYDAY REWARDS CREATOR GUIDELINES:
 
-Brand Personality: Friendly, helpful, rewarding, accessible
-Tone of Voice: Conversational, optimistic, inclusive, Australian
-Key Messages: 
-- Every shop counts
-- Rewards that matter
-- Making everyday better
-- Value for all Australians
+Brand Vibe: That mate who always has your back vs corporate loyalty program energy
+Creator Voice: Australian TikToker who gets it, not marketing department memo
+Anti-Messages: 
+- "POV: You're tired of discount hunting like it's a sport"
+- "Tell me you're over flash sales without telling me"
+- "This loyalty program actually makes sense"
+- "Finally, rewards that don't require a PhD to understand"
 
-Competitive Context:
-- Position against one-off sales events
-- Emphasize ongoing value vs limited-time offers
-- Highlight accessibility and inclusivity
-- Focus on everyday benefits over flashy promotions`,
+Cultural Reality Check:
+- We're competing with creators, not just other brands
+- Aussies can smell corporate BS from space
+- Every headline needs to survive the group chat test
+- Sound like someone's bestie, not their bank`,
 
-    territoryPrompt: `Generate exactly 6 creative territories. Each territory should include:
-- A catchy title (2-4 words)
-- Clear positioning statement (1-2 sentences)
-- Distinct strategic angle
+    territoryPrompt: `TERRITORY GENERATION PROMPT
+When creating broad campaign territories or strategic creative directions:
 
-Territory themes should explore:
+TERRITORY FRAMEWORK
+
+Cultural Moment: What's happening in culture that we can authentically tap into?
+Audience Tension: What frustration, desire, or shared experience drives our audience?
+Brand Truth: What can our brand uniquely own in this space?
+Emotional Territory: What feeling do we want to own? (Relief, vindication, discovery, community, etc.)
+Platform Playground: How does this territory play differently across TikTok/Instagram/YouTube?
+
+TERRITORY TYPES TO EXPLORE
+
+The Confession: "Things we all do but never admit"
+The Exposé: "Calling out industry BS"
+The Discovery: "You've been doing it wrong this whole time"
+The Community: "For everyone who..."
+The Celebration: "Finally, someone made this"
+The Rebellion: "We're not like other [category]"
+
+OUTPUT STRUCTURE FOR TERRITORIES
+Territory Name: [Catchy 2-4 word phrase]
+Core Insight: [One sentence audience truth]
+Emotional Positioning: [What feeling we own]
+Cultural Hook: [What trend/moment we're tapping]
+Platform Strategy: [How it adapts across channels]
+Proof Points: [3-5 ways to demonstrate this territory]
+
+Generate exactly 6 creative territories exploring themes like:
 - Everyday value vs event-driven savings
 - Inclusive rewards for all Australians  
 - Smart shopping without the pressure
@@ -104,13 +179,73 @@ Territory themes should explore:
 - Community and belonging
 - Australian cultural moments`,
 
-    headlinePrompt: `For each territory, create exactly 3 headlines that:
-- Capture the territory's core message
-- Use conversational Australian tone
-- Include specific value propositions
-- Are suitable for digital advertising
-- Range from 4-12 words each
-- Avoid hyperbole or unsubstantiated claims`,
+    headlinePrompt: `🚨 EXTREME HEADLINE FORMULA 🚨
+
+FORGET EVERYTHING. THIS IS THE ONLY STRUCTURE THAT MATTERS:
+
+## MANDATORY FORMAT (DO NOT DEVIATE):
+
+**text** field = SETUP (3-6 words that create relatable tension)
+**followUp** field = PUNCHLINE (3-8 words that deliver the absurd twist)
+
+## COMEDY TEMPLATES (COPY THESE VIBES):
+
+**TEMPLATE 1 - CONFESSION STYLE:**
+Setup: "I [normal relatable action]"
+Punchline: "Like [ridiculous comparison]"
+Example: "I hunt for discounts. / Like a serial killer hunts victims."
+
+**TEMPLATE 2 - POV CHAOS:**
+Setup: "POV: Your [thing]"  
+Punchline: "[absurd situation]"
+Example: "POV: Your loyalty app / needs therapy more than you do."
+
+**TEMPLATE 3 - COUNTING ABSURDITY:**
+Setup: "You have [number] [things]"
+Punchline: "[ridiculous consequence]"
+Example: "You have 12 shopping apps. / They're staging an intervention."
+
+**TEMPLATE 4 - SIMPLE STATEMENT DESTRUCTION:**
+Setup: "[Normal statement]"
+Punchline: "[Brutal/absurd reality check]"
+Example: "Loyalty programs are great. / Said no one ever, seriously."
+
+**TEMPLATE 5 - RELATIONSHIP METAPHORS:**
+Setup: "[Brand/shopping behavior]"
+Punchline: "Like [dating/relationship chaos]"
+Example: "Discount hunting is exhausting. / Like dating but with more receipts."
+
+## 🎯 PUNCHLINE GENERATORS:
+
+**For BRUTAL HONESTY:** "Plot twist: [uncomfortable truth]"
+**For THERAPY JOKES:** "[Thing] needs therapy / [Thing] has abandonment issues"
+**For SUPPORT GROUP:** "[Things] are forming a support group"
+**For RELATIONSHIP:** "Like [dating scenario] but [shopping twist]"
+**For INTERVENTION:** "[Things] are staging an intervention"
+**For FAMILY DRAMA:** "[Thing] is the toxic family member"
+
+## ⚡ GENERATION RULES:
+
+1. **Setup MUST be universally relatable** (everyone has experienced this)
+2. **Punchline MUST be completely unexpected** (make people double-take)
+3. **Use Australian slang/energy** but keep it accessible  
+4. **Make compliance sweat** (push boundaries but stay legal)
+5. **Screenshot test**: Would people send this to friends?
+
+## 🚫 INSTANT REJECTION CRITERIA:
+- If it sounds like marketing copy = FAIL
+- If your mum would approve = FAIL  
+- If it could be on a corporate poster = FAIL
+- If it doesn't make you uncomfortable = FAIL
+
+## 🔥 SUCCESS CRITERIA:
+- Makes people snort-laugh unexpectedly ✅
+- Gets quoted in group chats ✅  
+- Makes compliance nervous but legal ✅
+- Sounds like drunk friend giving advice ✅
+
+GENERATE 3 HEADLINES PER TERRITORY USING DIFFERENT COMEDY STYLES.
+EVERY. SINGLE. ONE. MUST. FOLLOW. SETUP → PUNCHLINE. NO EXCEPTIONS.`,
 
     compliancePrompt: `Provide compliance guidance covering:
 - ACCC advertising standards alignment
@@ -152,14 +287,16 @@ Territory themes should explore:
       openai: savedOpenAI || ''
     });
 
-    if (savedPrompts) {
-      try {
-        const parsedPrompts = JSON.parse(savedPrompts);
-        setPrompts(parsedPrompts);
-      } catch (error) {
-        console.log('Could not parse saved prompts, using defaults');
-      }
-    }
+    // FORCE USE NEW CREATOR GUIDELINES - ignore cached prompts temporarily
+    console.log('🔥 Forcing new creator guidelines, ignoring localStorage cache');
+    // if (savedPrompts) {
+    //   try {
+    //     const parsedPrompts = JSON.parse(savedPrompts);
+    //     setPrompts(parsedPrompts);
+    //   } catch (error) {
+    //     console.log('Could not parse saved prompts, using defaults');
+    //   }
+    // }
   }, []);
 
   const handleApiKeyUpdate = (provider: keyof ApiKeys, key: string) => {
@@ -201,7 +338,72 @@ Territory themes should explore:
     }));
   };
 
-  const handleGenerate = async () => {
+  // Star management functions
+  const toggleTerritoryStarred = (territoryId: string) => {
+    setStarredItems(prev => ({
+      ...prev,
+      territories: prev.territories.includes(territoryId)
+        ? prev.territories.filter(id => id !== territoryId)
+        : [...prev.territories, territoryId]
+    }));
+    
+    // Update generatedOutput with star status
+    if (generatedOutput) {
+      const updatedTerritories = generatedOutput.territories.map(territory => 
+        territory.id === territoryId 
+          ? { ...territory, starred: !territory.starred }
+          : territory
+      );
+      setGeneratedOutput({
+        ...generatedOutput,
+        territories: updatedTerritories
+      });
+    }
+  };
+
+  const toggleHeadlineStarred = (territoryId: string, headlineIndex: number) => {
+    setStarredItems(prev => {
+      const territoryHeadlines = prev.headlines[territoryId] || [];
+      const updatedHeadlines = territoryHeadlines.includes(headlineIndex)
+        ? territoryHeadlines.filter(index => index !== headlineIndex)
+        : [...territoryHeadlines, headlineIndex];
+      
+      return {
+        ...prev,
+        headlines: {
+          ...prev.headlines,
+          [territoryId]: updatedHeadlines
+        }
+      };
+    });
+
+    // Update generatedOutput with star status
+    if (generatedOutput) {
+      const updatedTerritories = generatedOutput.territories.map(territory => {
+        if (territory.id === territoryId) {
+          const updatedHeadlines = territory.headlines.map((headline, index) =>
+            index === headlineIndex 
+              ? { ...headline, starred: !headline.starred }
+              : headline
+          );
+          return { ...territory, headlines: updatedHeadlines };
+        }
+        return territory;
+      });
+      setGeneratedOutput({
+        ...generatedOutput,
+        territories: updatedTerritories
+      });
+    }
+  };
+
+  const getStarredCount = () => {
+    const starredTerritories = starredItems.territories.length;
+    const starredHeadlines = Object.values(starredItems.headlines).reduce((sum, headlines) => sum + headlines.length, 0);
+    return { territories: starredTerritories, headlines: starredHeadlines };
+  };
+
+  const handleGenerate = async (regenerateMode: boolean = false) => {
     if (!brief.trim()) {
       setError('Please enter a brief before generating.');
       return;
@@ -215,10 +417,46 @@ Territory themes should explore:
 
     setIsGenerating(true);
     setError('');
-    setShowOutput(false);
+    if (!regenerateMode) {
+      setShowOutput(false);
+    }
     setShowBriefAnalysis(false);
 
     try {
+      let promptAddition = '';
+      
+      // If regenerating, add instruction to preserve starred items
+      if (regenerateMode && generatedOutput) {
+        const starredCount = getStarredCount();
+        
+        if (starredCount.territories > 0 || starredCount.headlines > 0) {
+          promptAddition = `
+
+REGENERATION MODE: 
+- Keep the following starred territories exactly as they are: ${starredItems.territories.join(', ')}
+- Generate new territories to replace any unstarred ones
+- For starred territories, keep starred headlines exactly as they are
+- Generate new headlines only for unstarred headline positions
+- Maintain the same total number of territories (${generatedOutput.territories.length}) and headlines per territory (3)
+
+STARRED CONTENT TO PRESERVE:
+${generatedOutput.territories
+  .filter(t => t.starred)
+  .map(t => `Territory ${t.id}: "${t.title}" - ${t.positioning}`)
+  .join('\n')}
+
+${Object.entries(starredItems.headlines)
+  .map(([territoryId, headlineIndices]) => 
+    headlineIndices.length > 0 ? 
+    `Territory ${territoryId} starred headlines: ${headlineIndices.map(i => 
+      generatedOutput.territories.find(t => t.id === territoryId)?.headlines[i]?.text || ''
+    ).join(', ')}` : ''
+  )
+  .filter(Boolean)
+  .join('\n')}`;
+        }
+      }
+
       // Construct full prompt
       const fullPrompt = `${prompts.systemInstructions}
 
@@ -230,7 +468,21 @@ ${prompts.territoryPrompt}
 
 ${prompts.headlinePrompt}
 
-${prompts.compliancePrompt}
+${prompts.compliancePrompt}${promptAddition}
+
+FINAL CREATIVE DIRECTIVE:
+Remember: Write like a creator, not a corporation. Every headline MUST follow HOOK + PUNCHLINE format:
+
+HOOK (text field): Sets up the tension (3-6 words)
+PUNCHLINE (followUp field): Delivers the payoff (3-8 words)
+
+Examples of proper structure:
+✅ "I hunt for discounts. / Like a serial killer hunts victims."
+✅ "You have 12 shopping apps. / We have one brain cell."
+✅ "POV: Your loyalty program / ghosted you for someone richer."
+
+❌ Avoid single-line headlines without setup/payoff
+❌ Avoid corporate taglines that don't create tension
 
 Please provide a structured response with territories, headlines, and compliance guidance.`;
 
@@ -238,7 +490,12 @@ Please provide a structured response with territories, headlines, and compliance
       const result = await generateWithOpenAI(fullPrompt, apiKeys.openai);
 
       // Enhance the output with confidence scoring
-      const enhancedResult = enhanceGeneratedOutput(result, brief);
+      let enhancedResult = enhanceGeneratedOutput(result, brief);
+      
+      // If regenerating, merge with existing starred content
+      if (regenerateMode && generatedOutput) {
+        enhancedResult = mergeWithStarredContent(enhancedResult, generatedOutput, starredItems);
+      }
       
       setGeneratedOutput(enhancedResult);
       setShowOutput(true);
@@ -248,6 +505,42 @@ Please provide a structured response with territories, headlines, and compliance
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  // Function to merge new content with starred items
+  const mergeWithStarredContent = (newOutput: any, existingOutput: any, starred: any) => {
+    const mergedTerritories = newOutput.territories.map((newTerritory: any, index: number) => {
+      const existingTerritory = existingOutput.territories[index];
+      
+      // If territory is starred, keep the existing one
+      if (existingTerritory && existingTerritory.starred) {
+        return { ...existingTerritory, starred: true };
+      }
+      
+      // For unstarred territories, merge headlines
+      const territoryId = existingTerritory?.id || newTerritory.id;
+      const starredHeadlineIndices = starred.headlines[territoryId] || [];
+      
+      const mergedHeadlines = newTerritory.headlines.map((newHeadline: any, hIndex: number) => {
+        // If headline is starred, keep the existing one
+        if (starredHeadlineIndices.includes(hIndex) && existingTerritory?.headlines[hIndex]) {
+          return { ...existingTerritory.headlines[hIndex], starred: true };
+        }
+        return { ...newHeadline, starred: false };
+      });
+      
+      return {
+        ...newTerritory,
+        id: territoryId,
+        headlines: mergedHeadlines,
+        starred: false
+      };
+    });
+    
+    return {
+      ...newOutput,
+      territories: mergedTerritories
+    };
   };
 
   const handleMomentSelect = (moment: { name: string; date: string }) => {
@@ -346,7 +639,12 @@ Please provide a structured response with territories, headlines, and compliance
               setBrief('');
               setGeneratedOutput(null);
               setShowBriefAnalysis(false);
+              setStarredItems({ territories: [], headlines: {} });
             }}
+            onRegenerateUnstarred={() => handleGenerate(true)}
+            onToggleTerritoryStarred={toggleTerritoryStarred}
+            onToggleHeadlineStarred={toggleHeadlineStarred}
+            starredItems={starredItems}
           />
         )}
       </div>
@@ -354,7 +652,7 @@ Please provide a structured response with territories, headlines, and compliance
       {/* Progress Bar */}
       <ProgressBar 
         isVisible={isGenerating}
-        duration={20000} // 20 seconds estimated duration
+        duration={30000} // 30 seconds estimated duration
       />
 
       {/* Toast Notification */}

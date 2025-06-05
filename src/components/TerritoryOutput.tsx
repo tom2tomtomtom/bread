@@ -1,17 +1,158 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { EnhancedGeneratedOutput } from '../services/enhancementService';
 import { ConfidenceScoring } from './ConfidenceScoring';
 
 interface TerritoryOutputProps {
   generatedOutput: EnhancedGeneratedOutput;
   onNewBrief: () => void;
+  onRegenerateUnstarred: () => void;
+  onToggleTerritoryStarred: (territoryId: string) => void;
+  onToggleHeadlineStarred: (territoryId: string, headlineIndex: number) => void;
+  starredItems: {territories: string[], headlines: {[territoryId: string]: number[]}};
 }
 
-export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({ generatedOutput, onNewBrief }) => {
+export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({ 
+  generatedOutput, 
+  onNewBrief, 
+  onRegenerateUnstarred,
+  onToggleTerritoryStarred,
+  onToggleHeadlineStarred,
+  starredItems 
+}) => {
+  const [showConfidenceReport, setShowConfidenceReport] = useState(false);
+
   const handleReset = () => {
     if (window.confirm('Are you sure you want to start a new brief? This will clear all current results.')) {
       onNewBrief();
     }
+  };
+
+  const generateConfidenceReport = () => {
+    setShowConfidenceReport(true);
+  };
+
+  const exportToPDF = () => {
+    // Create formatted content for PDF
+    const content = {
+      title: 'BREAD Creative Territories Report',
+      timestamp: new Date().toLocaleString(),
+      overallConfidence: generatedOutput.overallConfidence,
+      territories: generatedOutput.territories.map(territory => ({
+        id: territory.id,
+        title: territory.title,
+        positioning: territory.positioning,
+        tone: territory.tone,
+        confidence: Math.round((territory.confidence.marketFit + territory.confidence.complianceConfidence + territory.confidence.audienceResonance) / 3),
+        riskLevel: territory.confidence.riskLevel,
+        headlines: territory.headlines.map(h => ({
+          text: h.text,
+          followUp: h.followUp,
+          reasoning: h.reasoning,
+          confidence: h.confidence
+        }))
+      })),
+      compliance: generatedOutput.compliance
+    };
+
+    // Simple PDF generation using browser print
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>BREAD Creative Report</title>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
+              .header { text-align: center; margin-bottom: 30px; }
+              .confidence-score { background: #f0f0f0; padding: 10px; border-radius: 5px; margin: 10px 0; }
+              .territory { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+              .headline { margin: 10px 0; padding: 10px; background: #f9f9f9; border-radius: 3px; }
+              .confidence-high { color: #22c55e; font-weight: bold; }
+              .confidence-medium { color: #f59e0b; font-weight: bold; }
+              .confidence-low { color: #ef4444; font-weight: bold; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>BREAD® Creative Territories Report</h1>
+              <p>Generated: ${content.timestamp}</p>
+              <div class="confidence-score">
+                <h2>Overall Confidence: <span class="${content.overallConfidence >= 80 ? 'confidence-high' : content.overallConfidence >= 60 ? 'confidence-medium' : 'confidence-low'}">${content.overallConfidence}%</span></h2>
+              </div>
+            </div>
+            ${content.territories.map(territory => `
+              <div class="territory">
+                <h3>${territory.id}: "${territory.title}"</h3>
+                <p><strong>Positioning:</strong> ${territory.positioning}</p>
+                <p><strong>Tone:</strong> ${territory.tone}</p>
+                <p><strong>Confidence:</strong> <span class="${territory.confidence >= 80 ? 'confidence-high' : territory.confidence >= 60 ? 'confidence-medium' : 'confidence-low'}">${territory.confidence}%</span></p>
+                <p><strong>Risk Level:</strong> ${territory.riskLevel}</p>
+                <h4>Headlines:</h4>
+                ${territory.headlines.map(headline => `
+                  <div class="headline">
+                    <p><strong>"${headline.text}"</strong></p>
+                    <p>${headline.followUp}</p>
+                    <p><em>Why this works:</em> ${headline.reasoning}</p>
+                    <p><strong>Confidence:</strong> <span class="${headline.confidence >= 80 ? 'confidence-high' : headline.confidence >= 60 ? 'confidence-medium' : 'confidence-low'}">${headline.confidence}%</span></p>
+                  </div>
+                `).join('')}
+              </div>
+            `).join('')}
+            <div class="territory">
+              <h3>Compliance Summary</h3>
+              <p><strong>Output:</strong> ${content.compliance.output}</p>
+              <p><strong>Powered by:</strong> ${content.compliance.powerBy.join(', ')}</p>
+              <p><strong>Notes:</strong></p>
+              <ul>${content.compliance.notes.map(note => `<li>${note}</li>`).join('')}</ul>
+            </div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
+
+  const exportToCSV = () => {
+    // Create CSV content
+    const csvData = [];
+    
+    // Headers
+    csvData.push(['Territory ID', 'Title', 'Positioning', 'Tone', 'Territory Confidence', 'Risk Level', 'Headline Text', 'Follow-up', 'Reasoning', 'Headline Confidence']);
+    
+    // Data rows
+    generatedOutput.territories.forEach(territory => {
+      const territoryConfidence = Math.round((territory.confidence.marketFit + territory.confidence.complianceConfidence + territory.confidence.audienceResonance) / 3);
+      
+      territory.headlines.forEach(headline => {
+        csvData.push([
+          territory.id,
+          territory.title,
+          territory.positioning.replace(/,/g, ';'), // Replace commas to avoid CSV issues
+          territory.tone.replace(/,/g, ';'),
+          territoryConfidence,
+          territory.confidence.riskLevel,
+          headline.text.replace(/,/g, ';'),
+          headline.followUp.replace(/,/g, ';'),
+          headline.reasoning.replace(/,/g, ';'),
+          headline.confidence
+        ]);
+      });
+    });
+    
+    // Convert to CSV string
+    const csvContent = csvData.map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+    
+    // Download CSV
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `bread-creative-territories-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -66,8 +207,21 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({ generatedOutpu
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="flex justify-between items-center mb-3">
-                  <div className="text-xs font-bold text-red-600 bg-white/20 px-2 py-1 rounded-full">
-                    {territory.id}
+                  <div className="flex items-center gap-2">
+                    <div className="text-xs font-bold text-red-600 bg-white/20 px-2 py-1 rounded-full">
+                      {territory.id}
+                    </div>
+                    <button
+                      onClick={() => onToggleTerritoryStarred(territory.id)}
+                      className={`text-lg transition-all duration-300 hover:scale-110 ${
+                        starredItems.territories.includes(territory.id) 
+                          ? 'text-yellow-500 drop-shadow-lg' 
+                          : 'text-gray-400 hover:text-yellow-400'
+                      }`}
+                      title={starredItems.territories.includes(territory.id) ? 'Unstar territory' : 'Star territory'}
+                    >
+                      {starredItems.territories.includes(territory.id) ? '⭐' : '☆'}
+                    </button>
                   </div>
                   <div className={`text-xs font-bold px-2 py-1 rounded-full ${
                     Math.round((territory.confidence.marketFit + territory.confidence.complianceConfidence + territory.confidence.audienceResonance) / 3) >= 80 ? 'bg-green-400 text-white' :
@@ -126,7 +280,20 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({ generatedOutpu
                     
                     {/* Individual Headline Confidence */}
                     <div className="flex justify-between items-center">
-                      <span className="text-xs font-subheading text-blue-200">HEADLINE CONFIDENCE:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-subheading text-blue-200">HEADLINE CONFIDENCE:</span>
+                        <button
+                          onClick={() => onToggleHeadlineStarred(territory.id, hIndex)}
+                          className={`text-lg transition-all duration-300 hover:scale-110 ${
+                            (starredItems.headlines[territory.id] || []).includes(hIndex)
+                              ? 'text-yellow-300 drop-shadow-lg' 
+                              : 'text-gray-300 hover:text-yellow-200'
+                          }`}
+                          title={(starredItems.headlines[territory.id] || []).includes(hIndex) ? 'Unstar headline' : 'Star headline'}
+                        >
+                          {(starredItems.headlines[territory.id] || []).includes(hIndex) ? '⭐' : '☆'}
+                        </button>
+                      </div>
                       <div className={`px-3 py-1 rounded-full font-bold text-sm ${
                         headline.confidence >= 80 ? 'bg-green-400 text-green-900' :
                         headline.confidence >= 60 ? 'bg-yellow-400 text-yellow-900' :
@@ -210,19 +377,150 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({ generatedOutpu
         </div>
       </div>
 
+      {/* Confidence Report Modal */}
+      {showConfidenceReport && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-purple-900/90 via-blue-900/90 to-purple-900/90 backdrop-blur-xl border border-purple-400/30 rounded-3xl p-8 shadow-2xl max-w-4xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-headline text-white">📊 CONFIDENCE REPORT</h3>
+              <button
+                onClick={() => setShowConfidenceReport(false)}
+                className="bg-white/10 hover:bg-white/20 px-3 py-1 rounded-lg text-gray-300 hover:text-white transition-all"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              {/* Overall Stats */}
+              <div className="bg-white/10 rounded-xl p-6">
+                <h4 className="font-subheading text-purple-300 mb-4">OVERALL PERFORMANCE</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white">{generatedOutput.overallConfidence}%</div>
+                    <div className="text-xs text-gray-300 font-body normal-case">Overall Confidence</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white">{generatedOutput.territories.length}</div>
+                    <div className="text-xs text-gray-300 font-body normal-case">Territories</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white">{generatedOutput.territories.reduce((sum, t) => sum + t.headlines.length, 0)}</div>
+                    <div className="text-xs text-gray-300 font-body normal-case">Headlines</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white">{Math.round(generatedOutput.territories.reduce((sum, t) => sum + t.confidence.complianceConfidence, 0) / generatedOutput.territories.length)}%</div>
+                    <div className="text-xs text-gray-300 font-body normal-case">Compliance</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Territory Breakdown */}
+              <div className="space-y-4">
+                <h4 className="font-subheading text-purple-300">TERRITORY BREAKDOWN</h4>
+                {generatedOutput.territories.map((territory, index) => {
+                  const avgConfidence = Math.round((territory.confidence.marketFit + territory.confidence.complianceConfidence + territory.confidence.audienceResonance) / 3);
+                  const avgHeadlineConfidence = Math.round(territory.headlines.reduce((sum, h) => sum + h.confidence, 0) / territory.headlines.length);
+                  
+                  return (
+                    <div key={territory.id} className="bg-white/5 rounded-lg p-4">
+                      <div className="flex justify-between items-center mb-3">
+                        <h5 className="font-subheading text-white">{territory.id}: {territory.title}</h5>
+                        <div className={`px-3 py-1 rounded-full text-sm font-bold ${
+                          avgConfidence >= 80 ? 'bg-green-400 text-green-900' :
+                          avgConfidence >= 60 ? 'bg-yellow-400 text-yellow-900' :
+                          'bg-red-400 text-red-900'
+                        }`}>
+                          {avgConfidence}%
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                        <div>
+                          <div className="text-gray-400 font-body normal-case">Market Fit</div>
+                          <div className="text-white font-bold">{territory.confidence.marketFit}%</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-400 font-body normal-case">Compliance</div>
+                          <div className="text-white font-bold">{territory.confidence.complianceConfidence}%</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-400 font-body normal-case">Audience Resonance</div>
+                          <div className="text-white font-bold">{territory.confidence.audienceResonance}%</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-400 font-body normal-case">Avg Headlines</div>
+                          <div className="text-white font-bold">{avgHeadlineConfidence}%</div>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-2">
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          territory.confidence.riskLevel === 'LOW' ? 'bg-green-500/20 text-green-300' :
+                          territory.confidence.riskLevel === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-300' :
+                          'bg-red-500/20 text-red-300'
+                        }`}>
+                          {territory.confidence.riskLevel} RISK
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Starred Items Summary */}
+      {(starredItems.territories.length > 0 || Object.values(starredItems.headlines).some(arr => arr.length > 0)) && (
+        <div className="backdrop-blur-xl bg-yellow-500/10 border border-yellow-500/20 rounded-3xl p-6 shadow-2xl text-center">
+          <h3 className="text-lg font-subheading text-yellow-400 mb-3">⭐ STARRED ITEMS</h3>
+          <div className="flex justify-center gap-6 text-sm font-body normal-case">
+            <div className="text-gray-300">
+              <span className="font-bold text-white">{starredItems.territories.length}</span> starred territories
+            </div>
+            <div className="text-gray-300">
+              <span className="font-bold text-white">{Object.values(starredItems.headlines).reduce((sum, arr) => sum + arr.length, 0)}</span> starred headlines
+            </div>
+          </div>
+          <p className="text-xs text-gray-400 mt-2 font-body normal-case">
+            Starred items will be preserved during regeneration
+          </p>
+        </div>
+      )}
+
       {/* Enhanced Action Buttons */}
-      <div className="flex gap-4 justify-center">
-        <button className="bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/30 px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2">
+      <div className="flex gap-4 justify-center flex-wrap">
+        {(starredItems.territories.length > 0 || Object.values(starredItems.headlines).some(arr => arr.length > 0)) && (
+          <button 
+            onClick={onRegenerateUnstarred}
+            className="bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 hover:from-yellow-500/30 hover:to-yellow-600/30 border border-yellow-500/30 hover:border-yellow-400/40 px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 text-yellow-300 hover:text-yellow-200"
+          >
+            <span>⭐</span>
+            REGENERATE UNSTARRED
+          </button>
+        )}
+        <button 
+          onClick={generateConfidenceReport}
+          className="bg-gradient-to-r from-purple-500/20 to-purple-600/20 hover:from-purple-500/30 hover:to-purple-600/30 border border-purple-500/30 hover:border-purple-400/40 px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 text-purple-300 hover:text-purple-200"
+        >
           <span>📊</span>
           CONFIDENCE REPORT
         </button>
-        <button className="bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/30 px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2">
+        <button 
+          onClick={exportToPDF}
+          className="bg-gradient-to-r from-blue-500/20 to-blue-600/20 hover:from-blue-500/30 hover:to-blue-600/30 border border-blue-500/30 hover:border-blue-400/40 px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 text-blue-300 hover:text-blue-200"
+        >
           <span>📥</span>
           EXPORT PDF
         </button>
-        <button className="bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/30 px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2">
-          <span>📧</span>
-          EMAIL BRIEF
+        <button 
+          onClick={exportToCSV}
+          className="bg-gradient-to-r from-green-500/20 to-green-600/20 hover:from-green-500/30 hover:to-green-600/30 border border-green-500/30 hover:border-green-400/40 px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 text-green-300 hover:text-green-200"
+        >
+          <span>📊</span>
+          EXPORT CSV
         </button>
         <button 
           onClick={handleReset}
