@@ -1,18 +1,26 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { generateWithOpenAI, generateWithClaude } from './services/aiService';
+import { generateWithOpenAI } from './services/aiService';
 import { analyzeBrief, enhanceGeneratedOutput, EnhancedGeneratedOutput, BriefAnalysis } from './services/enhancementService';
-import { ShoppingMoments } from './components/ShoppingMoments';
 import { AdminPanel } from './components/AdminPanel';
 import { BriefEnhancement } from './components/BriefEnhancement';
 import { TerritoryOutput } from './components/TerritoryOutput';
 import { BriefInput } from './components/BriefInput';
+import { Toast } from './components/Toast';
+import { ProgressBar } from './components/ProgressBar';
+
+export interface Headline {
+  text: string;
+  followUp: string;
+  reasoning: string;
+  confidence: number;
+}
 
 export interface Territory {
   id: string;
   title: string;
   positioning: string;
   tone: string;
-  headlines: string[];
+  headlines: Headline[];
 }
 
 export interface ComplianceData {
@@ -36,11 +44,10 @@ export interface Prompts {
 
 export interface ApiKeys {
   openai: string;
-  claude: string;
 }
 
 const BreadApp: React.FC = () => {
-  const [selectedAI, setSelectedAI] = useState<'openai' | 'claude'>('openai');
+  // AI is now fixed to OpenAI only
   const [brief, setBrief] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [showOutput, setShowOutput] = useState<boolean>(false);
@@ -48,11 +55,13 @@ const BreadApp: React.FC = () => {
   const [generatedOutput, setGeneratedOutput] = useState<EnhancedGeneratedOutput | null>(null);
   const [error, setError] = useState<string>('');
   const [apiKeys, setApiKeys] = useState<ApiKeys>({
-    openai: '',
-    claude: ''
+    openai: ''
   });
   const [apiKeysSaved, setApiKeysSaved] = useState<boolean>(false);
   const [showBriefAnalysis, setShowBriefAnalysis] = useState<boolean>(false);
+  const [showToast, setShowToast] = useState<boolean>(false);
+  const [toastMessage, setToastMessage] = useState<string>('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
 
   const [prompts, setPrompts] = useState<Prompts>({
     systemInstructions: `You are BREAD®, a creative AI platform designed to generate high-quality advertising territories and headlines for Everyday Rewards, Australia's largest loyalty program.
@@ -134,15 +143,23 @@ Territory themes should explore:
     }
   }, [brief, showOutput]);
 
-  // Load API keys from localStorage on component mount
+  // Load API keys and prompts from localStorage on component mount
   useEffect(() => {
     const savedOpenAI = localStorage.getItem('bread_openai_key');
-    const savedClaude = localStorage.getItem('bread_claude_key');
+    const savedPrompts = localStorage.getItem('bread_prompts');
     
     setApiKeys({
-      openai: savedOpenAI || '',
-      claude: savedClaude || ''
+      openai: savedOpenAI || ''
     });
+
+    if (savedPrompts) {
+      try {
+        const parsedPrompts = JSON.parse(savedPrompts);
+        setPrompts(parsedPrompts);
+      } catch (error) {
+        console.log('Could not parse saved prompts, using defaults');
+      }
+    }
   }, []);
 
   const handleApiKeyUpdate = (provider: keyof ApiKeys, key: string) => {
@@ -154,9 +171,27 @@ Territory themes should explore:
 
   const saveApiKeys = () => {
     localStorage.setItem('bread_openai_key', apiKeys.openai);
-    localStorage.setItem('bread_claude_key', apiKeys.claude);
+    
+    // Show success toast
+    setToastMessage('API Key saved successfully!');
+    setToastType('success');
+    setShowToast(true);
+    
     setApiKeysSaved(true);
     setTimeout(() => setApiKeysSaved(false), 2000);
+    
+    // Auto-return to main view after toast shows
+    setTimeout(() => setShowAdmin(false), 2000);
+  };
+
+  const saveConfiguration = () => {
+    // Save prompts to localStorage (in production, this would save to database)
+    localStorage.setItem('bread_prompts', JSON.stringify(prompts));
+    
+    // Show success toast
+    setToastMessage('Prompt configuration saved successfully!');
+    setToastType('success');
+    setShowToast(true);
   };
 
   const handlePromptUpdate = (key: keyof Prompts, value: string) => {
@@ -172,10 +207,9 @@ Territory themes should explore:
       return;
     }
 
-    // Check if API key is available for selected AI
-    const requiredKey = selectedAI === 'openai' ? apiKeys.openai : apiKeys.claude;
-    if (!requiredKey) {
-      setError(`Please configure your ${selectedAI === 'openai' ? 'OpenAI' : 'Claude'} API key in the Admin panel before generating.`);
+    // Check if OpenAI API key is available
+    if (!apiKeys.openai) {
+      setError('Please configure your OpenAI API key in the Admin panel before generating.');
       return;
     }
 
@@ -200,12 +234,8 @@ ${prompts.compliancePrompt}
 
 Please provide a structured response with territories, headlines, and compliance guidance.`;
 
-      let result: GeneratedOutput;
-      if (selectedAI === 'openai') {
-        result = await generateWithOpenAI(fullPrompt, requiredKey);
-      } else {
-        result = await generateWithClaude(fullPrompt, requiredKey);
-      }
+      // Generate with OpenAI
+      const result = await generateWithOpenAI(fullPrompt, apiKeys.openai);
 
       // Enhance the output with confidence scoring
       const enhancedResult = enhanceGeneratedOutput(result, brief);
@@ -213,7 +243,7 @@ Please provide a structured response with territories, headlines, and compliance
       setGeneratedOutput(enhancedResult);
       setShowOutput(true);
     } catch (err) {
-      setError(`Failed to generate content with ${selectedAI === 'openai' ? 'OpenAI' : 'Claude'}. Please check your API key and try again.`);
+      setError('Failed to generate content with OpenAI. Please check your API key and try again.');
       console.error('Generation error:', err);
     } finally {
       setIsGenerating(false);
@@ -237,11 +267,11 @@ Please provide a structured response with territories, headlines, and compliance
           <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 shadow-2xl">
             <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-6xl font-black tracking-tight bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text text-transparent">
+                <h1 className="text-6xl font-logo tracking-tight bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text text-transparent">
                   BREAD<span className="text-4xl">®</span>
                 </h1>
-                <p className="text-xl mt-2 font-normal text-gray-300">
-                  A TECH ENABLED PLATFORM FOR EVERYDAY REWARDS
+                <p className="text-xl mt-2 font-body font-normal text-gray-300 normal-case">
+                  A tech enabled platform for Everyday Rewards
                 </p>
               </div>
               <div className="text-right">
@@ -254,13 +284,9 @@ Please provide a structured response with territories, headlines, and compliance
                 <div className="text-sm text-gray-400">
                   <div className="flex items-center gap-2 justify-end mb-1">
                     <div className={`w-2 h-2 rounded-full ${
-                      selectedAI === 'openai' 
-                        ? (apiKeys.openai ? 'bg-green-400' : 'bg-red-400')
-                        : (apiKeys.claude ? 'bg-green-400' : 'bg-red-400')
+                      apiKeys.openai ? 'bg-green-400' : 'bg-red-400'
                     }`}></div>
-                    {selectedAI === 'openai' ? 'OpenAI' : 'Claude'} {
-                      (selectedAI === 'openai' ? apiKeys.openai : apiKeys.claude) ? 'Ready' : 'No API Key'
-                    }
+                    OpenAI {apiKeys.openai ? 'Ready' : 'No API Key'}
                   </div>
                   <div className="text-xs">
                     Smart Analysis • {new Date().toLocaleDateString()}
@@ -281,6 +307,8 @@ Please provide a structured response with territories, headlines, and compliance
           onPromptUpdate={handlePromptUpdate}
           onApiKeyUpdate={handleApiKeyUpdate}
           onSaveApiKeys={saveApiKeys}
+          onSaveConfiguration={saveConfiguration}
+          onClose={() => setShowAdmin(false)}
         />
       )}
 
@@ -291,8 +319,6 @@ Please provide a structured response with territories, headlines, and compliance
           <BriefInput
             brief={brief}
             setBrief={setBrief}
-            selectedAI={selectedAI}
-            setSelectedAI={setSelectedAI}
             apiKeys={apiKeys}
             error={error}
             isGenerating={isGenerating}
@@ -324,6 +350,20 @@ Please provide a structured response with territories, headlines, and compliance
           />
         )}
       </div>
+
+      {/* Progress Bar */}
+      <ProgressBar 
+        isVisible={isGenerating}
+        duration={20000} // 20 seconds estimated duration
+      />
+
+      {/* Toast Notification */}
+      <Toast
+        message={toastMessage}
+        type={toastType}
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+      />
     </div>
   );
 };

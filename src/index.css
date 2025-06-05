@@ -2,16 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
 @layer base {
   body {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Helvetica Neue', 'Inter', 'Arial', system-ui, sans-serif;
     background: #000000;
     color: #ffffff;
   }
   
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+  /* Logo and big headlines - Druk Wide Super equivalent */
+  .font-logo, .font-headline {
+    font-family: 'Druk Wide Super', 'Impact', 'Arial Black', sans-serif;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+  
+  /* Subheadings and section titles - Druk Wide Bold equivalent */
+  .font-subheading, .font-section {
+    font-family: 'Druk Wide Bold', 'Arial Black', 'Helvetica', sans-serif;
     font-weight: 700;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+  
+  /* Body copy and supporting text */
+  .font-body, p, span, div {
+    font-family: 'Helvetica Neue', 'Inter', 'Arial', system-ui, sans-serif;
+    font-weight: 400;
+  }
+  
+  /* Default heading styles */
+  h1 {
+    font-family: 'Druk Wide Super', 'Impact', 'Arial Black', sans-serif;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+  
+  h2, h3, h4, h5, h6 {
+    font-family: 'Druk Wide Bold', 'Arial Black', 'Helvetica', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
   }
 }
 

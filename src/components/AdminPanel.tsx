@@ -8,6 +8,7 @@ interface AdminPanelProps {
   onPromptUpdate: (key: keyof Prompts, value: string) => void;
   onApiKeyUpdate: (provider: keyof ApiKeys, key: string) => void;
   onSaveApiKeys: () => void;
+  onSaveConfiguration: () => void;
   onClose: () => void; // Add onClose callback
 }
 
@@ -18,6 +19,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   onPromptUpdate,
   onApiKeyUpdate,
   onSaveApiKeys,
+  onSaveConfiguration,
   onClose
 }) => {
   const handleTemplateLoad = (templateName: string) => {
@@ -34,13 +36,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   };
 
   const handleSaveConfiguration = () => {
-    // In real implementation, this would save to database
-    alert('Configuration saved successfully!');
+    // Call the configuration save handler (shows toast)
+    onSaveConfiguration();
     
     // Auto-close admin panel after saving
     setTimeout(() => {
       onClose();
-    }, 500); // Small delay so user sees the success message
+    }, 1500); // Small delay so user sees the toast message
   };
 
   return (
@@ -184,7 +186,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             )}
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="mb-6">
             <div>
               <label className="block text-sm font-bold mb-2 text-gray-300">
                 OpenAI API Key
@@ -212,34 +214,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               <div className="text-xs text-gray-400 mt-1">
                 Get your key from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">OpenAI Platform</a>
               </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-bold mb-2 text-gray-300">
-                Claude API Key (Anthropic)
-                <span className={`ml-2 text-xs ${apiKeys.claude ? 'text-green-400' : 'text-red-400'}`}>
-                  {apiKeys.claude ? '● Connected' : '○ Not configured'}
-                </span>
-              </label>
-              <div className="relative">
-                <input
-                  type="password"
-                  value={apiKeys.claude}
-                  onChange={(e) => onApiKeyUpdate('claude', e.target.value)}
-                  placeholder="sk-ant-..."
-                  className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white font-normal focus:outline-none focus:border-blue-400/50 focus:bg-white/10 transition-all duration-300 pr-10"
-                />
-                {apiKeys.claude && (
-                  <button
-                    onClick={() => onApiKeyUpdate('claude', '')}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
-              <div className="text-xs text-gray-400 mt-1">
-                Get your key from <a href="https://console.anthropic.com/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">Anthropic Console</a>
+              <div className="text-xs text-blue-400 mt-2 bg-blue-400/10 p-2 rounded">
+                💡 BREAD now uses OpenAI exclusively for optimal browser compatibility
               </div>
             </div>
           </div>
@@ -247,38 +223,32 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           <div className="flex gap-4">
             <button
               onClick={onSaveApiKeys}
-              disabled={!apiKeys.openai && !apiKeys.claude}
+              disabled={!apiKeys.openai}
               className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-700 text-white px-6 py-3 rounded-lg font-bold transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-blue-400/30 disabled:opacity-50"
             >
-              💾 Save API Keys
+              💾 Save API Key
             </button>
             
             <button
               onClick={() => {
-                if (confirm('Are you sure you want to clear all stored API keys?')) {
+                if (window.confirm('Are you sure you want to clear the stored OpenAI API key?')) {
                   localStorage.removeItem('bread_openai_key');
-                  localStorage.removeItem('bread_claude_key');
                   onApiKeyUpdate('openai', '');
-                  onApiKeyUpdate('claude', '');
                 }
               }}
               className="bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/30 px-6 py-3 rounded-lg font-bold transition-all duration-300 text-gray-300 hover:text-red-300"
             >
-              🗑️ Clear Keys
+              🗑️ Clear Key
             </button>
           </div>
 
           {/* API Status */}
           <div className="mt-4 p-4 bg-white/5 rounded-lg">
             <div className="text-sm font-bold mb-2 text-gray-300">API Status</div>
-            <div className="grid grid-cols-2 gap-4 text-xs">
+            <div className="text-xs">
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${apiKeys.openai ? 'bg-green-400' : 'bg-gray-500'}`}></div>
                 <span>OpenAI: {apiKeys.openai ? 'Ready' : 'Not configured'}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${apiKeys.claude ? 'bg-green-400' : 'bg-gray-500'}`}></div>
-                <span>Claude: {apiKeys.claude ? 'Ready' : 'Not configured'}</span>
               </div>
             </div>
             <div className="text-xs text-gray-400 mt-2">

@@ -7,8 +7,11 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'sans': ['Inter', 'system-ui', 'sans-serif'],
-        'display': ['Space Grotesk', 'system-ui', 'sans-serif'],
+        'sans': ['Helvetica Neue', 'Inter', 'Arial', 'system-ui', 'sans-serif'],
+        'body': ['Helvetica Neue', 'Inter', 'Arial', 'system-ui', 'sans-serif'],
+        'druk-super': ['Druk Wide Super', 'Impact', 'Arial Black', 'sans-serif'],
+        'druk-bold': ['Druk Wide Bold', 'Arial Black', 'Helvetica', 'sans-serif'],
+        'display': ['Druk Wide Super', 'Impact', 'Arial Black', 'sans-serif'],
       },
       colors: {
         bread: {
