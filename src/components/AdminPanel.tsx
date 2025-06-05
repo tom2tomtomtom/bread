@@ -8,6 +8,7 @@ interface AdminPanelProps {
   onPromptUpdate: (key: keyof Prompts, value: string) => void;
   onApiKeyUpdate: (provider: keyof ApiKeys, key: string) => void;
   onSaveApiKeys: () => void;
+  onClose: () => void; // Add onClose callback
 }
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({
@@ -16,7 +17,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   apiKeysSaved,
   onPromptUpdate,
   onApiKeyUpdate,
-  onSaveApiKeys
+  onSaveApiKeys,
+  onClose
 }) => {
   const handleTemplateLoad = (templateName: string) => {
     if (templateName === 'onepass') {
@@ -31,12 +33,30 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     }
   };
 
+  const handleSaveConfiguration = () => {
+    // In real implementation, this would save to database
+    alert('Configuration saved successfully!');
+    
+    // Auto-close admin panel after saving
+    setTimeout(() => {
+      onClose();
+    }, 500); // Small delay so user sees the success message
+  };
+
   return (
     <div className="relative z-10 max-w-6xl mx-auto px-8 mb-8">
       <div className="backdrop-blur-xl bg-purple-400/10 border border-purple-400/20 rounded-3xl p-8 shadow-2xl">
-        <h2 className="text-3xl font-black mb-8 text-purple-400 drop-shadow-lg">
-          CONFIGURATION
-        </h2>
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-3xl font-black text-purple-400 drop-shadow-lg">
+            CONFIGURATION
+          </h2>
+          <button
+            onClick={onClose}
+            className="bg-white/10 hover:bg-white/20 border border-white/10 hover:border-white/20 px-4 py-2 rounded-lg font-bold transition-all duration-300 text-gray-300 hover:text-white"
+          >
+            ✕ Close
+          </button>
+        </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* System Instructions */}
@@ -112,13 +132,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             Last saved: {new Date().toLocaleTimeString()}
           </div>
           <button 
-            onClick={() => {
-              // In real implementation, this would save to database
-              alert('Configuration saved successfully!');
-            }}
+            onClick={handleSaveConfiguration}
             className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-400 hover:to-purple-500 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 shadow-lg shadow-purple-500/25 hover:shadow-purple-400/30"
           >
-            💾 SAVE CONFIGURATION
+            💾 SAVE & CLOSE
           </button>
         </div>
 
