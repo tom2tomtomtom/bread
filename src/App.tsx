@@ -141,41 +141,39 @@ Cultural Reality Check:
 - Every headline needs to survive the group chat test
 - Sound like someone's bestie, not their bank`,
 
-    territoryPrompt: `TERRITORY GENERATION PROMPT
-When creating broad campaign territories or strategic creative directions:
+    territoryPrompt: `🎯 BRIEF-RESPONSIVE TERRITORY GENERATION
 
-TERRITORY FRAMEWORK
+*** CRITICAL: ALL TERRITORIES MUST DIRECTLY ADDRESS THE CAMPAIGN BRIEF ***
 
-Cultural Moment: What's happening in culture that we can authentically tap into?
-Audience Tension: What frustration, desire, or shared experience drives our audience?
-Brand Truth: What can our brand uniquely own in this space?
-Emotional Territory: What feeling do we want to own? (Relief, vindication, discovery, community, etc.)
-Platform Playground: How does this territory play differently across TikTok/Instagram/YouTube?
+TERRITORY FRAMEWORK (Applied to the Brief Context):
 
-TERRITORY TYPES TO EXPLORE
+Cultural Moment: What's happening in the brief's specific context? (Christmas, Black Friday, etc.)
+Audience Tension: What specific frustration does the brief identify?
+Brand Truth: How does Everyday Rewards solve the brief's specific challenge?
+Emotional Territory: What feeling addresses the brief's objective?
+Brief Relevance: How does this territory directly fulfill the brief's goals?
 
-The Confession: "Things we all do but never admit"
-The Exposé: "Calling out industry BS"
-The Discovery: "You've been doing it wrong this whole time"
-The Community: "For everyone who..."
-The Celebration: "Finally, someone made this"
-The Rebellion: "We're not like other [category]"
+TERRITORY TYPES (Adapted to Brief Context):
 
-OUTPUT STRUCTURE FOR TERRITORIES
-Territory Name: [Catchy 2-4 word phrase]
-Core Insight: [One sentence audience truth]
-Emotional Positioning: [What feeling we own]
-Cultural Hook: [What trend/moment we're tapping]
-Platform Strategy: [How it adapts across channels]
-Proof Points: [3-5 ways to demonstrate this territory]
+The Brief-Specific Problem: Address the exact challenge mentioned in the brief
+The Timing Solution: Leverage the specific seasonal/cultural moment from the brief
+The Competitive Response: Counter the specific competitors or alternatives mentioned
+The Context-Aware Community: Unite people around the brief's specific scenario
+The Seasonal Celebration: Embrace the specific moment/holiday from the brief
+The Brief-Focused Rebellion: Position against exactly what the brief identifies as the problem
 
-Generate exactly 6 creative territories exploring themes like:
-- Everyday value vs event-driven savings
-- Inclusive rewards for all Australians  
-- Smart shopping without the pressure
-- Consistent benefits vs unpredictable deals
-- Community and belonging
-- Australian cultural moments`,
+🚨 BRIEF ALIGNMENT CHECKLIST:
+For each territory, ask:
+- Does this directly address the brief's context?
+- Would this work for the specific timing mentioned?
+- Does this counter the exact competitors/alternatives in the brief?
+- Is this relevant to the audience situation described?
+- Does this fulfill the campaign objectives stated?
+
+BANNED: Generic territories that could work for any brief
+REQUIRED: Territories that could ONLY work for this specific brief
+
+Generate exactly 6 creative territories that are laser-focused on the brief's specific context, timing, and objectives.`,
 
     headlinePrompt: `🎭 MIXED HEADLINE FORMULA: Problem/Solution + Gags + Sales 🎭
 
@@ -438,7 +436,12 @@ ${Object.entries(starredItems.headlines)
 
 ${prompts.brandGuidelines}
 
-BRIEF: ${brief}
+🚨 CRITICAL BRIEF FOCUS 🚨
+CAMPAIGN BRIEF: ${brief}
+
+*** YOU MUST GENERATE TERRITORIES AND HEADLINES THAT DIRECTLY RESPOND TO THIS SPECIFIC BRIEF ***
+*** DO NOT IGNORE THE BRIEF AND CREATE GENERIC CONTENT ***
+*** EVERY TERRITORY MUST BE RELEVANT TO THE BRIEF'S CONTEXT, TIMING, AND OBJECTIVES ***
 
 ${prompts.territoryPrompt}
 
@@ -446,21 +449,29 @@ ${prompts.headlinePrompt}
 
 ${prompts.compliancePrompt}${promptAddition}
 
+🎯 BRIEF ALIGNMENT REQUIREMENTS:
+- Read the brief above carefully
+- Identify the specific context (Christmas, Black Friday, seasonal moment, etc.)
+- Create territories that specifically address the brief's objectives
+- Make headlines relevant to the brief's timing and competitive context
+- If brief mentions Christmas → Christmas-relevant territories
+- If brief mentions Black Friday → Black Friday positioning
+- If brief mentions specific competitor → address that competitor
+
 FINAL CREATIVE DIRECTIVE:
-Remember: Write like a creator, not a corporation. Every headline MUST follow HOOK + PUNCHLINE format:
+Every headline MUST follow HOOK + PUNCHLINE format AND be relevant to the brief:
 
-HOOK (text field): Sets up the tension (3-6 words)
-PUNCHLINE (followUp field): Delivers the payoff (3-8 words)
+HOOK (text field): Sets up tension related to the brief context (3-6 words)
+PUNCHLINE (followUp field): Delivers Everyday Rewards solution for that context (3-8 words)
 
-Examples of proper structure:
-✅ "I hunt for discounts. / Like a serial killer hunts victims."
-✅ "You have 12 shopping apps. / We have one brain cell."
-✅ "POV: Your loyalty program / ghosted you for someone richer."
+✅ Brief-relevant examples:
+If Christmas brief: "Christmas shopping overwhelms me. / Everyday Rewards simplifies everything."
+If Black Friday brief: "Black Friday crowds stress me. / Everyday rewards skip the chaos."
 
-❌ Avoid single-line headlines without setup/payoff
-❌ Avoid corporate taglines that don't create tension
+❌ BANNED: Generic territories that ignore the brief
+❌ BANNED: Headlines that could work for any campaign
 
-Please provide a structured response with territories, headlines, and compliance guidance.`;
+Please provide a structured response with territories, headlines, and compliance guidance that DIRECTLY ADDRESSES THE BRIEF.`;
 
       // Generate with OpenAI
       const result = await generateWithOpenAI(fullPrompt, apiKeys.openai);
