@@ -34,12 +34,10 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
 }) => {
   const [progress, setProgress] = useState(0);
   const [currentWord, setCurrentWord] = useState(creativeWords[0]);
-  const [wordIndex, setWordIndex] = useState(0);
 
   useEffect(() => {
     if (!isVisible) {
       setProgress(0);
-      setWordIndex(0);
       setCurrentWord(creativeWords[0]);
       return;
     }
@@ -55,10 +53,10 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
 
     // Word changing animation
     const wordInterval = setInterval(() => {
-      setWordIndex(prev => {
-        const newIndex = (prev + 1) % creativeWords.length;
-        setCurrentWord(creativeWords[newIndex]);
-        return newIndex;
+      setCurrentWord(prev => {
+        const currentIndex = creativeWords.indexOf(prev);
+        const newIndex = (currentIndex + 1) % creativeWords.length;
+        return creativeWords[newIndex];
       });
     }, 1500); // Change word every 1.5 seconds
 

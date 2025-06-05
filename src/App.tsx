@@ -263,10 +263,9 @@ DON'T MAKE EVERY HEADLINE THE SAME FORMULA.`,
     }
   }, [brief, showOutput]);
 
-  // Load API keys and prompts from localStorage on component mount
+  // Load API keys from localStorage on component mount
   useEffect(() => {
     const savedOpenAI = localStorage.getItem('bread_openai_key');
-    const savedPrompts = localStorage.getItem('bread_prompts');
     
     setApiKeys({
       openai: savedOpenAI || ''
@@ -274,14 +273,6 @@ DON'T MAKE EVERY HEADLINE THE SAME FORMULA.`,
 
     // FORCE USE NEW CREATOR GUIDELINES - ignore cached prompts temporarily
     console.log('🔥 Forcing new creator guidelines, ignoring localStorage cache');
-    // if (savedPrompts) {
-    //   try {
-    //     const parsedPrompts = JSON.parse(savedPrompts);
-    //     setPrompts(parsedPrompts);
-    //   } catch (error) {
-    //     console.log('Could not parse saved prompts, using defaults');
-    //   }
-    // }
   }, []);
 
   const handleApiKeyUpdate = (provider: keyof ApiKeys, key: string) => {
