@@ -13,6 +13,7 @@ export interface Headline {
   followUp: string;
   reasoning: string;
   confidence: number;
+  imageUrl?: string;  // New field for AI-generated background image
   starred?: boolean;
 }
 
