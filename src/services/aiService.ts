@@ -5,30 +5,99 @@ import { GeneratedOutput } from '../App';
 // Set to false to disable mock responses and force real API calls
 const ENABLE_MOCK_FALLBACK = false;
 
-// Generate smart image prompt based on headline and territory context
+// Generate smart image prompt based on headline content - much more specific to the actual headline
 const generateImagePrompt = (headline: { text: string; followUp: string }, territory: { title: string; tone: string }, brief: string): string => {
+  const headlineText = headline.text.toLowerCase();
+  const followUpText = headline.followUp.toLowerCase();
   const briefContext = brief.toLowerCase();
-  let contextualElements = '';
   
-  // Extract seasonal/event context from brief
-  if (briefContext.includes('christmas') || briefContext.includes('holiday')) {
-    contextualElements = 'holiday shopping, festive atmosphere, warm lighting, ';
-  } else if (briefContext.includes('black friday') || briefContext.includes('sale')) {
-    contextualElements = 'shopping excitement, modern retail, dynamic energy, ';
-  } else if (briefContext.includes('summer')) {
-    contextualElements = 'bright summer vibes, fresh colors, outdoor lifestyle, ';
-  } else if (briefContext.includes('winter')) {
-    contextualElements = 'cozy winter atmosphere, warm tones, comfort, ';
+  // Analyze headline content to determine visual theme
+  let visualConcept = '';
+  let visualElements = '';
+  let colorMood = '';
+  
+  // Headline-specific visual analysis
+  if (headlineText.includes('every day') || headlineText.includes('everyday')) {
+    visualConcept = 'everyday life, daily routines, morning sunlight, fresh starts';
+    visualElements = 'sunrise, coffee cups, fresh produce, clean home spaces';
+    colorMood = 'warm morning light, soft yellows, gentle oranges';
+  } else if (headlineText.includes('save') || headlineText.includes('saving') || followUpText.includes('save')) {
+    visualConcept = 'abundance, prosperity, financial growth, smart choices';
+    visualElements = 'overflowing baskets, golden coins, flourishing plants, treasure chests';
+    colorMood = 'rich golds, prosperity greens, warm amber tones';
+  } else if (headlineText.includes('smart') || headlineText.includes('clever') || headlineText.includes('intelligent')) {
+    visualConcept = 'intelligence, strategy, modern thinking, innovation';
+    visualElements = 'lightbulbs, brain connections, geometric patterns, clean modern spaces';
+    colorMood = 'cool blues, electric whites, smart purple accents';
+  } else if (headlineText.includes('trust') || headlineText.includes('reliable') || headlineText.includes('mate')) {
+    visualConcept = 'friendship, reliability, Australian culture, loyalty';
+    visualElements = 'handshakes, Australian landscapes, loyal dogs, steady foundations';
+    colorMood = 'earth tones, honest browns, loyal blues';
+  } else if (headlineText.includes('fast') || headlineText.includes('quick') || headlineText.includes('instant')) {
+    visualConcept = 'speed, efficiency, momentum, quick solutions';
+    visualElements = 'motion blur, racing lines, swift birds, flowing water';
+    colorMood = 'dynamic blues, energetic greens, swift silver';
+  } else if (headlineText.includes('stress') || headlineText.includes('pressure') || headlineText.includes('rush')) {
+    visualConcept = 'calm, relaxation, peace, stress relief';
+    visualElements = 'peaceful lakes, zen gardens, flowing silk, gentle waves';
+    colorMood = 'calming blues, peaceful greens, serene whites';
+  } else if (headlineText.includes('club') || headlineText.includes('member') || headlineText.includes('join')) {
+    visualConcept = 'community, belonging, exclusive groups, membership';
+    visualElements = 'circles of people, exclusive spaces, VIP areas, community gatherings';
+    colorMood = 'premium purples, exclusive golds, welcoming warm tones';
+  } else if (headlineText.includes('value') || headlineText.includes('worth') || headlineText.includes('deserve')) {
+    visualConcept = 'worth, value, precious things, quality';
+    visualElements = 'precious gems, quality materials, fine craftsmanship, valuable items';
+    colorMood = 'rich jewel tones, valuable golds, quality silvers';
+  } else if (headlineText.includes('time') || headlineText.includes('wait') || headlineText.includes('schedule')) {
+    visualConcept = 'time freedom, flexibility, perfect timing';
+    visualElements = 'flowing clocks, flexible schedules, perfect moments, time flowing';
+    colorMood = 'timeless blues, flexible whites, perfect timing golds';
+  } else {
+    // Fallback to general positive concepts
+    visualConcept = 'success, happiness, positive outcomes, satisfaction';
+    visualElements = 'success symbols, happy moments, positive energy, satisfaction';
+    colorMood = 'happy yellows, positive blues, satisfied greens';
   }
   
-  return `Create a modern, visually striking mobile advertisement background for: "${headline.text}". 
-  Territory: ${territory.title}. 
-  Style: Clean, professional, ${territory.tone.toLowerCase()}, suitable for mobile advertising with text overlay. 
-  Visual elements: ${contextualElements}vibrant but not overwhelming colors, abstract shapes or subtle lifestyle imagery.
-  Color palette: Modern blues, warm yellows, clean whites, and soft grays that complement Everyday Rewards branding.
-  Focus: Abstract visual representation that enhances the headline without competing with text.
-  Avoid: Busy patterns, text, logos, or overly detailed imagery that would interfere with headline readability.
-  Style inspiration: Modern app design, clean UI backgrounds, premium mobile advertising.`;
+  // Add seasonal context from brief
+  let seasonalElements = '';
+  if (briefContext.includes('christmas') || briefContext.includes('holiday')) {
+    seasonalElements = ', festive decorations, holiday warmth, celebration atmosphere';
+    colorMood += ', festive reds, holiday greens';
+  } else if (briefContext.includes('black friday') || briefContext.includes('sale')) {
+    seasonalElements = ', shopping excitement, deal discovery, retail energy';
+    colorMood += ', dynamic energy, shopping excitement';
+  } else if (briefContext.includes('summer')) {
+    seasonalElements = ', summer vibes, bright sunshine, outdoor freshness';
+    colorMood += ', bright summer tones, fresh outdoor colors';
+  } else if (briefContext.includes('winter')) {
+    seasonalElements = ', winter coziness, warm comfort, seasonal warmth';
+    colorMood += ', cozy winter tones, warm comfort colors';
+  }
+  
+  return `Create a beautiful, headline-specific image representing: "${headline.text}" and "${headline.followUp}".
+
+VISUAL CONCEPT: ${visualConcept}${seasonalElements}
+VISUAL ELEMENTS: ${visualElements}
+COLOR MOOD: ${colorMood}
+
+STYLE REQUIREMENTS:
+- Clean, professional, premium photography or illustration
+- Mobile-friendly vertical composition (9:16 ratio)
+- Soft, subtle imagery that enhances text readability
+- Modern, minimalist aesthetic
+- High-quality, inspiring visual
+
+STRICT REQUIREMENTS - MUST AVOID:
+- NO text, letters, words, or writing of any kind
+- NO phones, screens, devices, or technology
+- NO people's faces or recognizable individuals
+- NO busy patterns or overwhelming details
+- NO logos, brands, or commercial signage
+- NO fake interfaces or mock-ups
+
+FOCUS: Create a beautiful, relevant background that emotionally supports the headline's message about "${headline.text}" while being perfect for text overlay.`;
 };
 
 // Generate images for all headlines in parallel
