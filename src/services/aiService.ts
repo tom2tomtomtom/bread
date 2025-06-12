@@ -5,6 +5,93 @@ import { GeneratedOutput } from '../App';
 // Set to false to disable mock responses and force real API calls
 const ENABLE_MOCK_FALLBACK = false;
 
+// Generate smart image prompt based on headline and territory context
+const generateImagePrompt = (headline: { text: string; followUp: string }, territory: { title: string; tone: string }, brief: string): string => {
+  const briefContext = brief.toLowerCase();
+  let contextualElements = '';
+  
+  // Extract seasonal/event context from brief
+  if (briefContext.includes('christmas') || briefContext.includes('holiday')) {
+    contextualElements = 'holiday shopping, festive atmosphere, warm lighting, ';
+  } else if (briefContext.includes('black friday') || briefContext.includes('sale')) {
+    contextualElements = 'shopping excitement, modern retail, dynamic energy, ';
+  } else if (briefContext.includes('summer')) {
+    contextualElements = 'bright summer vibes, fresh colors, outdoor lifestyle, ';
+  } else if (briefContext.includes('winter')) {
+    contextualElements = 'cozy winter atmosphere, warm tones, comfort, ';
+  }
+  
+  return `Create a modern, visually striking mobile advertisement background for: "${headline.text}". 
+  Territory: ${territory.title}. 
+  Style: Clean, professional, ${territory.tone.toLowerCase()}, suitable for mobile advertising with text overlay. 
+  Visual elements: ${contextualElements}vibrant but not overwhelming colors, abstract shapes or subtle lifestyle imagery.
+  Color palette: Modern blues, warm yellows, clean whites, and soft grays that complement Everyday Rewards branding.
+  Focus: Abstract visual representation that enhances the headline without competing with text.
+  Avoid: Busy patterns, text, logos, or overly detailed imagery that would interfere with headline readability.
+  Style inspiration: Modern app design, clean UI backgrounds, premium mobile advertising.`;
+};
+
+// Generate images for all headlines in parallel
+const generateHeadlineImages = async (territories: any[], brief: string, openai: OpenAI): Promise<any[]> => {
+  console.log('🎨 Starting image generation for all headlines...');
+  
+  const imagePromises: Promise<any>[] = [];
+  
+  territories.forEach((territory, territoryIndex) => {
+    territory.headlines.forEach((headline: any, headlineIndex: number) => {
+      const imagePrompt = generateImagePrompt(headline, territory, brief);
+      
+      const imagePromise = openai.images.generate({
+        model: "dall-e-3",
+        prompt: imagePrompt,
+        n: 1,
+        size: "1024x1792", // Tall mobile aspect ratio
+        quality: "standard",
+        style: "natural"
+      }).then(response => ({
+        territoryIndex,
+        headlineIndex,
+        imageUrl: response.data[0]?.url || null,
+        prompt: imagePrompt
+      })).catch(error => {
+        console.error(`❌ Image generation failed for territory ${territoryIndex}, headline ${headlineIndex}:`, error);
+        return {
+          territoryIndex,
+          headlineIndex,
+          imageUrl: null,
+          error: error.message
+        };
+      });
+      
+      imagePromises.push(imagePromise);
+    });
+  });
+  
+  console.log(`🎨 Generating ${imagePromises.length} images in parallel...`);
+  const imageResults = await Promise.all(imagePromises);
+  
+  // Log results
+  const successCount = imageResults.filter(r => r.imageUrl).length;
+  const failCount = imageResults.filter(r => !r.imageUrl).length;
+  console.log(`✅ Image generation complete: ${successCount} success, ${failCount} failed`);
+  
+  return imageResults;
+};
+
+// Apply generated images to territories
+const applyImagesToTerritories = (territories: any[], imageResults: any[]): any[] => {
+  const updatedTerritories = [...territories];
+  
+  imageResults.forEach(result => {
+    if (result.imageUrl && updatedTerritories[result.territoryIndex]?.headlines[result.headlineIndex]) {
+      updatedTerritories[result.territoryIndex].headlines[result.headlineIndex].imageUrl = result.imageUrl;
+      console.log(`🖼️ Applied image to Territory ${result.territoryIndex + 1}, Headline ${result.headlineIndex + 1}`);
+    }
+  });
+  
+  return updatedTerritories;
+};
+
 // Mock response for demo purposes - enhanced with more realistic data
 const mockResponse = (): GeneratedOutput => ({
   territories: [
@@ -240,10 +327,11 @@ const parseAIResponse = (text: string): GeneratedOutput => {
   }
 };
 
-export const generateWithOpenAI = async (prompt: string, apiKey: string): Promise<GeneratedOutput> => {
+export const generateWithOpenAI = async (prompt: string, apiKey: string, generateImages: boolean = false, brief: string = ''): Promise<GeneratedOutput> => {
   console.log('🔄 Starting OpenAI API call...');
   console.log('API Key present:', !!apiKey);
   console.log('Prompt length:', prompt.length);
+  console.log('Generate images:', generateImages);
   console.log('📄 Full prompt being sent to OpenAI:');
   console.log('='.repeat(80));
   console.log(prompt);
@@ -317,6 +405,25 @@ Generate exactly 6 territories, each with 3 headlines. For each headline, provid
     console.log('📝 Parsing OpenAI response...');
     const parsed = parseAIResponse(response);
     console.log('✅ Successfully parsed OpenAI response');
+    
+    // Generate images if requested
+    if (generateImages && parsed.territories) {
+      console.log('🎨 Image generation enabled, generating images...');
+      try {
+        const imageResults = await generateHeadlineImages(parsed.territories, brief || prompt, openai);
+        const territoriesWithImages = applyImagesToTerritories(parsed.territories, imageResults);
+        
+        return {
+          ...parsed,
+          territories: territoriesWithImages
+        };
+      } catch (imageError) {
+        console.error('❌ Image generation failed, continuing without images:', imageError);
+        // Return original parsed response if image generation fails
+        return parsed;
+      }
+    }
+    
     return parsed;
   } catch (error) {
     console.error('❌ OpenAI API Error:', error);
