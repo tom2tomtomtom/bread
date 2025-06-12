@@ -5,6 +5,9 @@ import { GeneratedOutput } from '../App';
 // Set to false to disable mock responses and force real API calls
 const ENABLE_MOCK_FALLBACK = false;
 
+// Helper function to add delay between requests
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 // Generate smart image prompt based on headline content - much more specific to the actual headline
 const generateImagePrompt = (headline: { text: string; followUp: string }, territory: { title: string; tone: string }, brief: string): string => {
   const headlineText = headline.text.toLowerCase();
@@ -100,51 +103,154 @@ STRICT REQUIREMENTS - MUST AVOID:
 FOCUS: Create a beautiful, relevant background that emotionally supports the headline's message about "${headline.text}" while being perfect for text overlay.`;
 };
 
-// Generate images for all headlines in parallel
-const generateHeadlineImages = async (territories: any[], brief: string, openai: OpenAI): Promise<any[]> => {
-  console.log('🎨 Starting image generation for all headlines...');
+// Generate a simpler fallback prompt if the main one fails
+const generateFallbackPrompt = (headline: { text: string; followUp: string }): string => {
+  return `Create a simple, elegant background image suitable for mobile advertising.
+Style: Clean, minimalist, professional
+Colors: Soft blues, warm yellows, gentle whites
+Elements: Abstract shapes, subtle gradients, peaceful atmosphere
+Avoid: Text, logos, devices, busy patterns, people
+Focus: Simple, calming background perfect for text overlay.`;
+};
+
+// Generate a single image with retry logic
+const generateSingleImage = async (
+  openai: OpenAI, 
+  headline: { text: string; followUp: string }, 
+  territory: { title: string; tone: string }, 
+  brief: string,
+  territoryIndex: number,
+  headlineIndex: number,
+  maxRetries: number = 3
+): Promise<any> => {
+  let lastError = null;
   
-  const imagePromises: Promise<any>[] = [];
-  
-  territories.forEach((territory, territoryIndex) => {
-    territory.headlines.forEach((headline: any, headlineIndex: number) => {
-      const imagePrompt = generateImagePrompt(headline, territory, brief);
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`🎨 Generating image for Territory ${territoryIndex + 1}, Headline ${headlineIndex + 1} (Attempt ${attempt}/${maxRetries})`);
       
-      const imagePromise = openai.images.generate({
+      // Use main prompt on first attempt, fallback on subsequent attempts
+      const imagePrompt = attempt === 1 
+        ? generateImagePrompt(headline, territory, brief)
+        : generateFallbackPrompt(headline);
+      
+      const response = await openai.images.generate({
         model: "dall-e-3",
         prompt: imagePrompt,
         n: 1,
         size: "1024x1792", // Tall mobile aspect ratio
         quality: "standard",
         style: "natural"
-      }).then(response => ({
-        territoryIndex,
-        headlineIndex,
-        imageUrl: response.data?.[0]?.url || null, // Fixed: Added null safety with optional chaining
-        prompt: imagePrompt
-      })).catch(error => {
-        console.error(`❌ Image generation failed for territory ${territoryIndex}, headline ${headlineIndex}:`, error);
+      });
+
+      const imageUrl = response.data?.[0]?.url;
+      
+      if (imageUrl) {
+        console.log(`✅ Image generated successfully for Territory ${territoryIndex + 1}, Headline ${headlineIndex + 1} on attempt ${attempt}`);
         return {
           territoryIndex,
           headlineIndex,
-          imageUrl: null,
-          error: error.message
+          imageUrl,
+          prompt: imagePrompt,
+          attempt
         };
-      });
+      } else {
+        throw new Error('No image URL returned from API');
+      }
       
-      imagePromises.push(imagePromise);
+    } catch (error: any) {
+      lastError = error;
+      console.error(`❌ Attempt ${attempt} failed for Territory ${territoryIndex + 1}, Headline ${headlineIndex + 1}:`, error.message);
+      
+      if (attempt < maxRetries) {
+        // Exponential backoff: wait longer between retries
+        const waitTime = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+        console.log(`⏳ Waiting ${waitTime}ms before retry...`);
+        await delay(waitTime);
+      }
+    }
+  }
+  
+  // All attempts failed
+  console.error(`💥 All ${maxRetries} attempts failed for Territory ${territoryIndex + 1}, Headline ${headlineIndex + 1}:`, lastError?.message);
+  return {
+    territoryIndex,
+    headlineIndex,
+    imageUrl: null,
+    error: lastError?.message || 'Unknown error',
+    attempts: maxRetries
+  };
+};
+
+// Generate images for all headlines with batched processing and retry logic
+const generateHeadlineImages = async (territories: any[], brief: string, openai: OpenAI): Promise<any[]> => {
+  console.log('🎨 Starting enhanced image generation for all headlines...');
+  
+  const allImageRequests: Array<{
+    headline: any;
+    territory: any;
+    territoryIndex: number;
+    headlineIndex: number;
+  }> = [];
+  
+  // Collect all image requests
+  territories.forEach((territory, territoryIndex) => {
+    territory.headlines.forEach((headline: any, headlineIndex: number) => {
+      allImageRequests.push({
+        headline,
+        territory,
+        territoryIndex,
+        headlineIndex
+      });
     });
   });
   
-  console.log(`🎨 Generating ${imagePromises.length} images in parallel...`);
-  const imageResults = await Promise.all(imagePromises);
+  console.log(`🎨 Processing ${allImageRequests.length} images in batches of 6...`);
   
-  // Log results
-  const successCount = imageResults.filter(r => r.imageUrl).length;
-  const failCount = imageResults.filter(r => !r.imageUrl).length;
-  console.log(`✅ Image generation complete: ${successCount} success, ${failCount} failed`);
+  const results: any[] = [];
+  const batchSize = 6; // Process 6 images at a time to avoid rate limits
   
-  return imageResults;
+  for (let i = 0; i < allImageRequests.length; i += batchSize) {
+    const batch = allImageRequests.slice(i, i + batchSize);
+    console.log(`🎨 Processing batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(allImageRequests.length / batchSize)}...`);
+    
+    // Process batch in parallel
+    const batchPromises = batch.map(request => 
+      generateSingleImage(
+        openai,
+        request.headline,
+        request.territory,
+        brief,
+        request.territoryIndex,
+        request.headlineIndex
+      )
+    );
+    
+    const batchResults = await Promise.all(batchPromises);
+    results.push(...batchResults);
+    
+    // Small delay between batches to be nice to the API
+    if (i + batchSize < allImageRequests.length) {
+      console.log('⏳ Waiting 2s before next batch...');
+      await delay(2000);
+    }
+  }
+  
+  // Log final results
+  const successCount = results.filter(r => r.imageUrl).length;
+  const failCount = results.filter(r => !r.imageUrl).length;
+  
+  console.log(`✅ Enhanced image generation complete:`);
+  console.log(`   🎉 ${successCount} images generated successfully`);
+  console.log(`   ❌ ${failCount} images failed after all retries`);
+  
+  if (failCount > 0) {
+    console.log('Failed images:', results.filter(r => !r.imageUrl).map(r => 
+      `Territory ${r.territoryIndex + 1}, Headline ${r.headlineIndex + 1}: ${r.error}`
+    ));
+  }
+  
+  return results;
 };
 
 // Apply generated images to territories
@@ -477,7 +583,7 @@ Generate exactly 6 territories, each with 3 headlines. For each headline, provid
     
     // Generate images if requested
     if (generateImages && parsed.territories) {
-      console.log('🎨 Image generation enabled, generating images...');
+      console.log('🎨 Enhanced image generation enabled...');
       try {
         const imageResults = await generateHeadlineImages(parsed.territories, brief || prompt, openai);
         const territoriesWithImages = applyImagesToTerritories(parsed.territories, imageResults);
