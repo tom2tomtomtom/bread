@@ -13,6 +13,7 @@ export interface Headline {
   followUp: string;
   reasoning: string;
   confidence: number;
+  imageUrl?: string;  // AI-generated image URL
   starred?: boolean;
 }
 
@@ -68,6 +69,10 @@ const BreadApp: React.FC = () => {
     territories: [],
     headlines: {}
   });
+  
+  // New state for image generation
+  const [generateImages, setGenerateImages] = useState<boolean>(false);
+  const [isGeneratingImages, setIsGeneratingImages] = useState<boolean>(false);
 
   const [prompts, setPrompts] = useState<Prompts>({
     systemInstructions: `# VARIETY PACK: Problem-Solvers, Gag Writers & Sales Pros
@@ -264,10 +269,13 @@ DON'T MAKE EVERY HEADLINE THE SAME FORMULA.`,
   // Load API keys from localStorage on component mount
   useEffect(() => {
     const savedOpenAI = localStorage.getItem('bread_openai_key');
+    const savedGenerateImages = localStorage.getItem('bread_generate_images');
     
     setApiKeys({
       openai: savedOpenAI || ''
     });
+    
+    setGenerateImages(savedGenerateImages === 'true');
 
     // FORCE USE NEW CREATOR GUIDELINES - ignore cached prompts temporarily
     console.log('🔥 Forcing new creator guidelines, ignoring localStorage cache');
@@ -278,6 +286,11 @@ DON'T MAKE EVERY HEADLINE THE SAME FORMULA.`,
       ...prev,
       [provider]: key
     }));
+  };
+
+  const handleGenerateImagesToggle = (enabled: boolean) => {
+    setGenerateImages(enabled);
+    localStorage.setItem('bread_generate_images', enabled.toString());
   };
 
   const saveApiKeys = () => {
@@ -474,7 +487,7 @@ If Black Friday brief: "Black Friday crowds stress me. / Everyday rewards skip t
 Please provide a structured response with territories, headlines, and compliance guidance that DIRECTLY ADDRESSES THE BRIEF.`;
 
       // Generate with OpenAI
-      const result = await generateWithOpenAI(fullPrompt, apiKeys.openai);
+      const result = await generateWithOpenAI(fullPrompt, apiKeys.openai, generateImages);
 
       // Enhance the output with confidence scoring
       let enhancedResult = enhanceGeneratedOutput(result, brief);
@@ -568,6 +581,12 @@ Please provide a structured response with territories, headlines, and compliance
                     }`}></div>
                     OpenAI {apiKeys.openai ? 'Ready' : 'No API Key'}
                   </div>
+                  <div className="flex items-center gap-2 justify-end mb-1">
+                    <div className={`w-2 h-2 rounded-full ${
+                      generateImages ? 'bg-purple-400' : 'bg-gray-400'
+                    }`}></div>
+                    Images {generateImages ? 'ON' : 'OFF'}
+                  </div>
                   <div className="text-xs">
                     Smart Analysis • {new Date().toLocaleDateString()}
                   </div>
@@ -584,10 +603,12 @@ Please provide a structured response with territories, headlines, and compliance
           prompts={prompts}
           apiKeys={apiKeys}
           apiKeysSaved={apiKeysSaved}
+          generateImages={generateImages}
           onPromptUpdate={handlePromptUpdate}
           onApiKeyUpdate={handleApiKeyUpdate}
           onSaveApiKeys={saveApiKeys}
           onSaveConfiguration={saveConfiguration}
+          onGenerateImagesToggle={handleGenerateImagesToggle}
           onClose={() => setShowAdmin(false)}
         />
       )}
@@ -639,7 +660,7 @@ Please provide a structured response with territories, headlines, and compliance
       {/* Progress Bar */}
       <ProgressBar 
         isVisible={isGenerating}
-        duration={30000} // 30 seconds estimated duration
+        duration={generateImages ? 45000 : 30000} // Longer duration if generating images
       />
 
       {/* Toast Notification */}
