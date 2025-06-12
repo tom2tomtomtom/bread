@@ -548,7 +548,7 @@ Please provide a structured response with territories, headlines, and compliance
             <div className="flex justify-between items-center">
               <div>
                 <h1 className="text-6xl font-logo tracking-tight bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text text-transparent">
-                  BREAD<span className="text-4xl">®</span>
+                  AIdeas
                 </h1>
                 <p className="text-xl mt-2 font-body font-normal text-gray-300 normal-case">
                   A tech enabled platform for Everyday Rewards
