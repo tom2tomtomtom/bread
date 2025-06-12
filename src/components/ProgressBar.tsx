@@ -84,9 +84,9 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
         
         {/* Creative Word Display */}
         <div className="text-center mb-8">
-          <div className="text-4xl mb-2">🍞🧠</div>
+          <div className="text-4xl mb-2">💡🧠</div>
           <h3 className="text-2xl font-headline text-white mb-2">
-            BREAD IS THINKING
+            AI GENERATING IDEAS
           </h3>
           <div className="text-xl font-subheading text-purple-300 transition-all duration-500 ease-in-out">
             {currentWord}...
