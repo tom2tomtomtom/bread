@@ -281,11 +281,11 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
                           </div>
                         </div>
 
-                        {/* Phone Content */}
-                        <div className="p-4 h-full flex flex-col justify-between">
+                        {/* Phone Content - Centered */}
+                        <div className="p-4 h-full flex flex-col justify-center items-center text-center">
                           {/* Main Headline */}
-                          <div className="text-center mb-4">
-                            <h4 className="text-lg font-bold mb-2 leading-tight">
+                          <div className="mb-6">
+                            <h4 className="text-lg font-bold mb-3 leading-tight">
                               "{headline.text}"
                             </h4>
                             <p className="text-blue-100 text-sm font-medium">
@@ -294,7 +294,7 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
                           </div>
                           
                           {/* Confidence Badge */}
-                          <div className="text-center mb-2">
+                          <div className="mb-4">
                             <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
                               headline.confidence >= 80 ? 'bg-green-400 text-green-900' :
                               headline.confidence >= 60 ? 'bg-yellow-400 text-yellow-900' :
@@ -305,7 +305,7 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
                           </div>
 
                           {/* Star Button */}
-                          <div className="text-center">
+                          <div>
                             <button
                               onClick={() => onToggleHeadlineStarred(territory.id, hIndex)}
                               className={`text-2xl transition-all duration-300 hover:scale-110 ${
