@@ -16,21 +16,24 @@ const mockResponse = (): GeneratedOutput => ({
       headlines: [
         {
           text: 'Every day is your day with Everyday Rewards.',
-          followUp: 'Because great rewards shouldn\'t wait for special occasions.',
+          followUp: 'Because great rewards shouldn\\'t wait for special occasions.',
           reasoning: 'Positions everyday shopping as personally beneficial, contrasting with event-driven competitors.',
-          confidence: 85
+          confidence: 85,
+          imageUrl: 'https://via.placeholder.com/400x800/3b82f6/ffffff?text=Everyday+Advantage'
         },
         {
           text: 'Why wait for sales when savings happen daily?',
           followUp: 'Join millions who save on every shop.',
           reasoning: 'Direct challenge to sale-focused retailers, emphasizing consistent value over sporadic discounts.',
-          confidence: 78
+          confidence: 78,
+          imageUrl: 'https://via.placeholder.com/400x800/10b981/ffffff?text=Daily+Savings'
         },
         {
           text: 'Everyday Rewards: Making ordinary shopping extraordinary.',
           followUp: 'Turn your weekly shop into weekly wins.',
           reasoning: 'Elevates mundane shopping experience while maintaining approachable, everyday positioning.',
-          confidence: 82
+          confidence: 82,
+          imageUrl: 'https://via.placeholder.com/400x800/f59e0b/ffffff?text=Extraordinary+Shopping'
         }
       ]
     },
@@ -44,19 +47,22 @@ const mockResponse = (): GeneratedOutput => ({
           text: 'Join the club where every shop counts.',
           followUp: 'Smart shoppers choose consistent rewards.',
           reasoning: 'Creates exclusivity while emphasizing the value of regular shopping behavior.',
-          confidence: 80
+          confidence: 80,
+          imageUrl: 'https://via.placeholder.com/400x800/8b5cf6/ffffff?text=Smart+Club'
         },
         {
           text: 'Smart shopping, everyday rewards.',
           followUp: 'The smarter way to shop at Woolworths.',
           reasoning: 'Positions members as intelligent consumers making strategic choices.',
-          confidence: 75
+          confidence: 75,
+          imageUrl: 'https://via.placeholder.com/400x800/06b6d4/ffffff?text=Smart+Shopping'
         },
         {
           text: 'Your everyday essentials, properly rewarded.',
           followUp: 'Because regular shopping deserves regular rewards.',
           reasoning: 'Validates necessity purchases while promising fair compensation.',
-          confidence: 83
+          confidence: 83,
+          imageUrl: 'https://via.placeholder.com/400x800/84cc16/ffffff?text=Essential+Rewards'
         }
       ]
     },
@@ -70,19 +76,22 @@ const mockResponse = (): GeneratedOutput => ({
           text: 'No countdown clocks. Just everyday savings.',
           followUp: 'Relax and shop when it suits you.',
           reasoning: 'Directly counters urgency-driven sales tactics, promoting stress-free shopping.',
-          confidence: 88
+          confidence: 88,
+          imageUrl: 'https://via.placeholder.com/400x800/14b8a6/ffffff?text=No+Rush'
         },
         {
           text: 'Rewards without the rush or pressure.',
           followUp: 'Good rewards come to those who shop.',
           reasoning: 'Appeals to consumers tired of high-pressure sales environments.',
-          confidence: 84
+          confidence: 84,
+          imageUrl: 'https://via.placeholder.com/400x800/f97316/ffffff?text=Pressure+Free'
         },
         {
           text: 'Shop at your pace, earn at every place.',
           followUp: 'Your schedule, your rewards.',
           reasoning: 'Emphasizes personal control and convenience over forced urgency.',
-          confidence: 81
+          confidence: 81,
+          imageUrl: 'https://via.placeholder.com/400x800/ec4899/ffffff?text=Your+Pace'
         }
       ]
     },
@@ -96,19 +105,22 @@ const mockResponse = (): GeneratedOutput => ({
           text: 'Rewards as reliable as a true blue mate.',
           followUp: 'Always there when you need them.',
           reasoning: 'Uses distinctly Australian language to build trust and reliability.',
-          confidence: 86
+          confidence: 86,
+          imageUrl: 'https://via.placeholder.com/400x800/3b82f6/ffffff?text=True+Blue'
         },
         {
           text: 'Fair dinkum savings for fair dinkum people.',
           followUp: 'Honest rewards for honest shoppers.',
           reasoning: 'Appeals to Australian values of honesty and straightforwardness.',
-          confidence: 79
+          confidence: 79,
+          imageUrl: 'https://via.placeholder.com/400x800/059669/ffffff?text=Fair+Dinkum'
         },
         {
           text: 'Everyday value for everyday Australians.',
           followUp: 'Because every Australian deserves great rewards.',
           reasoning: 'Inclusive messaging that speaks to all Australians regardless of background.',
-          confidence: 87
+          confidence: 87,
+          imageUrl: 'https://via.placeholder.com/400x800/dc2626/ffffff?text=Aussie+Value'
         }
       ]
     },
@@ -122,19 +134,22 @@ const mockResponse = (): GeneratedOutput => ({
           text: 'They saved twenty dollars once. You save every time.',
           followUp: 'Consistent beats sporadic. Every time.',
           reasoning: 'Competitive comparison highlighting superior long-term value proposition.',
-          confidence: 92
+          confidence: 92,
+          imageUrl: 'https://via.placeholder.com/400x800/7c3aed/ffffff?text=Steady+Wins'
         },
         {
           text: 'Stacking rewards while others chase sales.',
           followUp: 'Smart shoppers stack. Smart shoppers win.',
           reasoning: 'Positions members as strategic thinkers vs impulsive sale-chasers.',
-          confidence: 85
+          confidence: 85,
+          imageUrl: 'https://via.placeholder.com/400x800/0891b2/ffffff?text=Stack+Rewards'
         },
         {
           text: 'The maths always works in your favour.',
           followUp: 'Every shop. Every time. Every reward.',
           reasoning: 'Confidence in program value with mathematical certainty appeal.',
-          confidence: 89
+          confidence: 89,
+          imageUrl: 'https://via.placeholder.com/400x800/65a30d/ffffff?text=Smart+Maths'
         }
       ]
     },
@@ -145,22 +160,25 @@ const mockResponse = (): GeneratedOutput => ({
       tone: 'Direct, everyday',
       headlines: [
         {
-          text: 'Today\'s deal? The same as every day.',
+          text: 'Today\\'s deal? The same as every day.',
           followUp: 'No waiting. No wondering. Just rewards.',
           reasoning: 'Contrasts reliability with competitor deal unpredictability.',
-          confidence: 83
+          confidence: 83,
+          imageUrl: 'https://via.placeholder.com/400x800/f59e0b/ffffff?text=Any+Day'
         },
         {
           text: 'Great value today. And every day after.',
           followUp: 'Consistency you can count on.',
           reasoning: 'Promise of sustained value rather than temporary offers.',
-          confidence: 86
+          confidence: 86,
+          imageUrl: 'https://via.placeholder.com/400x800/10b981/ffffff?text=Great+Value'
         },
         {
           text: 'Every day is rewards day with us.',
           followUp: 'Making every shop count.',
           reasoning: 'Transforms ordinary shopping into rewarding experiences.',
-          confidence: 81
+          confidence: 81,
+          imageUrl: 'https://via.placeholder.com/400x800/dc2626/ffffff?text=Rewards+Day'
         }
       ]
     }
@@ -182,6 +200,86 @@ const mockResponse = (): GeneratedOutput => ({
     ]
   }
 });
+
+// Generate image prompt for a headline
+const generateImagePrompt = (headline: { text: string; followUp: string }, territory: { title: string; tone: string; positioning: string }) => {
+  return `Create a modern, stylish mobile advertisement background for: "${headline.text} ${headline.followUp}". 
+Territory concept: ${territory.title}. 
+Mood: ${territory.tone.toLowerCase()}. 
+Style: Clean, professional, suitable for mobile advertising, contemporary design. 
+Visual theme: ${territory.positioning.substring(0, 100)}...
+Colors: Vibrant but not overwhelming, mobile-optimized. 
+Format: Vertical mobile format, suitable as background image.
+Focus: Abstract visual representation that supports the headline message without text overlay.
+Aesthetic: Premium, modern, Australian market appropriate.`;
+};
+
+// Generate image using DALL-E
+export const generateImage = async (headline: { text: string; followUp: string }, territory: { title: string; tone: string; positioning: string }, apiKey: string): Promise<string | null> => {
+  console.log('🎨 Generating image for headline:', headline.text);
+  
+  try {
+    const openai = new OpenAI({
+      apiKey: apiKey,
+      dangerouslyAllowBrowser: true
+    });
+
+    const prompt = generateImagePrompt(headline, territory);
+    console.log('🖼️ Image prompt:', prompt);
+
+    const response = await openai.images.generate({
+      model: "dall-e-3",
+      prompt: prompt,
+      n: 1,
+      size: "1024x1792", // Vertical format for mobile
+      quality: "standard",
+      style: "natural"
+    });
+
+    const imageUrl = response.data[0]?.url;
+    console.log('✅ Image generated:', !!imageUrl);
+    return imageUrl || null;
+  } catch (error) {
+    console.error('❌ Image generation failed:', error);
+    return null; // Graceful fallback - continue without image
+  }
+};
+
+// Generate images for all headlines in parallel
+export const generateImagesForTerritories = async (territories: any[], apiKey: string, onProgress?: (current: number, total: number) => void): Promise<any[]> => {
+  console.log('🎨 Starting image generation for all territories...');
+  
+  const totalImages = territories.reduce((sum, territory) => sum + territory.headlines.length, 0);
+  let currentImage = 0;
+  
+  const updatedTerritories = await Promise.all(
+    territories.map(async (territory) => {
+      const updatedHeadlines = await Promise.all(
+        territory.headlines.map(async (headline: any) => {
+          currentImage++;
+          onProgress?.(currentImage, totalImages);
+          
+          console.log(`🎨 Generating image ${currentImage}/${totalImages} for "${headline.text}"`);
+          
+          const imageUrl = await generateImage(headline, territory, apiKey);
+          
+          return {
+            ...headline,
+            imageUrl: imageUrl
+          };
+        })
+      );
+      
+      return {
+        ...territory,
+        headlines: updatedHeadlines
+      };
+    })
+  );
+  
+  console.log('✅ Image generation complete!');
+  return updatedTerritories;
+};
 
 // Parse AI response into structured format
 const parseAIResponse = (text: string): GeneratedOutput => {
@@ -317,7 +415,17 @@ Generate exactly 6 territories, each with 3 headlines. For each headline, provid
     console.log('📝 Parsing OpenAI response...');
     const parsed = parseAIResponse(response);
     console.log('✅ Successfully parsed OpenAI response');
-    return parsed;
+    
+    // Generate images for all headlines
+    console.log('🎨 Starting image generation...');
+    const territoriesWithImages = await generateImagesForTerritories(parsed.territories, apiKey, (current, total) => {
+      console.log(`🖼️ Image progress: ${current}/${total}`);
+    });
+    
+    return {
+      ...parsed,
+      territories: territoriesWithImages
+    };
   } catch (error) {
     console.error('❌ OpenAI API Error:', error);
     if (ENABLE_MOCK_FALLBACK) {
@@ -351,7 +459,7 @@ export const generateWithClaude = async (prompt: string, apiKey: string): Promis
       messages: [
         {
           role: "user",
-          content: `You are BREAD®, a creative AI platform. Always respond with structured JSON containing territories and compliance data.
+          content: `You are AIdeas, a creative AI platform. Always respond with structured JSON containing territories and compliance data.
 
 Structure your response exactly like this:
 {
