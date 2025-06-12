@@ -72,7 +72,6 @@ const BreadApp: React.FC = () => {
   
   // New state for image generation
   const [generateImages, setGenerateImages] = useState<boolean>(false);
-  const [isGeneratingImages, setIsGeneratingImages] = useState<boolean>(false);
 
   const [prompts, setPrompts] = useState<Prompts>({
     systemInstructions: `# VARIETY PACK: Problem-Solvers, Gag Writers & Sales Pros
