@@ -5,21 +5,25 @@ interface AdminPanelProps {
   prompts: Prompts;
   apiKeys: ApiKeys;
   apiKeysSaved: boolean;
+  generateImages: boolean;
   onPromptUpdate: (key: keyof Prompts, value: string) => void;
   onApiKeyUpdate: (provider: keyof ApiKeys, key: string) => void;
   onSaveApiKeys: () => void;
   onSaveConfiguration: () => void;
-  onClose: () => void; // Add onClose callback
+  onGenerateImagesToggle: (enabled: boolean) => void;
+  onClose: () => void;
 }
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({
   prompts,
   apiKeys,
   apiKeysSaved,
+  generateImages,
   onPromptUpdate,
   onApiKeyUpdate,
   onSaveApiKeys,
   onSaveConfiguration,
+  onGenerateImagesToggle,
   onClose
 }) => {
   const handleTemplateLoad = (templateName: string) => {
@@ -128,6 +132,63 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           </div>
         </div>
 
+        {/* AI Image Generation Configuration */}
+        <div className="mt-8 pt-6 border-t border-white/10">
+          <label className="block text-lg font-bold mb-4 text-gray-200">
+            🎨 AI IMAGE GENERATION
+          </label>
+          
+          <div className="bg-white/5 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-bold text-white mb-2">Generate AI Images for Headlines</h3>
+                <p className="text-sm text-gray-300 font-normal">
+                  Automatically create DALL-E generated background images for phone panels based on headline content and territory context.
+                </p>
+              </div>
+              
+              <button
+                onClick={() => onGenerateImagesToggle(!generateImages)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ${
+                  generateImages ? 'bg-purple-500' : 'bg-gray-600'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${
+                    generateImages ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="bg-white/5 rounded-lg p-3">
+                <div className="text-purple-300 font-bold mb-1">📱 Visual Impact</div>
+                <div className="text-gray-300 font-normal">Phone panels display as complete mobile ads with compelling background visuals</div>
+              </div>
+              
+              <div className="bg-white/5 rounded-lg p-3">
+                <div className="text-purple-300 font-bold mb-1">🤖 Smart Prompts</div>
+                <div className="text-gray-300 font-normal">Context-aware prompts based on headline content, territory tone, and brief context</div>
+              </div>
+              
+              <div className="bg-white/5 rounded-lg p-3">
+                <div className="text-purple-300 font-bold mb-1">💰 Cost Estimate</div>
+                <div className="text-gray-300 font-normal">~$0.04 per image, 18 images = ~$0.72 per generation</div>
+              </div>
+            </div>
+            
+            {generateImages && (
+              <div className="mt-4 p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
+                <div className="text-sm text-purple-300 font-bold mb-1">✨ Image Generation Enabled</div>
+                <div className="text-xs text-purple-200 font-normal">
+                  DALL-E will generate background images automatically when creating headlines. This will increase generation time and API costs.
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Save Button */}
         <div className="flex justify-between items-center mt-8">
           <div className="text-sm text-gray-400">
@@ -215,7 +276,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 Get your key from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">OpenAI Platform</a>
               </div>
               <div className="text-xs text-blue-400 mt-2 bg-blue-400/10 p-2 rounded">
-                💡 BREAD now uses OpenAI exclusively for optimal browser compatibility
+                💡 BREAD now uses OpenAI for both text generation and DALL-E image generation
               </div>
             </div>
           </div>
@@ -246,9 +307,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           <div className="mt-4 p-4 bg-white/5 rounded-lg">
             <div className="text-sm font-bold mb-2 text-gray-300">API Status</div>
             <div className="text-xs">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 mb-1">
                 <div className={`w-2 h-2 rounded-full ${apiKeys.openai ? 'bg-green-400' : 'bg-gray-500'}`}></div>
-                <span>OpenAI: {apiKeys.openai ? 'Ready' : 'Not configured'}</span>
+                <span>OpenAI Text Generation: {apiKeys.openai ? 'Ready' : 'Not configured'}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${apiKeys.openai && generateImages ? 'bg-purple-400' : 'bg-gray-500'}`}></div>
+                <span>DALL-E Image Generation: {apiKeys.openai && generateImages ? 'Enabled' : 'Disabled'}</span>
               </div>
             </div>
             <div className="text-xs text-gray-400 mt-2">
