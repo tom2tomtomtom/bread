@@ -34,7 +34,7 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
   const exportToPDF = () => {
     // Create formatted content for PDF
     const content = {
-      title: 'BREAD Creative Territories Report',
+      title: 'AIdeas Creative Territories Report',
       timestamp: new Date().toLocaleString(),
       overallConfidence: generatedOutput.overallConfidence,
       territories: generatedOutput.territories.map(territory => ({
@@ -60,7 +60,7 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
       printWindow.document.write(`
         <html>
           <head>
-            <title>BREAD Creative Report</title>
+            <title>AIdeas Creative Report</title>
             <style>
               body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
               .header { text-align: center; margin-bottom: 30px; }
@@ -74,7 +74,7 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
           </head>
           <body>
             <div class="header">
-              <h1>BREAD® Creative Territories Report</h1>
+              <h1>AIdeas Creative Territories Report</h1>
               <p>Generated: ${content.timestamp}</p>
               <div class="confidence-score">
                 <h2>Overall Confidence: <span class="${content.overallConfidence >= 80 ? 'confidence-high' : content.overallConfidence >= 60 ? 'confidence-medium' : 'confidence-low'}">${content.overallConfidence}%</span></h2>
@@ -148,7 +148,7 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `bread-creative-territories-${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `aideas-creative-territories-${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -252,71 +252,100 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
                 </div>
               </div>
 
-              {/* Headlines Cards - Individual Cards for Each Headline */}
-              <div className="space-y-4">
+              {/* Phone Panels Grid for Headlines */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {territory.headlines.map((headline, hIndex) => (
                   <div 
                     key={hIndex}
-                    className="bg-gradient-to-br from-blue-500 via-blue-400 to-blue-600 text-white p-6 rounded-2xl shadow-xl shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-300"
+                    className="relative group"
                     style={{ animationDelay: `${index * 300 + hIndex * 100 + 50}ms` }}
                   >
-                    {/* Main Headline */}
-                    <div className="mb-4">
-                      <h4 className="text-xl font-subheading mb-2">
-                        "{headline.text}"
-                      </h4>
-                      <p className="text-lg font-body text-blue-100 normal-case">
-                        {headline.followUp}
-                      </p>
-                    </div>
-                    
-                    {/* Reasoning */}
-                    <div className="bg-white/10 p-4 rounded-xl mb-4">
-                      <div className="text-xs font-subheading mb-2 text-blue-200">WHY THIS WORKS</div>
-                      <p className="font-body font-normal text-sm normal-case text-blue-50">
-                        {headline.reasoning}
-                      </p>
-                    </div>
-                    
-                    {/* Individual Headline Confidence */}
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-subheading text-blue-200">HEADLINE CONFIDENCE:</span>
-                        <button
-                          onClick={() => onToggleHeadlineStarred(territory.id, hIndex)}
-                          className={`text-lg transition-all duration-300 hover:scale-110 ${
-                            (starredItems.headlines[territory.id] || []).includes(hIndex)
-                              ? 'text-yellow-300 drop-shadow-lg' 
-                              : 'text-gray-300 hover:text-yellow-200'
-                          }`}
-                          title={(starredItems.headlines[territory.id] || []).includes(hIndex) ? 'Unstar headline' : 'Star headline'}
-                        >
-                          {(starredItems.headlines[territory.id] || []).includes(hIndex) ? '⭐' : '☆'}
-                        </button>
-                      </div>
-                      <div className={`px-3 py-1 rounded-full font-bold text-sm ${
-                        headline.confidence >= 80 ? 'bg-green-400 text-green-900' :
-                        headline.confidence >= 60 ? 'bg-yellow-400 text-yellow-900' :
-                        'bg-red-400 text-red-900'
-                      }`}>
-                        {headline.confidence}%
+                    {/* Phone Frame */}
+                    <div className="bg-gray-800 p-2 rounded-3xl shadow-2xl hover:scale-105 transition-all duration-300">
+                      {/* Phone Screen */}
+                      <div 
+                        className="bg-gradient-to-br from-blue-500 via-blue-400 to-blue-600 text-white rounded-2xl overflow-hidden shadow-inner relative"
+                        style={{ aspectRatio: '9 / 16' }}
+                      >
+                        {/* Status Bar */}
+                        <div className="bg-black/10 px-4 py-2 flex justify-between items-center text-xs">
+                          <div className="flex items-center gap-1">
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                            <span className="ml-1 font-mono">AIdeas</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <span className="font-mono">📶</span>
+                            <span className="font-mono">🔋</span>
+                          </div>
+                        </div>
+
+                        {/* Phone Content */}
+                        <div className="p-4 h-full flex flex-col justify-between">
+                          {/* Main Headline */}
+                          <div className="text-center mb-4">
+                            <h4 className="text-lg font-bold mb-2 leading-tight">
+                              "{headline.text}"
+                            </h4>
+                            <p className="text-blue-100 text-sm font-medium">
+                              {headline.followUp}
+                            </p>
+                          </div>
+                          
+                          {/* Confidence Badge */}
+                          <div className="text-center mb-2">
+                            <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
+                              headline.confidence >= 80 ? 'bg-green-400 text-green-900' :
+                              headline.confidence >= 60 ? 'bg-yellow-400 text-yellow-900' :
+                              'bg-red-400 text-red-900'
+                            }`}>
+                              {headline.confidence}% CONFIDENCE
+                            </div>
+                          </div>
+
+                          {/* Star Button */}
+                          <div className="text-center">
+                            <button
+                              onClick={() => onToggleHeadlineStarred(territory.id, hIndex)}
+                              className={`text-2xl transition-all duration-300 hover:scale-110 ${
+                                (starredItems.headlines[territory.id] || []).includes(hIndex)
+                                  ? 'text-yellow-300 drop-shadow-lg' 
+                                  : 'text-gray-300 hover:text-yellow-200'
+                              }`}
+                              title={(starredItems.headlines[territory.id] || []).includes(hIndex) ? 'Unstar headline' : 'Star headline'}
+                            >
+                              {(starredItems.headlines[territory.id] || []).includes(hIndex) ? '⭐' : '☆'}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Hover Overlay with Reasoning */}
+                        <div className="absolute inset-0 bg-black/90 opacity-0 group-hover:opacity-100 transition-all duration-300 p-4 flex flex-col justify-center">
+                          <div className="text-center">
+                            <h5 className="text-sm font-bold text-yellow-300 mb-3">WHY THIS WORKS</h5>
+                            <p className="text-xs text-blue-100 leading-relaxed">
+                              {headline.reasoning}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 ))}
+              </div>
                 
-                {/* Territory Tone - Separate Card */}
-                <div className="bg-gradient-to-br from-purple-500 via-purple-400 to-purple-600 text-white p-6 rounded-2xl shadow-xl shadow-purple-500/20">
-                  <div className="text-xs font-subheading mb-2 text-purple-200">TERRITORY TONE</div>
-                  <p className="font-body font-normal text-lg normal-case">{territory.tone}</p>
-                  
-                  {/* Territory Confidence Scoring Panel */}
-                  <div className="mt-4">
-                    <ConfidenceScoring 
-                      confidence={territory.confidence}
-                      territoryId={territory.id}
-                    />
-                  </div>
+              {/* Territory Tone - Separate Card */}
+              <div className="bg-gradient-to-br from-purple-500 via-purple-400 to-purple-600 text-white p-6 rounded-2xl shadow-xl shadow-purple-500/20">
+                <div className="text-xs font-subheading mb-2 text-purple-200">TERRITORY TONE</div>
+                <p className="font-body font-normal text-lg normal-case">{territory.tone}</p>
+                
+                {/* Territory Confidence Scoring Panel */}
+                <div className="mt-4">
+                  <ConfidenceScoring 
+                    confidence={territory.confidence}
+                    territoryId={territory.id}
+                  />
                 </div>
               </div>
             </div>
