@@ -51,7 +51,7 @@ const generateHeadlineImages = async (territories: any[], brief: string, openai:
       }).then(response => ({
         territoryIndex,
         headlineIndex,
-        imageUrl: response.data[0]?.url || null,
+        imageUrl: response.data?.[0]?.url || null, // Fixed: Added null safety with optional chaining
         prompt: imagePrompt
       })).catch(error => {
         console.error(`❌ Image generation failed for territory ${territoryIndex}, headline ${headlineIndex}:`, error);
