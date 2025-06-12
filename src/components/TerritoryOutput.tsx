@@ -264,11 +264,24 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
                     <div className="bg-gray-800 p-2 rounded-3xl shadow-2xl hover:scale-105 transition-all duration-300">
                       {/* Phone Screen */}
                       <div 
-                        className="bg-gradient-to-br from-blue-500 via-blue-400 to-blue-600 text-white rounded-2xl overflow-hidden shadow-inner relative"
-                        style={{ aspectRatio: '9 / 16' }}
+                        className="text-white rounded-2xl overflow-hidden shadow-inner relative"
+                        style={{ 
+                          aspectRatio: '9 / 16',
+                          backgroundImage: headline.imageUrl 
+                            ? `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${headline.imageUrl})`
+                            : 'linear-gradient(135deg, #3b82f6 0%, #1e40af 50%, #1e3a8a 100%)',
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                          backgroundRepeat: 'no-repeat'
+                        }}
                       >
+                        {/* Loading state overlay for missing images */}
+                        {!headline.imageUrl && (
+                          <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-blue-400 to-blue-600"></div>
+                        )}
+
                         {/* Status Bar */}
-                        <div className="bg-black/10 px-4 py-2 flex justify-between items-center text-xs">
+                        <div className="relative z-10 bg-black/10 px-4 py-2 flex justify-between items-center text-xs">
                           <div className="flex items-center gap-1">
                             <div className="w-1 h-1 bg-white rounded-full"></div>
                             <div className="w-1 h-1 bg-white rounded-full"></div>
@@ -282,23 +295,23 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
                         </div>
 
                         {/* Phone Content - Centered */}
-                        <div className="p-4 h-full flex flex-col justify-center items-center text-center">
+                        <div className="relative z-10 p-4 h-full flex flex-col justify-center items-center text-center">
                           {/* Main Headline */}
                           <div className="mb-6">
-                            <h4 className="text-lg font-bold mb-3 leading-tight">
+                            <h4 className="text-lg font-bold mb-3 leading-tight drop-shadow-lg">
                               "{headline.text}"
                             </h4>
-                            <p className="text-blue-100 text-sm font-medium">
+                            <p className="text-blue-100 text-sm font-medium drop-shadow">
                               {headline.followUp}
                             </p>
                           </div>
                           
                           {/* Confidence Badge */}
                           <div className="mb-4">
-                            <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
-                              headline.confidence >= 80 ? 'bg-green-400 text-green-900' :
-                              headline.confidence >= 60 ? 'bg-yellow-400 text-yellow-900' :
-                              'bg-red-400 text-red-900'
+                            <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${
+                              headline.confidence >= 80 ? 'bg-green-400/80 text-green-900' :
+                              headline.confidence >= 60 ? 'bg-yellow-400/80 text-yellow-900' :
+                              'bg-red-400/80 text-red-900'
                             }`}>
                               {headline.confidence}% CONFIDENCE
                             </div>
@@ -308,9 +321,9 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
                           <div>
                             <button
                               onClick={() => onToggleHeadlineStarred(territory.id, hIndex)}
-                              className={`text-2xl transition-all duration-300 hover:scale-110 ${
+                              className={`text-2xl transition-all duration-300 hover:scale-110 drop-shadow-lg ${
                                 (starredItems.headlines[territory.id] || []).includes(hIndex)
-                                  ? 'text-yellow-300 drop-shadow-lg' 
+                                  ? 'text-yellow-300' 
                                   : 'text-gray-300 hover:text-yellow-200'
                               }`}
                               title={(starredItems.headlines[territory.id] || []).includes(hIndex) ? 'Unstar headline' : 'Star headline'}
@@ -318,15 +331,30 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
                               {(starredItems.headlines[territory.id] || []).includes(hIndex) ? '⭐' : '☆'}
                             </button>
                           </div>
+
+                          {/* AI-Generated Image Indicator */}
+                          {headline.imageUrl && (
+                            <div className="absolute top-16 right-4">
+                              <div className="text-xs bg-purple-500/80 text-white px-2 py-1 rounded-full backdrop-blur-sm">
+                                🎨 AI
+                              </div>
+                            </div>
+                          )}
                         </div>
 
                         {/* Hover Overlay with Reasoning */}
-                        <div className="absolute inset-0 bg-black/90 opacity-0 group-hover:opacity-100 transition-all duration-300 p-4 flex flex-col justify-center">
+                        <div className="absolute inset-0 bg-black/90 opacity-0 group-hover:opacity-100 transition-all duration-300 p-4 flex flex-col justify-center z-20">
                           <div className="text-center">
                             <h5 className="text-sm font-bold text-yellow-300 mb-3">WHY THIS WORKS</h5>
                             <p className="text-xs text-blue-100 leading-relaxed">
                               {headline.reasoning}
                             </p>
+                            {headline.imageUrl && (
+                              <div className="mt-3 text-xs text-purple-300">
+                                <div className="text-purple-200">🎨 AI-Generated Visual</div>
+                                <div className="text-xs text-purple-400 mt-1">Background designed by DALL-E</div>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
