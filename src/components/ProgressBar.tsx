@@ -7,7 +7,7 @@ interface ProgressBarProps {
 
 const creativeWords = [
   'Cogitating',
-  'Ruminating', 
+  'Ruminating',
   'Imagining',
   'Inventing',
   'Creating',
@@ -25,12 +25,12 @@ const creativeWords = [
   'Sculpting',
   'Architecting',
   'Manifesting',
-  'Synthesizing'
+  'Synthesizing',
 ];
 
-export const ProgressBar: React.FC<ProgressBarProps> = ({ 
-  isVisible, 
-  duration = 15000 // Default 15 seconds
+export const ProgressBar: React.FC<ProgressBarProps> = ({
+  isVisible,
+  duration = 15000, // Default 15 seconds
 }) => {
   const [progress, setProgress] = useState(0);
   const [currentWord, setCurrentWord] = useState(creativeWords[0]);
@@ -47,7 +47,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
       setProgress(prev => {
         if (prev >= 85) return 85; // Stop at 85% until actual completion
         // Slower increment: reaches 85% over the duration
-        return prev + (85 / (duration / 200)); // Update every 200ms, slower progression
+        return prev + 85 / (duration / 200); // Update every 200ms, slower progression
       });
     }, 200);
 
@@ -81,13 +81,10 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
       <div className="bg-gradient-to-br from-purple-900/90 via-blue-900/90 to-purple-900/90 backdrop-blur-xl border border-purple-400/30 rounded-3xl p-8 shadow-2xl shadow-purple-500/20 max-w-lg w-full mx-4">
-        
         {/* Creative Word Display */}
         <div className="text-center mb-8">
           <div className="text-4xl mb-2">💡🧠</div>
-          <h3 className="text-2xl font-headline text-white mb-2">
-            AI GENERATING IDEAS
-          </h3>
+          <h3 className="text-2xl font-headline text-white mb-2">AI GENERATING IDEAS</h3>
           <div className="text-xl font-subheading text-purple-300 transition-all duration-500 ease-in-out">
             {currentWord}...
           </div>
@@ -96,7 +93,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
         {/* Progress Bar */}
         <div className="relative">
           <div className="w-full bg-purple-800/30 rounded-full h-3 mb-4 overflow-hidden">
-            <div 
+            <div
               className="h-full bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 rounded-full transition-all duration-300 ease-out relative"
               style={{ width: `${progress}%` }}
             >
@@ -104,15 +101,13 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
             </div>
           </div>
-          
+
           {/* Progress Text */}
           <div className="flex justify-between items-center text-sm">
             <span className="text-purple-300 font-body normal-case">
               Generating creative territories...
             </span>
-            <span className="text-purple-200 font-body">
-              {Math.round(progress)}%
-            </span>
+            <span className="text-purple-200 font-body">{Math.round(progress)}%</span>
           </div>
         </div>
 

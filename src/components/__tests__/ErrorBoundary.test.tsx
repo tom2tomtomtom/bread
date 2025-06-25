@@ -88,7 +88,7 @@ describe('ErrorBoundary', () => {
     expect(onErrorMock).toHaveBeenCalledWith(
       expect.any(Error),
       expect.objectContaining({
-        componentStack: expect.any(String)
+        componentStack: expect.any(String),
       })
     );
   });
@@ -111,7 +111,9 @@ describe('GenerationErrorBoundary', () => {
     );
 
     expect(screen.getByText('Generation Failed')).toBeInTheDocument();
-    expect(screen.getByText(/There was an issue generating your creative content/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/There was an issue generating your creative content/)
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
   });
 

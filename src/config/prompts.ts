@@ -160,7 +160,7 @@ RECOMMENDATIONS:
 - Suggest disclaimers where needed
 - Highlight any claims requiring substantiation
 - Flag potential legal review requirements
-- Ensure brand safety and reputation protection`
+- Ensure brand safety and reputation protection`,
 };
 
 // Prompt templates for different campaign types
@@ -168,36 +168,36 @@ export const CAMPAIGN_TEMPLATES = {
   seasonal: {
     christmas: {
       systemAddition: `\n\nCHRISTMAS CONTEXT: Focus on family gatherings, gift shopping, and holiday meal preparation. Position Everyday Rewards as the smart choice for holiday shopping.`,
-      territoryFocus: 'Christmas shopping, family meals, gift giving, holiday preparation'
+      territoryFocus: 'Christmas shopping, family meals, gift giving, holiday preparation',
     },
     blackFriday: {
       systemAddition: `\n\nBLACK FRIDAY CONTEXT: Counter the chaos of one-day sales with consistent everyday value. Position against rushed shopping and limited-time pressure.`,
-      territoryFocus: 'Consistent value vs flash sales, smart shopping vs rushed decisions'
+      territoryFocus: 'Consistent value vs flash sales, smart shopping vs rushed decisions',
     },
     backToSchool: {
       systemAddition: `\n\nBACK TO SCHOOL CONTEXT: Focus on family preparation, budget management, and routine establishment. Highlight everyday savings for ongoing school needs.`,
-      territoryFocus: 'Family budgeting, routine shopping, ongoing school needs'
-    }
+      territoryFocus: 'Family budgeting, routine shopping, ongoing school needs',
+    },
   },
   competitive: {
     flybuys: {
       systemAddition: `\n\nCOMPETITIVE CONTEXT: Position against Flybuys with focus on simplicity, broader acceptance, and everyday value over complex point systems.`,
-      territoryFocus: 'Simplicity vs complexity, broad acceptance, everyday value'
+      territoryFocus: 'Simplicity vs complexity, broad acceptance, everyday value',
     },
     oneDay: {
       systemAddition: `\n\nCOMPETITIVE CONTEXT: Counter one-day sale mentality with consistent everyday rewards. Focus on reliability vs unpredictability.`,
-      territoryFocus: 'Consistent rewards vs unpredictable sales, everyday value vs waiting'
-    }
-  }
+      territoryFocus: 'Consistent rewards vs unpredictable sales, everyday value vs waiting',
+    },
+  },
 };
 
 // Prompt enhancement utilities
 export const enhancePromptForContext = (basePrompts: Prompts, context: string): Prompts => {
   // Add contextual enhancements based on brief analysis
   const contextLower = context.toLowerCase();
-  
+
   let enhancement = '';
-  
+
   if (contextLower.includes('christmas')) {
     enhancement = CAMPAIGN_TEMPLATES.seasonal.christmas.systemAddition;
   } else if (contextLower.includes('black friday')) {
@@ -207,9 +207,9 @@ export const enhancePromptForContext = (basePrompts: Prompts, context: string): 
   } else if (contextLower.includes('flybuys')) {
     enhancement = CAMPAIGN_TEMPLATES.competitive.flybuys.systemAddition;
   }
-  
+
   return {
     ...basePrompts,
-    systemInstructions: basePrompts.systemInstructions + enhancement
+    systemInstructions: basePrompts.systemInstructions + enhancement,
   };
 };

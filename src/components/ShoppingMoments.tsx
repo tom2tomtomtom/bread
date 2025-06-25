@@ -10,10 +10,10 @@ export const ShoppingMoments: React.FC<ShoppingMomentsProps> = ({ onMomentSelect
     { name: 'Christmas', date: 'December 25' },
     { name: 'EOFY Sales', date: 'June 30' },
     { name: 'Back to School', date: 'January' },
-    { name: 'Mother\'s Day', date: 'May 14' },
-    { name: 'Father\'s Day', date: 'September 3' },
+    { name: "Mother's Day", date: 'May 14' },
+    { name: "Father's Day", date: 'September 3' },
     { name: 'Australia Day', date: 'January 26' },
-    { name: 'Valentine\'s Day', date: 'February 14' }
+    { name: "Valentine's Day", date: 'February 14' },
   ];
 
   return (

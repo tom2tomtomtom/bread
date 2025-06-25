@@ -19,8 +19,8 @@ const getApiBaseUrl = (): string => {
 
 // Generate content using OpenAI via secure server-side function
 export const generateWithOpenAI = async (
-  prompt: string, 
-  generateImages: boolean = false, 
+  prompt: string,
+  generateImages: boolean = false,
   brief: string = ''
 ): Promise<GeneratedOutput> => {
   console.log('🔄 Starting secure OpenAI API call...');
@@ -29,7 +29,7 @@ export const generateWithOpenAI = async (
 
   try {
     const apiUrl = `${getApiBaseUrl()}/generate-openai`;
-    
+
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
@@ -38,8 +38,8 @@ export const generateWithOpenAI = async (
       body: JSON.stringify({
         prompt,
         generateImages,
-        brief
-      })
+        brief,
+      }),
     });
 
     if (!response.ok) {
@@ -47,7 +47,7 @@ export const generateWithOpenAI = async (
     }
 
     const result: ApiResponse = await response.json();
-    
+
     if (!result.success) {
       throw new Error(result.error || 'Unknown error from API');
     }
@@ -69,7 +69,6 @@ export const generateWithOpenAI = async (
     }
 
     return generatedOutput;
-
   } catch (error: any) {
     console.error('❌ Secure OpenAI API Error:', error);
     throw new Error(`Failed to generate content: ${error.message}`);
@@ -83,15 +82,15 @@ export const generateWithClaude = async (prompt: string): Promise<GeneratedOutpu
 
   try {
     const apiUrl = `${getApiBaseUrl()}/generate-claude`;
-    
+
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        prompt
-      })
+        prompt,
+      }),
     });
 
     if (!response.ok) {
@@ -99,14 +98,13 @@ export const generateWithClaude = async (prompt: string): Promise<GeneratedOutpu
     }
 
     const result: ApiResponse = await response.json();
-    
+
     if (!result.success) {
       throw new Error(result.error || 'Unknown error from API');
     }
 
     console.log('✅ Secure Claude API response received');
     return result.data;
-
   } catch (error: any) {
     console.error('❌ Secure Claude API Error:', error);
     throw new Error(`Failed to generate content: ${error.message}`);
@@ -119,7 +117,7 @@ const generateImages_API = async (territories: any[], brief: string): Promise<an
 
   try {
     const apiUrl = `${getApiBaseUrl()}/generate-images`;
-    
+
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
@@ -127,8 +125,8 @@ const generateImages_API = async (territories: any[], brief: string): Promise<an
       },
       body: JSON.stringify({
         territories,
-        brief
-      })
+        brief,
+      }),
     });
 
     if (!response.ok) {
@@ -136,14 +134,13 @@ const generateImages_API = async (territories: any[], brief: string): Promise<an
     }
 
     const result: ApiResponse = await response.json();
-    
+
     if (!result.success) {
       throw new Error(result.error || 'Unknown error from image API');
     }
 
     console.log('✅ Secure image generation completed');
     return result.data || [];
-
   } catch (error: any) {
     console.error('❌ Secure image generation error:', error);
     throw error;
@@ -151,19 +148,28 @@ const generateImages_API = async (territories: any[], brief: string): Promise<an
 };
 
 // Apply generated images to territories
-const applyImagesToTerritories = (generatedOutput: GeneratedOutput, imageResults: any[]): GeneratedOutput => {
+const applyImagesToTerritories = (
+  generatedOutput: GeneratedOutput,
+  imageResults: any[]
+): GeneratedOutput => {
   const updatedTerritories = [...generatedOutput.territories];
-  
+
   imageResults.forEach(result => {
-    if (result.imageUrl && updatedTerritories[result.territoryIndex]?.headlines[result.headlineIndex]) {
-      updatedTerritories[result.territoryIndex].headlines[result.headlineIndex].imageUrl = result.imageUrl;
-      console.log(`🖼️ Applied image to Territory ${result.territoryIndex + 1}, Headline ${result.headlineIndex + 1}`);
+    if (
+      result.imageUrl &&
+      updatedTerritories[result.territoryIndex]?.headlines[result.headlineIndex]
+    ) {
+      updatedTerritories[result.territoryIndex].headlines[result.headlineIndex].imageUrl =
+        result.imageUrl;
+      console.log(
+        `🖼️ Applied image to Territory ${result.territoryIndex + 1}, Headline ${result.headlineIndex + 1}`
+      );
     }
   });
-  
+
   return {
     ...generatedOutput,
-    territories: updatedTerritories
+    territories: updatedTerritories,
   };
 };
 
@@ -173,55 +179,61 @@ export const mockResponse = (): GeneratedOutput => ({
     {
       id: '001',
       title: 'Everyday Advantage',
-      positioning: 'While others wait for sales events, Everyday Rewards members enjoy benefits year-round with consistent value.',
+      positioning:
+        'While others wait for sales events, Everyday Rewards members enjoy benefits year-round with consistent value.',
       tone: 'Confident, relatable',
       headlines: [
         {
           text: 'Every day is your day with Everyday Rewards.',
-          followUp: 'Because great rewards shouldn\'t wait for special occasions.',
-          reasoning: 'Positions everyday shopping as personally beneficial, contrasting with event-driven competitors.',
-          confidence: 85
+          followUp: "Because great rewards shouldn't wait for special occasions.",
+          reasoning:
+            'Positions everyday shopping as personally beneficial, contrasting with event-driven competitors.',
+          confidence: 85,
         },
         {
-          text: 'Why wait for sales when you\'re already saving?',
+          text: "Why wait for sales when you're already saving?",
           followUp: 'Everyday Rewards delivers value every single day.',
-          reasoning: 'Challenges the traditional sale-waiting behavior while highlighting consistent benefits.',
-          confidence: 82
+          reasoning:
+            'Challenges the traditional sale-waiting behavior while highlighting consistent benefits.',
+          confidence: 82,
         },
         {
           text: 'Your everyday shop, elevated.',
           followUp: 'Discover the rewards hiding in your regular routine.',
           reasoning: 'Transforms mundane shopping into something special and rewarding.',
-          confidence: 78
-        }
-      ]
-    }
+          confidence: 78,
+        },
+      ],
+    },
   ],
   compliance: {
     powerBy: [
       'All headlines comply with advertising standards',
       'Claims are substantiated and truthful',
-      'No misleading or deceptive content identified'
+      'No misleading or deceptive content identified',
     ],
     output: 'LOW RISK - All content meets compliance requirements',
     notes: [
       'Content reviewed for accuracy and truthfulness',
       'No regulatory concerns identified',
-      'Suitable for all advertising channels'
-    ]
-  }
+      'Suitable for all advertising channels',
+    ],
+  },
 });
 
 // Enhanced output processing (keeping existing functionality)
-export const enhanceGeneratedOutput = (output: GeneratedOutput, brief: string): GeneratedOutput => {
+export const enhanceGeneratedOutput = (
+  output: GeneratedOutput,
+  _brief: string
+): GeneratedOutput => {
   // Add any enhancement logic here
   return output;
 };
 
 export const mergeWithStarredContent = (
-  newOutput: GeneratedOutput, 
-  existingOutput: GeneratedOutput, 
-  starredItems: any
+  newOutput: GeneratedOutput,
+  _existingOutput: GeneratedOutput,
+  _starredItems: any
 ): GeneratedOutput => {
   // Add merge logic here
   return newOutput;

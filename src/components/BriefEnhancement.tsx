@@ -26,7 +26,9 @@ export const BriefEnhancement: React.FC<BriefEnhancementProps> = ({ analysis, is
       <div className="flex items-center gap-3 mb-4">
         <div className="text-purple-400 text-2xl">🧠</div>
         <h3 className="text-lg font-bold text-purple-400">SMART BRIEF ANALYSIS</h3>
-        <div className={`px-3 py-1 rounded-full text-sm font-bold border ${getScoreBackground(analysis.score)}`}>
+        <div
+          className={`px-3 py-1 rounded-full text-sm font-bold border ${getScoreBackground(analysis.score)}`}
+        >
           <span className={getScoreColor(analysis.score)}>{analysis.score}/100</span>
         </div>
       </div>

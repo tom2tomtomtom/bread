@@ -25,40 +25,37 @@ describe('secureApiService', () => {
                   text: 'Test headline',
                   followUp: 'Test follow up',
                   reasoning: 'Test reasoning',
-                  confidence: 85
-                }
-              ]
-            }
+                  confidence: 85,
+                },
+              ],
+            },
           ],
           compliance: {
             powerBy: ['Test compliance'],
             output: 'LOW RISK',
-            notes: ['Test note']
-          }
-        }
+            notes: ['Test note'],
+          },
+        },
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockResponse
+        json: async () => mockResponse,
       });
 
       const result = await generateWithOpenAI('test prompt', false, 'test brief');
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        '/.netlify/functions/generate-openai',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            prompt: 'test prompt',
-            generateImages: false,
-            brief: 'test brief'
-          })
-        }
-      );
+      expect(mockFetch).toHaveBeenCalledWith('/.netlify/functions/generate-openai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: 'test prompt',
+          generateImages: false,
+          brief: 'test brief',
+        }),
+      });
 
       expect(result).toEqual(mockResponse.data);
     });
@@ -66,7 +63,7 @@ describe('secureApiService', () => {
     it('should handle API errors gracefully', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
-        status: 500
+        status: 500,
       });
 
       await expect(generateWithOpenAI('test prompt')).rejects.toThrow(
@@ -77,12 +74,12 @@ describe('secureApiService', () => {
     it('should handle API response errors', async () => {
       const errorResponse = {
         success: false,
-        error: 'API key not configured'
+        error: 'API key not configured',
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => errorResponse
+        json: async () => errorResponse,
       });
 
       await expect(generateWithOpenAI('test prompt')).rejects.toThrow(
@@ -98,8 +95,8 @@ describe('secureApiService', () => {
         ok: true,
         json: async () => ({
           success: true,
-          data: { territories: [], compliance: { powerBy: [], output: '', notes: [] } }
-        })
+          data: { territories: [], compliance: { powerBy: [], output: '', notes: [] } },
+        }),
       });
 
       await generateWithOpenAI('test prompt');

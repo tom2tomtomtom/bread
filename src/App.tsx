@@ -4,11 +4,22 @@ import { GenerationController } from './components/generation/GenerationControll
 import { ConfigurationManager } from './components/configuration/ConfigurationManager';
 import { useAppStore } from './stores/appStore';
 import { generateWithOpenAI } from './services/secureApiService';
-import { analyzeBrief, enhanceGeneratedOutput, mergeWithStarredContent } from './services/enhancementService';
+import {
+  analyzeBrief,
+  enhanceGeneratedOutput,
+  mergeWithStarredContent,
+} from './services/enhancementService';
 import { APP_CONFIG } from './config/app';
 
 // Types are now imported from types/index.ts
-export type { Headline, Territory, ComplianceData, GeneratedOutput, Prompts, ApiKeys } from './types';
+export type {
+  Headline,
+  Territory,
+  ComplianceData,
+  GeneratedOutput,
+  Prompts,
+  ApiKeys,
+} from './types';
 
 const BreadApp: React.FC = () => {
   // Zustand store - centralized state management
@@ -49,7 +60,7 @@ const BreadApp: React.FC = () => {
     toggleTerritoryStarred,
     toggleHeadlineStarred,
     clearStarredItems,
-    resetGeneration
+    resetGeneration,
   } = useAppStore();
 
   // Event handlers
@@ -111,7 +122,6 @@ Please provide a structured response with territories, headlines, and compliance
 
       showToastMessage(APP_CONFIG.success.generation, 'success');
       console.log('✅ Generation completed successfully');
-
     } catch (error: any) {
       console.error('❌ Generation failed:', error);
       const errorMessage = error.message || APP_CONFIG.errors.generation.apiError;
@@ -138,7 +148,7 @@ Please provide a structured response with territories, headlines, and compliance
       generateImages={generateImages}
       apiStatus={{
         openaiReady: true, // Always true with server-side setup
-        imagesEnabled: generateImages
+        imagesEnabled: generateImages,
       }}
     >
       <GenerationController

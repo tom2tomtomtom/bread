@@ -9,23 +9,23 @@ interface GenerationControllerProps {
   // Brief state
   brief: string;
   setBrief: (brief: string) => void;
-  
+
   // Generation state
   isGenerating: boolean;
   error: string;
   showOutput: boolean;
   generatedOutput: any | null;
-  
+
   // Brief analysis
   showBriefAnalysis: boolean;
   briefAnalysis: any | null;
-  
+
   // Starred items
   starredItems: StarredItems;
-  
+
   // API configuration
   apiKeys: ApiKeys;
-  
+
   // Event handlers
   onGenerate: () => void;
   onMomentSelect: (moment: { name: string; date: string }) => void;
@@ -53,7 +53,7 @@ export const GenerationController: React.FC<GenerationControllerProps> = ({
   onRegenerateUnstarred,
   onToggleTerritoryStarred,
   onToggleHeadlineStarred,
-  onBriefAnalysisToggle
+  _onBriefAnalysisToggle,
 }) => {
   return (
     <div className="max-w-6xl mx-auto p-8">
@@ -74,10 +74,7 @@ export const GenerationController: React.FC<GenerationControllerProps> = ({
         {/* Smart Brief Analysis */}
         {briefAnalysis && (
           <div className="mt-6">
-            <BriefEnhancement
-              analysis={briefAnalysis}
-              isVisible={showBriefAnalysis}
-            />
+            <BriefEnhancement analysis={briefAnalysis} isVisible={showBriefAnalysis} />
           </div>
         )}
       </div>
