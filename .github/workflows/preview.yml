@@ -1,0 +1,125 @@
+name: Preview Deployment
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  # Deploy preview for pull requests
+  preview:
+    name: Deploy Preview
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    environment:
+      name: preview
+      url: ${{ steps.deploy.outputs.deploy-url }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run quality checks
+        run: |
+          npm run lint
+          npm run format -- --check
+
+      - name: Run tests
+        run: npm run test:run
+
+      - name: Build application
+        run: npm run build
+
+      - name: Deploy preview to Netlify
+        id: deploy
+        uses: netlify/actions/cli@master
+        with:
+          args: deploy --dir=dist --alias=pr-${{ github.event.number }}
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+      - name: Comment preview URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('🔍 **Preview Deployment**')
+            );
+            
+            const body = `🔍 **Preview Deployment**
+            
+            ✅ **Status**: Deployed successfully
+            📍 **Preview URL**: ${{ steps.deploy.outputs.deploy-url }}
+            🔗 **Alias**: pr-${{ github.event.number }}
+            
+            📊 **Build Info**:
+            - **Commit**: ${context.sha.substring(0, 7)}
+            - **Branch**: ${context.payload.pull_request.head.ref}
+            - **Deployed at**: ${new Date().toISOString()}
+            
+            🧪 **Quality Checks**: All passed ✅
+            - ESLint: Passed
+            - Prettier: Passed  
+            - Tests: Passed
+            - Build: Successful
+            
+            ---
+            *This preview will be updated automatically when you push new commits.*`;
+            
+            if (botComment) {
+              github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: body
+              });
+            }
+
+  # Cleanup preview when PR is closed
+  cleanup:
+    name: Cleanup Preview
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed'
+    steps:
+      - name: Delete preview deployment
+        uses: netlify/actions/cli@master
+        with:
+          args: api deleteDeployment --data '{"deploy_id": "pr-${{ github.event.number }}"}'
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        continue-on-error: true
+
+      - name: Comment cleanup
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🧹 **Preview Cleanup**\n\nPreview deployment has been cleaned up as the PR was closed.'
+            })
+        continue-on-error: true

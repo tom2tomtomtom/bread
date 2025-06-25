@@ -4,6 +4,15 @@ A tech-enabled platform for generating high-quality advertising territories and 
 
 ![BREAD® Platform](https://img.shields.io/badge/BREAD®-Creative%20Platform-yellow?style=for-the-badge)
 
+## 📊 Project Status
+
+[![CI/CD Pipeline](https://github.com/tom2tomtomtom/bread/actions/workflows/ci.yml/badge.svg)](https://github.com/tom2tomtomtom/bread/actions/workflows/ci.yml)
+[![Security Scan](https://github.com/tom2tomtomtom/bread/actions/workflows/security.yml/badge.svg)](https://github.com/tom2tomtomtom/bread/actions/workflows/security.yml)
+[![Code Quality](https://img.shields.io/badge/code%20style-prettier-ff69b4.svg)](https://prettier.io/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3.3-blue.svg)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18.3.1-61dafb.svg)](https://reactjs.org/)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/your-site-id/deploy-status)](https://app.netlify.com/sites/your-site-name/deploys)
+
 ## 🚀 Features
 
 - **AI-Powered Generation**: Supports both OpenAI and Claude for creative territory generation
