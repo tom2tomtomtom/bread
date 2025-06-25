@@ -304,20 +304,20 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           </div>
 
           {/* API Status */}
-          <div className="mt-4 p-4 bg-white/5 rounded-lg">
-            <div className="text-sm font-bold mb-2 text-gray-300">API Status</div>
+          <div className="mt-4 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+            <div className="text-sm font-bold mb-2 text-green-300">🔒 Secure API Status</div>
             <div className="text-xs">
               <div className="flex items-center gap-2 mb-1">
-                <div className={`w-2 h-2 rounded-full ${apiKeys.openai ? 'bg-green-400' : 'bg-gray-500'}`}></div>
-                <span>OpenAI Text Generation: {apiKeys.openai ? 'Ready' : 'Not configured'}</span>
+                <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                <span>OpenAI Text Generation: Secure Server-side</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${apiKeys.openai && generateImages ? 'bg-purple-400' : 'bg-gray-500'}`}></div>
-                <span>DALL-E Image Generation: {apiKeys.openai && generateImages ? 'Enabled' : 'Disabled'}</span>
+                <div className={`w-2 h-2 rounded-full ${generateImages ? 'bg-purple-400' : 'bg-gray-500'}`}></div>
+                <span>DALL-E Image Generation: {generateImages ? 'Enabled (Secure)' : 'Disabled'}</span>
               </div>
             </div>
-            <div className="text-xs text-gray-400 mt-2">
-              🔒 Keys are stored locally in your browser for security. Never share your API keys.
+            <div className="text-xs text-green-200 mt-2">
+              ✅ API keys are now handled securely server-side. No sensitive data exposed in browser.
             </div>
           </div>
         </div>

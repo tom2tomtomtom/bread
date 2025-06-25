@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { generateWithOpenAI } from './services/aiService';
+import { generateWithOpenAI, generateWithClaude } from './services/secureApiService';
 import { analyzeBrief, enhanceGeneratedOutput, EnhancedGeneratedOutput, BriefAnalysis } from './services/enhancementService';
 import { AdminPanel } from './components/AdminPanel';
 import { BriefEnhancement } from './components/BriefEnhancement';
@@ -395,11 +395,8 @@ DON'T MAKE EVERY HEADLINE THE SAME FORMULA.`,
       return;
     }
 
-    // Check if OpenAI API key is available
-    if (!apiKeys.openai) {
-      setError('Please configure your OpenAI API key in the Admin panel before generating.');
-      return;
-    }
+    // API keys are now handled securely server-side
+    // No client-side validation needed
 
     setIsGenerating(true);
     setError('');
@@ -485,8 +482,8 @@ If Black Friday brief: "Black Friday crowds stress me. / Everyday rewards skip t
 
 Please provide a structured response with territories, headlines, and compliance guidance that DIRECTLY ADDRESSES THE BRIEF.`;
 
-      // Generate with OpenAI
-      const result = await generateWithOpenAI(fullPrompt, apiKeys.openai, generateImages, brief);
+      // Generate with OpenAI (now secure server-side)
+      const result = await generateWithOpenAI(fullPrompt, generateImages, brief);
 
       // Enhance the output with confidence scoring
       let enhancedResult = enhanceGeneratedOutput(result, brief);
@@ -575,10 +572,8 @@ Please provide a structured response with territories, headlines, and compliance
                 </button>
                 <div className="text-sm text-gray-400">
                   <div className="flex items-center gap-2 justify-end mb-1">
-                    <div className={`w-2 h-2 rounded-full ${
-                      apiKeys.openai ? 'bg-green-400' : 'bg-red-400'
-                    }`}></div>
-                    OpenAI {apiKeys.openai ? 'Ready' : 'No API Key'}
+                    <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                    OpenAI (Server-side Secure)
                   </div>
                   <div className="flex items-center gap-2 justify-end mb-1">
                     <div className={`w-2 h-2 rounded-full ${
