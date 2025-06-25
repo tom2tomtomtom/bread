@@ -1,4 +1,4 @@
-import { Territory, GeneratedOutput } from '../App';
+import { Territory, GeneratedOutput, StarredItems } from '../types';
 
 export interface BriefAnalysis {
   score: number; // 0-100
@@ -206,5 +206,45 @@ export const enhanceGeneratedOutput = (output: GeneratedOutput, brief: string): 
     ...output,
     territories: enhancedTerritories,
     overallConfidence: Math.round(overallConfidence)
+  };
+};
+
+// Merge new generated content with existing starred content
+export const mergeWithStarredContent = (
+  newOutput: any,
+  existingOutput: any,
+  starredItems: StarredItems
+): any => {
+  const mergedTerritories = newOutput.territories.map((newTerritory: any, index: number) => {
+    const existingTerritory = existingOutput.territories[index];
+
+    // If territory is starred, keep the existing one
+    if (existingTerritory && starredItems.territories.includes(existingTerritory.id)) {
+      return { ...existingTerritory, starred: true };
+    }
+
+    // For unstarred territories, merge headlines
+    const territoryId = existingTerritory?.id || newTerritory.id;
+    const starredHeadlineIndices = starredItems.headlines[territoryId] || [];
+
+    const mergedHeadlines = newTerritory.headlines.map((newHeadline: any, hIndex: number) => {
+      // If headline is starred, keep the existing one
+      if (starredHeadlineIndices.includes(hIndex) && existingTerritory?.headlines[hIndex]) {
+        return { ...existingTerritory.headlines[hIndex], starred: true };
+      }
+      return { ...newHeadline, starred: false };
+    });
+
+    return {
+      ...newTerritory,
+      id: territoryId,
+      headlines: mergedHeadlines,
+      starred: false
+    };
+  });
+
+  return {
+    ...newOutput,
+    territories: mergedTerritories
   };
 };
