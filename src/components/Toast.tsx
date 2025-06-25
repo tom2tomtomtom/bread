@@ -8,12 +8,12 @@ interface ToastProps {
   duration?: number;
 }
 
-export const Toast: React.FC<ToastProps> = ({ 
-  message, 
-  type = 'success', 
-  isVisible, 
-  onClose, 
-  duration = 3000 
+export const Toast: React.FC<ToastProps> = ({
+  message,
+  type = 'success',
+  isVisible,
+  onClose,
+  duration = 3000,
 }) => {
   useEffect(() => {
     if (isVisible) {
@@ -54,11 +54,13 @@ export const Toast: React.FC<ToastProps> = ({
 
   return (
     <div className="fixed top-8 right-8 z-50 animate-in slide-in-from-right duration-300">
-      <div className={`
+      <div
+        className={`
         backdrop-blur-xl rounded-2xl border p-6 shadow-2xl
         ${getToastStyles()}
         min-w-[300px] max-w-[500px]
-      `}>
+      `}
+      >
         <div className="flex items-center gap-3">
           <span className="text-2xl">{getIcon()}</span>
           <div className="flex-1">

@@ -8,21 +8,25 @@ interface TerritoryOutputProps {
   onRegenerateUnstarred: () => void;
   onToggleTerritoryStarred: (territoryId: string) => void;
   onToggleHeadlineStarred: (territoryId: string, headlineIndex: number) => void;
-  starredItems: {territories: string[], headlines: {[territoryId: string]: number[]}};
+  starredItems: { territories: string[]; headlines: { [territoryId: string]: number[] } };
 }
 
-export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({ 
-  generatedOutput, 
-  onNewBrief, 
+export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
+  generatedOutput,
+  onNewBrief,
   onRegenerateUnstarred,
   onToggleTerritoryStarred,
   onToggleHeadlineStarred,
-  starredItems 
+  starredItems,
 }) => {
   const [showConfidenceReport, setShowConfidenceReport] = useState(false);
 
   const handleReset = () => {
-    if (window.confirm('Are you sure you want to start a new brief? This will clear all current results.')) {
+    if (
+      window.confirm(
+        'Are you sure you want to start a new brief? This will clear all current results.'
+      )
+    ) {
       onNewBrief();
     }
   };
@@ -42,16 +46,21 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
         title: territory.title,
         positioning: territory.positioning,
         tone: territory.tone,
-        confidence: Math.round((territory.confidence.marketFit + territory.confidence.complianceConfidence + territory.confidence.audienceResonance) / 3),
+        confidence: Math.round(
+          (territory.confidence.marketFit +
+            territory.confidence.complianceConfidence +
+            territory.confidence.audienceResonance) /
+            3
+        ),
         riskLevel: territory.confidence.riskLevel,
         headlines: territory.headlines.map(h => ({
           text: h.text,
           followUp: h.followUp,
           reasoning: h.reasoning,
-          confidence: h.confidence
-        }))
+          confidence: h.confidence,
+        })),
       })),
-      compliance: generatedOutput.compliance
+      compliance: generatedOutput.compliance,
     };
 
     // Simple PDF generation using browser print
@@ -80,7 +89,9 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
                 <h2>Overall Confidence: <span class="${content.overallConfidence >= 80 ? 'confidence-high' : content.overallConfidence >= 60 ? 'confidence-medium' : 'confidence-low'}">${content.overallConfidence}%</span></h2>
               </div>
             </div>
-            ${content.territories.map(territory => `
+            ${content.territories
+              .map(
+                territory => `
               <div class="territory">
                 <h3>${territory.id}: "${territory.title}"</h3>
                 <p><strong>Positioning:</strong> ${territory.positioning}</p>
@@ -88,16 +99,22 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
                 <p><strong>Confidence:</strong> <span class="${territory.confidence >= 80 ? 'confidence-high' : territory.confidence >= 60 ? 'confidence-medium' : 'confidence-low'}">${territory.confidence}%</span></p>
                 <p><strong>Risk Level:</strong> ${territory.riskLevel}</p>
                 <h4>Headlines:</h4>
-                ${territory.headlines.map(headline => `
+                ${territory.headlines
+                  .map(
+                    headline => `
                   <div class="headline">
                     <p><strong>"${headline.text}"</strong></p>
                     <p>${headline.followUp}</p>
                     <p><em>Why this works:</em> ${headline.reasoning}</p>
                     <p><strong>Confidence:</strong> <span class="${headline.confidence >= 80 ? 'confidence-high' : headline.confidence >= 60 ? 'confidence-medium' : 'confidence-low'}">${headline.confidence}%</span></p>
                   </div>
-                `).join('')}
+                `
+                  )
+                  .join('')}
               </div>
-            `).join('')}
+            `
+              )
+              .join('')}
             <div class="territory">
               <h3>Compliance Summary</h3>
               <p><strong>Output:</strong> ${content.compliance.output}</p>
@@ -116,14 +133,30 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
   const exportToCSV = () => {
     // Create CSV content
     const csvData = [];
-    
+
     // Headers
-    csvData.push(['Territory ID', 'Title', 'Positioning', 'Tone', 'Territory Confidence', 'Risk Level', 'Headline Text', 'Follow-up', 'Reasoning', 'Headline Confidence']);
-    
+    csvData.push([
+      'Territory ID',
+      'Title',
+      'Positioning',
+      'Tone',
+      'Territory Confidence',
+      'Risk Level',
+      'Headline Text',
+      'Follow-up',
+      'Reasoning',
+      'Headline Confidence',
+    ]);
+
     // Data rows
     generatedOutput.territories.forEach(territory => {
-      const territoryConfidence = Math.round((territory.confidence.marketFit + territory.confidence.complianceConfidence + territory.confidence.audienceResonance) / 3);
-      
+      const territoryConfidence = Math.round(
+        (territory.confidence.marketFit +
+          territory.confidence.complianceConfidence +
+          territory.confidence.audienceResonance) /
+          3
+      );
+
       territory.headlines.forEach(headline => {
         csvData.push([
           territory.id,
@@ -135,20 +168,23 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
           headline.text.replace(/,/g, ';'),
           headline.followUp.replace(/,/g, ';'),
           headline.reasoning.replace(/,/g, ';'),
-          headline.confidence
+          headline.confidence,
         ]);
       });
     });
-    
+
     // Convert to CSV string
     const csvContent = csvData.map(row => row.map(field => `"${field}"`).join(',')).join('\n');
-    
+
     // Download CSV
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `aideas-creative-territories-${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute(
+      'download',
+      `aideas-creative-territories-${new Date().toISOString().split('T')[0]}.csv`
+    );
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -161,9 +197,11 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-headline text-white">CREATIVE TERRITORIES & EXECUTIONS</h1>
-          <p className="text-gray-400 text-sm font-body normal-case">AI-generated creative territories with confidence scoring</p>
+          <p className="text-gray-400 text-sm font-body normal-case">
+            AI-generated creative territories with confidence scoring
+          </p>
         </div>
-        <button 
+        <button
           onClick={handleReset}
           className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 shadow-lg shadow-red-500/25 hover:shadow-red-400/30 flex items-center gap-2"
         >
@@ -178,13 +216,19 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
           <div className="text-4xl">🧠</div>
           <div>
             <h3 className="text-2xl font-subheading text-purple-400">OVERALL CONFIDENCE</h3>
-            <p className="text-sm text-gray-300 font-body normal-case">AI-Generated Performance Prediction</p>
+            <p className="text-sm text-gray-300 font-body normal-case">
+              AI-Generated Performance Prediction
+            </p>
           </div>
-          <div className={`text-4xl font-black px-6 py-3 rounded-2xl ${
-            generatedOutput.overallConfidence >= 80 ? 'text-green-400 bg-green-400/10' :
-            generatedOutput.overallConfidence >= 60 ? 'text-yellow-400 bg-yellow-400/10' :
-            'text-red-400 bg-red-400/10'
-          }`}>
+          <div
+            className={`text-4xl font-black px-6 py-3 rounded-2xl ${
+              generatedOutput.overallConfidence >= 80
+                ? 'text-green-400 bg-green-400/10'
+                : generatedOutput.overallConfidence >= 60
+                  ? 'text-yellow-400 bg-yellow-400/10'
+                  : 'text-red-400 bg-red-400/10'
+            }`}
+          >
             {generatedOutput.overallConfidence}%
           </div>
         </div>
@@ -202,7 +246,7 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
           {generatedOutput.territories.map((territory, index) => (
             <div key={territory.id} className="space-y-6">
               {/* Territory Card */}
-              <div 
+              <div
                 className="bg-gradient-to-br from-yellow-400 via-yellow-300 to-yellow-500 text-black p-6 rounded-2xl shadow-xl shadow-yellow-400/20 hover:shadow-yellow-400/30 transition-all duration-300"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
@@ -214,39 +258,67 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
                     <button
                       onClick={() => onToggleTerritoryStarred(territory.id)}
                       className={`text-lg transition-all duration-300 hover:scale-110 ${
-                        starredItems.territories.includes(territory.id) 
-                          ? 'text-yellow-500 drop-shadow-lg' 
+                        starredItems.territories.includes(territory.id)
+                          ? 'text-yellow-500 drop-shadow-lg'
                           : 'text-gray-400 hover:text-yellow-400'
                       }`}
-                      title={starredItems.territories.includes(territory.id) ? 'Unstar territory' : 'Star territory'}
+                      title={
+                        starredItems.territories.includes(territory.id)
+                          ? 'Unstar territory'
+                          : 'Star territory'
+                      }
                     >
                       {starredItems.territories.includes(territory.id) ? '⭐' : '☆'}
                     </button>
                   </div>
-                  <div className={`text-xs font-bold px-2 py-1 rounded-full ${
-                    Math.round((territory.confidence.marketFit + territory.confidence.complianceConfidence + territory.confidence.audienceResonance) / 3) >= 80 ? 'bg-green-400 text-white' :
-                    Math.round((territory.confidence.marketFit + territory.confidence.complianceConfidence + territory.confidence.audienceResonance) / 3) >= 60 ? 'bg-yellow-600 text-white' :
-                    'bg-red-500 text-white'
-                  }`}>
-                    {Math.round((territory.confidence.marketFit + territory.confidence.complianceConfidence + territory.confidence.audienceResonance) / 3)}% CONF
+                  <div
+                    className={`text-xs font-bold px-2 py-1 rounded-full ${
+                      Math.round(
+                        (territory.confidence.marketFit +
+                          territory.confidence.complianceConfidence +
+                          territory.confidence.audienceResonance) /
+                          3
+                      ) >= 80
+                        ? 'bg-green-400 text-white'
+                        : Math.round(
+                              (territory.confidence.marketFit +
+                                territory.confidence.complianceConfidence +
+                                territory.confidence.audienceResonance) /
+                                3
+                            ) >= 60
+                          ? 'bg-yellow-600 text-white'
+                          : 'bg-red-500 text-white'
+                    }`}
+                  >
+                    {Math.round(
+                      (territory.confidence.marketFit +
+                        territory.confidence.complianceConfidence +
+                        territory.confidence.audienceResonance) /
+                        3
+                    )}
+                    % CONF
                   </div>
                 </div>
-                <h3 className="text-2xl font-subheading mb-4">
-                  "{territory.title}"
-                </h3>
+                <h3 className="text-2xl font-subheading mb-4">"{territory.title}"</h3>
                 <div className="bg-black/10 p-3 rounded-xl mb-3">
                   <div className="text-xs font-subheading mb-2">POSITIONING</div>
-                  <p className="font-body font-normal text-sm text-gray-800 normal-case">{territory.positioning}</p>
+                  <p className="font-body font-normal text-sm text-gray-800 normal-case">
+                    {territory.positioning}
+                  </p>
                 </div>
-                
+
                 {/* Risk Level Indicator */}
                 <div className="flex justify-between items-center">
                   <span className="text-xs font-subheading text-gray-700">RISK LEVEL:</span>
-                  <span className={`text-xs font-bold px-2 py-1 rounded-full ${
-                    territory.confidence.riskLevel === 'LOW' ? 'bg-green-500 text-white' :
-                    territory.confidence.riskLevel === 'MEDIUM' ? 'bg-yellow-600 text-white' :
-                    'bg-red-500 text-white'
-                  }`}>
+                  <span
+                    className={`text-xs font-bold px-2 py-1 rounded-full ${
+                      territory.confidence.riskLevel === 'LOW'
+                        ? 'bg-green-500 text-white'
+                        : territory.confidence.riskLevel === 'MEDIUM'
+                          ? 'bg-yellow-600 text-white'
+                          : 'bg-red-500 text-white'
+                    }`}
+                  >
                     {territory.confidence.riskLevel}
                   </span>
                 </div>
@@ -255,7 +327,7 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
               {/* Phone Panels Grid for Headlines */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {territory.headlines.map((headline, hIndex) => (
-                  <div 
+                  <div
                     key={hIndex}
                     className="relative group"
                     style={{ animationDelay: `${index * 300 + hIndex * 100 + 50}ms` }}
@@ -263,16 +335,16 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
                     {/* Phone Frame */}
                     <div className="bg-gray-800 p-2 rounded-3xl shadow-2xl hover:scale-105 transition-all duration-300">
                       {/* Phone Screen */}
-                      <div 
+                      <div
                         className="text-white rounded-2xl overflow-hidden shadow-inner relative"
-                        style={{ 
+                        style={{
                           aspectRatio: '9 / 16',
-                          backgroundImage: headline.imageUrl 
+                          backgroundImage: headline.imageUrl
                             ? `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${headline.imageUrl})`
                             : 'linear-gradient(135deg, #3b82f6 0%, #1e40af 50%, #1e3a8a 100%)',
                           backgroundSize: 'cover',
                           backgroundPosition: 'center',
-                          backgroundRepeat: 'no-repeat'
+                          backgroundRepeat: 'no-repeat',
                         }}
                       >
                         {/* Loading state overlay for missing images */}
@@ -305,14 +377,18 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
                               {headline.followUp}
                             </p>
                           </div>
-                          
+
                           {/* Confidence Badge */}
                           <div className="mb-4">
-                            <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${
-                              headline.confidence >= 80 ? 'bg-green-400/80 text-green-900' :
-                              headline.confidence >= 60 ? 'bg-yellow-400/80 text-yellow-900' :
-                              'bg-red-400/80 text-red-900'
-                            }`}>
+                            <div
+                              className={`inline-block px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${
+                                headline.confidence >= 80
+                                  ? 'bg-green-400/80 text-green-900'
+                                  : headline.confidence >= 60
+                                    ? 'bg-yellow-400/80 text-yellow-900'
+                                    : 'bg-red-400/80 text-red-900'
+                              }`}
+                            >
                               {headline.confidence}% CONFIDENCE
                             </div>
                           </div>
@@ -323,12 +399,18 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
                               onClick={() => onToggleHeadlineStarred(territory.id, hIndex)}
                               className={`text-2xl transition-all duration-300 hover:scale-110 drop-shadow-lg ${
                                 (starredItems.headlines[territory.id] || []).includes(hIndex)
-                                  ? 'text-yellow-300' 
+                                  ? 'text-yellow-300'
                                   : 'text-gray-300 hover:text-yellow-200'
                               }`}
-                              title={(starredItems.headlines[territory.id] || []).includes(hIndex) ? 'Unstar headline' : 'Star headline'}
+                              title={
+                                (starredItems.headlines[territory.id] || []).includes(hIndex)
+                                  ? 'Unstar headline'
+                                  : 'Star headline'
+                              }
                             >
-                              {(starredItems.headlines[territory.id] || []).includes(hIndex) ? '⭐' : '☆'}
+                              {(starredItems.headlines[territory.id] || []).includes(hIndex)
+                                ? '⭐'
+                                : '☆'}
                             </button>
                           </div>
 
@@ -345,14 +427,18 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
                         {/* Hover Overlay with Reasoning */}
                         <div className="absolute inset-0 bg-black/90 opacity-0 group-hover:opacity-100 transition-all duration-300 p-4 flex flex-col justify-center z-20">
                           <div className="text-center">
-                            <h5 className="text-sm font-bold text-yellow-300 mb-3">WHY THIS WORKS</h5>
+                            <h5 className="text-sm font-bold text-yellow-300 mb-3">
+                              WHY THIS WORKS
+                            </h5>
                             <p className="text-xs text-blue-100 leading-relaxed">
                               {headline.reasoning}
                             </p>
                             {headline.imageUrl && (
                               <div className="mt-3 text-xs text-purple-300">
                                 <div className="text-purple-200">🎨 AI-Generated Visual</div>
-                                <div className="text-xs text-purple-400 mt-1">Background designed by DALL-E</div>
+                                <div className="text-xs text-purple-400 mt-1">
+                                  Background designed by DALL-E
+                                </div>
                               </div>
                             )}
                           </div>
@@ -362,18 +448,15 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
                   </div>
                 ))}
               </div>
-                
+
               {/* Territory Tone - Separate Card */}
               <div className="bg-gradient-to-br from-purple-500 via-purple-400 to-purple-600 text-white p-6 rounded-2xl shadow-xl shadow-purple-500/20">
                 <div className="text-xs font-subheading mb-2 text-purple-200">TERRITORY TONE</div>
                 <p className="font-body font-normal text-lg normal-case">{territory.tone}</p>
-                
+
                 {/* Territory Confidence Scoring Panel */}
                 <div className="mt-4">
-                  <ConfidenceScoring 
-                    confidence={territory.confidence}
-                    territoryId={territory.id}
-                  />
+                  <ConfidenceScoring confidence={territory.confidence} territoryId={territory.id} />
                 </div>
               </div>
             </div>
@@ -417,17 +500,37 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
               </ul>
             </div>
           </div>
-          
+
           {/* Overall Compliance Score */}
           <div className="mt-6 pt-6 border-t border-white/20">
             <div className="flex items-center justify-between">
               <span className="font-subheading">OVERALL COMPLIANCE CONFIDENCE:</span>
-              <div className={`px-4 py-2 rounded-full font-bold ${
-                Math.round(generatedOutput.territories.reduce((sum, t) => sum + t.confidence.complianceConfidence, 0) / generatedOutput.territories.length) >= 80 ? 'bg-green-400 text-green-900' :
-                Math.round(generatedOutput.territories.reduce((sum, t) => sum + t.confidence.complianceConfidence, 0) / generatedOutput.territories.length) >= 60 ? 'bg-yellow-400 text-yellow-900' :
-                'bg-red-400 text-red-900'
-              }`}>
-                {Math.round(generatedOutput.territories.reduce((sum, t) => sum + t.confidence.complianceConfidence, 0) / generatedOutput.territories.length)}%
+              <div
+                className={`px-4 py-2 rounded-full font-bold ${
+                  Math.round(
+                    generatedOutput.territories.reduce(
+                      (sum, t) => sum + t.confidence.complianceConfidence,
+                      0
+                    ) / generatedOutput.territories.length
+                  ) >= 80
+                    ? 'bg-green-400 text-green-900'
+                    : Math.round(
+                          generatedOutput.territories.reduce(
+                            (sum, t) => sum + t.confidence.complianceConfidence,
+                            0
+                          ) / generatedOutput.territories.length
+                        ) >= 60
+                      ? 'bg-yellow-400 text-yellow-900'
+                      : 'bg-red-400 text-red-900'
+                }`}
+              >
+                {Math.round(
+                  generatedOutput.territories.reduce(
+                    (sum, t) => sum + t.confidence.complianceConfidence,
+                    0
+                  ) / generatedOutput.territories.length
+                )}
+                %
               </div>
             </div>
           </div>
@@ -447,76 +550,118 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
                 ✕
               </button>
             </div>
-            
+
             <div className="space-y-6">
               {/* Overall Stats */}
               <div className="bg-white/10 rounded-xl p-6">
                 <h4 className="font-subheading text-purple-300 mb-4">OVERALL PERFORMANCE</h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-white">{generatedOutput.overallConfidence}%</div>
-                    <div className="text-xs text-gray-300 font-body normal-case">Overall Confidence</div>
+                    <div className="text-2xl font-bold text-white">
+                      {generatedOutput.overallConfidence}%
+                    </div>
+                    <div className="text-xs text-gray-300 font-body normal-case">
+                      Overall Confidence
+                    </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-white">{generatedOutput.territories.length}</div>
+                    <div className="text-2xl font-bold text-white">
+                      {generatedOutput.territories.length}
+                    </div>
                     <div className="text-xs text-gray-300 font-body normal-case">Territories</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-white">{generatedOutput.territories.reduce((sum, t) => sum + t.headlines.length, 0)}</div>
+                    <div className="text-2xl font-bold text-white">
+                      {generatedOutput.territories.reduce((sum, t) => sum + t.headlines.length, 0)}
+                    </div>
                     <div className="text-xs text-gray-300 font-body normal-case">Headlines</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-white">{Math.round(generatedOutput.territories.reduce((sum, t) => sum + t.confidence.complianceConfidence, 0) / generatedOutput.territories.length)}%</div>
+                    <div className="text-2xl font-bold text-white">
+                      {Math.round(
+                        generatedOutput.territories.reduce(
+                          (sum, t) => sum + t.confidence.complianceConfidence,
+                          0
+                        ) / generatedOutput.territories.length
+                      )}
+                      %
+                    </div>
                     <div className="text-xs text-gray-300 font-body normal-case">Compliance</div>
                   </div>
                 </div>
               </div>
-              
+
               {/* Territory Breakdown */}
               <div className="space-y-4">
                 <h4 className="font-subheading text-purple-300">TERRITORY BREAKDOWN</h4>
-                {generatedOutput.territories.map((territory, index) => {
-                  const avgConfidence = Math.round((territory.confidence.marketFit + territory.confidence.complianceConfidence + territory.confidence.audienceResonance) / 3);
-                  const avgHeadlineConfidence = Math.round(territory.headlines.reduce((sum, h) => sum + h.confidence, 0) / territory.headlines.length);
-                  
+                {generatedOutput.territories.map((territory, _index) => {
+                  const avgConfidence = Math.round(
+                    (territory.confidence.marketFit +
+                      territory.confidence.complianceConfidence +
+                      territory.confidence.audienceResonance) /
+                      3
+                  );
+                  const avgHeadlineConfidence = Math.round(
+                    territory.headlines.reduce((sum, h) => sum + h.confidence, 0) /
+                      territory.headlines.length
+                  );
+
                   return (
                     <div key={territory.id} className="bg-white/5 rounded-lg p-4">
                       <div className="flex justify-between items-center mb-3">
-                        <h5 className="font-subheading text-white">{territory.id}: {territory.title}</h5>
-                        <div className={`px-3 py-1 rounded-full text-sm font-bold ${
-                          avgConfidence >= 80 ? 'bg-green-400 text-green-900' :
-                          avgConfidence >= 60 ? 'bg-yellow-400 text-yellow-900' :
-                          'bg-red-400 text-red-900'
-                        }`}>
+                        <h5 className="font-subheading text-white">
+                          {territory.id}: {territory.title}
+                        </h5>
+                        <div
+                          className={`px-3 py-1 rounded-full text-sm font-bold ${
+                            avgConfidence >= 80
+                              ? 'bg-green-400 text-green-900'
+                              : avgConfidence >= 60
+                                ? 'bg-yellow-400 text-yellow-900'
+                                : 'bg-red-400 text-red-900'
+                          }`}
+                        >
                           {avgConfidence}%
                         </div>
                       </div>
-                      
+
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                         <div>
                           <div className="text-gray-400 font-body normal-case">Market Fit</div>
-                          <div className="text-white font-bold">{territory.confidence.marketFit}%</div>
+                          <div className="text-white font-bold">
+                            {territory.confidence.marketFit}%
+                          </div>
                         </div>
                         <div>
                           <div className="text-gray-400 font-body normal-case">Compliance</div>
-                          <div className="text-white font-bold">{territory.confidence.complianceConfidence}%</div>
+                          <div className="text-white font-bold">
+                            {territory.confidence.complianceConfidence}%
+                          </div>
                         </div>
                         <div>
-                          <div className="text-gray-400 font-body normal-case">Audience Resonance</div>
-                          <div className="text-white font-bold">{territory.confidence.audienceResonance}%</div>
+                          <div className="text-gray-400 font-body normal-case">
+                            Audience Resonance
+                          </div>
+                          <div className="text-white font-bold">
+                            {territory.confidence.audienceResonance}%
+                          </div>
                         </div>
                         <div>
                           <div className="text-gray-400 font-body normal-case">Avg Headlines</div>
                           <div className="text-white font-bold">{avgHeadlineConfidence}%</div>
                         </div>
                       </div>
-                      
+
                       <div className="mt-2">
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          territory.confidence.riskLevel === 'LOW' ? 'bg-green-500/20 text-green-300' :
-                          territory.confidence.riskLevel === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-300' :
-                          'bg-red-500/20 text-red-300'
-                        }`}>
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full ${
+                            territory.confidence.riskLevel === 'LOW'
+                              ? 'bg-green-500/20 text-green-300'
+                              : territory.confidence.riskLevel === 'MEDIUM'
+                                ? 'bg-yellow-500/20 text-yellow-300'
+                                : 'bg-red-500/20 text-red-300'
+                          }`}
+                        >
                           {territory.confidence.riskLevel} RISK
                         </span>
                       </div>
@@ -530,15 +675,20 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
       )}
 
       {/* Starred Items Summary */}
-      {(starredItems.territories.length > 0 || Object.values(starredItems.headlines).some(arr => arr.length > 0)) && (
+      {(starredItems.territories.length > 0 ||
+        Object.values(starredItems.headlines).some(arr => arr.length > 0)) && (
         <div className="backdrop-blur-xl bg-yellow-500/10 border border-yellow-500/20 rounded-3xl p-6 shadow-2xl text-center">
           <h3 className="text-lg font-subheading text-yellow-400 mb-3">⭐ STARRED ITEMS</h3>
           <div className="flex justify-center gap-6 text-sm font-body normal-case">
             <div className="text-gray-300">
-              <span className="font-bold text-white">{starredItems.territories.length}</span> starred territories
+              <span className="font-bold text-white">{starredItems.territories.length}</span>{' '}
+              starred territories
             </div>
             <div className="text-gray-300">
-              <span className="font-bold text-white">{Object.values(starredItems.headlines).reduce((sum, arr) => sum + arr.length, 0)}</span> starred headlines
+              <span className="font-bold text-white">
+                {Object.values(starredItems.headlines).reduce((sum, arr) => sum + arr.length, 0)}
+              </span>{' '}
+              starred headlines
             </div>
           </div>
           <p className="text-xs text-gray-400 mt-2 font-body normal-case">
@@ -549,8 +699,9 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
 
       {/* Enhanced Action Buttons */}
       <div className="flex gap-4 justify-center flex-wrap">
-        {(starredItems.territories.length > 0 || Object.values(starredItems.headlines).some(arr => arr.length > 0)) && (
-          <button 
+        {(starredItems.territories.length > 0 ||
+          Object.values(starredItems.headlines).some(arr => arr.length > 0)) && (
+          <button
             onClick={onRegenerateUnstarred}
             className="bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 hover:from-yellow-500/30 hover:to-yellow-600/30 border border-yellow-500/30 hover:border-yellow-400/40 px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 text-yellow-300 hover:text-yellow-200"
           >
@@ -558,28 +709,28 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
             REGENERATE UNSTARRED
           </button>
         )}
-        <button 
+        <button
           onClick={generateConfidenceReport}
           className="bg-gradient-to-r from-purple-500/20 to-purple-600/20 hover:from-purple-500/30 hover:to-purple-600/30 border border-purple-500/30 hover:border-purple-400/40 px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 text-purple-300 hover:text-purple-200"
         >
           <span>📊</span>
           CONFIDENCE REPORT
         </button>
-        <button 
+        <button
           onClick={exportToPDF}
           className="bg-gradient-to-r from-blue-500/20 to-blue-600/20 hover:from-blue-500/30 hover:to-blue-600/30 border border-blue-500/30 hover:border-blue-400/40 px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 text-blue-300 hover:text-blue-200"
         >
           <span>📥</span>
           EXPORT PDF
         </button>
-        <button 
+        <button
           onClick={exportToCSV}
           className="bg-gradient-to-r from-green-500/20 to-green-600/20 hover:from-green-500/30 hover:to-green-600/30 border border-green-500/30 hover:border-green-400/40 px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 text-green-300 hover:text-green-200"
         >
           <span>📊</span>
           EXPORT CSV
         </button>
-        <button 
+        <button
           onClick={handleReset}
           className="bg-gradient-to-r from-red-500/20 to-red-600/20 hover:from-red-500/30 hover:to-red-600/30 border border-red-500/30 hover:border-red-400/40 px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 text-red-300 hover:text-red-200"
         >

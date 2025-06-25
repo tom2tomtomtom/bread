@@ -5,7 +5,7 @@ export interface Headline {
   followUp: string;
   reasoning: string;
   confidence: number;
-  imageUrl?: string;  // AI-generated image URL
+  imageUrl?: string; // AI-generated image URL
   starred?: boolean;
 }
 

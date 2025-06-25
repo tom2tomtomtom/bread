@@ -16,7 +16,7 @@ export const getCampaignMoments = (): CampaignMoment[] => {
 export const getUpcomingMoments = (): CampaignMoment[] => {
   const now = new Date();
   const threeMonthsFromNow = new Date(now.getFullYear(), now.getMonth() + 3, now.getDate());
-  
+
   return CAMPAIGN_MOMENTS.filter(moment => {
     // Simple date parsing - in a real app, you'd want more robust date handling
     const momentDate = new Date(moment.date);
@@ -38,25 +38,23 @@ Key themes to consider: ${moment.keywords.join(', ')}`;
 // Detect campaign moment from brief text
 export const detectCampaignMoment = (brief: string): CampaignMoment | null => {
   const briefLower = brief.toLowerCase();
-  
+
   for (const moment of CAMPAIGN_MOMENTS) {
     // Check if any of the moment's keywords appear in the brief
-    const hasKeyword = moment.keywords.some(keyword => 
-      briefLower.includes(keyword.toLowerCase())
-    );
-    
+    const hasKeyword = moment.keywords.some(keyword => briefLower.includes(keyword.toLowerCase()));
+
     if (hasKeyword) {
       return moment;
     }
   }
-  
+
   return null;
 };
 
 // Get seasonal context for a given date
 export const getSeasonalContext = (date: Date = new Date()): string => {
   const month = date.getMonth() + 1; // JavaScript months are 0-indexed
-  
+
   if (month >= 12 || month <= 2) {
     return 'summer'; // Australian summer
   } else if (month >= 3 && month <= 5) {
@@ -75,14 +73,14 @@ export const getSeasonalMoments = (): CampaignMoment[] => {
     summer: ['christmas', 'holiday', 'new year', 'australia day'],
     autumn: ['back to school', 'easter', 'mothers day'],
     winter: ['eofy', 'tax', 'fathers day'],
-    spring: ['black friday', 'spring', 'melbourne cup']
+    spring: ['black friday', 'spring', 'melbourne cup'],
   };
-  
+
   const keywords = seasonalKeywords[season as keyof typeof seasonalKeywords] || [];
-  
+
   return CAMPAIGN_MOMENTS.filter(moment =>
-    moment.keywords.some(keyword => 
-      keywords.some(seasonalKeyword => 
+    moment.keywords.some(keyword =>
+      keywords.some(seasonalKeyword =>
         keyword.toLowerCase().includes(seasonalKeyword.toLowerCase())
       )
     )
@@ -97,17 +95,16 @@ export const formatMomentForDisplay = (moment: CampaignMoment): string => {
 // Get moment suggestions based on brief analysis
 export const getMomentSuggestions = (brief: string): CampaignMoment[] => {
   const detectedMoment = detectCampaignMoment(brief);
-  
+
   if (detectedMoment) {
     // If we detected a specific moment, return related moments
-    return CAMPAIGN_MOMENTS.filter(moment => 
-      moment !== detectedMoment && 
-      moment.keywords.some(keyword => 
-        detectedMoment.keywords.includes(keyword)
-      )
+    return CAMPAIGN_MOMENTS.filter(
+      moment =>
+        moment !== detectedMoment &&
+        moment.keywords.some(keyword => detectedMoment.keywords.includes(keyword))
     ).slice(0, 3); // Return top 3 related moments
   }
-  
+
   // Otherwise, return seasonal moments
   return getSeasonalMoments().slice(0, 3);
 };
@@ -117,7 +114,7 @@ export const isMomentRelevant = (moment: CampaignMoment): boolean => {
   const now = new Date();
   const momentDate = new Date(moment.date);
   const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate());
-  
+
   return momentDate >= sixMonthsAgo;
 };
 

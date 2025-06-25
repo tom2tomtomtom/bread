@@ -16,7 +16,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   showAdmin,
   onAdminToggle,
   generateImages,
-  apiStatus
+  _apiStatus,
 }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
@@ -58,12 +58,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
                   OpenAI (Server-side Secure)
                 </div>
                 <div className="flex items-center gap-2 justify-end mb-1">
-                  <div className={`w-2 h-2 rounded-full ${generateImages ? 'bg-purple-400' : 'bg-gray-400'}`}></div>
+                  <div
+                    className={`w-2 h-2 rounded-full ${generateImages ? 'bg-purple-400' : 'bg-gray-400'}`}
+                  ></div>
                   Images {generateImages ? 'Enabled' : 'Disabled'}
                 </div>
-                <div className="text-xs text-gray-500">
-                  🔒 Secure & Ready
-                </div>
+                <div className="text-xs text-gray-500">🔒 Secure & Ready</div>
               </div>
             </div>
           </div>
@@ -71,7 +71,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
       </header>
 
       {/* Main Content */}
-      <main className={`relative z-10 transition-all duration-500 ${showAdmin ? 'opacity-50 scale-95' : 'opacity-100 scale-100'}`}>
+      <main
+        className={`relative z-10 transition-all duration-500 ${showAdmin ? 'opacity-50 scale-95' : 'opacity-100 scale-100'}`}
+      >
         {children}
       </main>
     </div>

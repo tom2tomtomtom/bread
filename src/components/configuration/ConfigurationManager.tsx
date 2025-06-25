@@ -7,18 +7,18 @@ interface ConfigurationManagerProps {
   // Admin panel state
   showAdmin: boolean;
   onAdminClose: () => void;
-  
+
   // Configuration state
   prompts: Prompts;
   apiKeys: ApiKeys;
   apiKeysSaved: boolean;
   generateImages: boolean;
-  
+
   // Toast state
   showToast: boolean;
   toastMessage: string;
   toastType: ToastType;
-  
+
   // Event handlers
   onPromptUpdate: (key: keyof Prompts, value: string) => void;
   onApiKeyUpdate: (provider: keyof ApiKeys, key: string) => void;
@@ -43,14 +43,14 @@ export const ConfigurationManager: React.FC<ConfigurationManagerProps> = ({
   onSaveApiKeys,
   onSaveConfiguration,
   onGenerateImagesToggle,
-  onToastClose
+  onToastClose,
 }) => {
   return (
     <>
       {/* Admin Panel Overlay */}
       {showAdmin && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div 
+          <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={onAdminClose}
           ></div>
@@ -72,12 +72,7 @@ export const ConfigurationManager: React.FC<ConfigurationManagerProps> = ({
       )}
 
       {/* Toast Notifications */}
-      <Toast
-        message={toastMessage}
-        type={toastType}
-        isVisible={showToast}
-        onClose={onToastClose}
-      />
+      <Toast message={toastMessage} type={toastType} isVisible={showToast} onClose={onToastClose} />
     </>
   );
 };

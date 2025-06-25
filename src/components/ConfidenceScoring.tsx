@@ -6,7 +6,10 @@ interface ConfidenceScoringProps {
   territoryId: string;
 }
 
-export const ConfidenceScoring: React.FC<ConfidenceScoringProps> = ({ confidence, territoryId }) => {
+export const ConfidenceScoring: React.FC<ConfidenceScoringProps> = ({
+  confidence,
+  _territoryId,
+}) => {
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-400';
     if (score >= 60) return 'text-yellow-400';
@@ -21,10 +24,14 @@ export const ConfidenceScoring: React.FC<ConfidenceScoringProps> = ({ confidence
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
-      case 'LOW': return 'text-green-400 bg-green-400/20';
-      case 'MEDIUM': return 'text-yellow-400 bg-yellow-400/20';
-      case 'HIGH': return 'text-red-400 bg-red-400/20';
-      default: return 'text-gray-400 bg-gray-400/20';
+      case 'LOW':
+        return 'text-green-400 bg-green-400/20';
+      case 'MEDIUM':
+        return 'text-yellow-400 bg-yellow-400/20';
+      case 'HIGH':
+        return 'text-red-400 bg-red-400/20';
+      default:
+        return 'text-gray-400 bg-gray-400/20';
     }
   };
 
@@ -36,7 +43,9 @@ export const ConfidenceScoring: React.FC<ConfidenceScoringProps> = ({ confidence
     <div className="bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-white/10">
       <div className="flex items-center justify-between mb-3">
         <h4 className="text-xs font-bold text-white/80">CONFIDENCE ANALYSIS</h4>
-        <div className={`px-2 py-1 rounded-full text-xs font-bold ${getScoreBackground(averageScore)}`}>
+        <div
+          className={`px-2 py-1 rounded-full text-xs font-bold ${getScoreBackground(averageScore)}`}
+        >
           <span className={getScoreColor(averageScore)}>{averageScore}%</span>
         </div>
       </div>
@@ -71,39 +80,45 @@ export const ConfidenceScoring: React.FC<ConfidenceScoringProps> = ({ confidence
       <div className="mb-3">
         <div className="flex items-center justify-between">
           <span className="text-xs text-white/60">Risk Level:</span>
-          <span className={`px-2 py-1 rounded-full text-xs font-bold ${getRiskColor(confidence.riskLevel)}`}>
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-bold ${getRiskColor(confidence.riskLevel)}`}
+          >
             {confidence.riskLevel}
           </span>
         </div>
       </div>
 
       {/* Reasoning */}
-      <div className="text-xs text-white/70 leading-relaxed">
-        {confidence.reasoning}
-      </div>
+      <div className="text-xs text-white/70 leading-relaxed">{confidence.reasoning}</div>
 
       {/* Visual Score Bars */}
       <div className="mt-4 space-y-2">
         <div className="flex items-center gap-2">
           <span className="text-xs text-white/60 w-16">Market:</span>
           <div className="flex-1 bg-white/10 rounded-full h-2">
-            <div 
+            <div
               className={`h-2 rounded-full transition-all duration-300 ${
-                confidence.marketFit >= 80 ? 'bg-green-400' : 
-                confidence.marketFit >= 60 ? 'bg-yellow-400' : 'bg-red-400'
+                confidence.marketFit >= 80
+                  ? 'bg-green-400'
+                  : confidence.marketFit >= 60
+                    ? 'bg-yellow-400'
+                    : 'bg-red-400'
               }`}
               style={{ width: `${confidence.marketFit}%` }}
             />
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2">
           <span className="text-xs text-white/60 w-16">Legal:</span>
           <div className="flex-1 bg-white/10 rounded-full h-2">
-            <div 
+            <div
               className={`h-2 rounded-full transition-all duration-300 ${
-                confidence.complianceConfidence >= 80 ? 'bg-green-400' : 
-                confidence.complianceConfidence >= 60 ? 'bg-yellow-400' : 'bg-red-400'
+                confidence.complianceConfidence >= 80
+                  ? 'bg-green-400'
+                  : confidence.complianceConfidence >= 60
+                    ? 'bg-yellow-400'
+                    : 'bg-red-400'
               }`}
               style={{ width: `${confidence.complianceConfidence}%` }}
             />
@@ -113,10 +128,13 @@ export const ConfidenceScoring: React.FC<ConfidenceScoringProps> = ({ confidence
         <div className="flex items-center gap-2">
           <span className="text-xs text-white/60 w-16">Appeal:</span>
           <div className="flex-1 bg-white/10 rounded-full h-2">
-            <div 
+            <div
               className={`h-2 rounded-full transition-all duration-300 ${
-                confidence.audienceResonance >= 80 ? 'bg-green-400' : 
-                confidence.audienceResonance >= 60 ? 'bg-yellow-400' : 'bg-red-400'
+                confidence.audienceResonance >= 80
+                  ? 'bg-green-400'
+                  : confidence.audienceResonance >= 60
+                    ? 'bg-yellow-400'
+                    : 'bg-red-400'
               }`}
               style={{ width: `${confidence.audienceResonance}%` }}
             />

@@ -2,7 +2,15 @@ import React, { useState, useRef } from 'react';
 
 interface BriefBlock {
   id: string;
-  type: 'objective' | 'audience' | 'message' | 'context' | 'tone' | 'channels' | 'kpi' | 'constraints';
+  type:
+    | 'objective'
+    | 'audience'
+    | 'message'
+    | 'context'
+    | 'tone'
+    | 'channels'
+    | 'kpi'
+    | 'constraints';
   title: string;
   content: string;
   placeholder: string;
@@ -20,32 +28,36 @@ const briefBlocks: BriefBlock[] = [
     type: 'objective',
     title: 'Campaign Objective',
     content: '',
-    placeholder: 'What do you want to achieve? (e.g., Drive awareness, increase sign-ups, boost engagement)',
-    icon: '🎯'
+    placeholder:
+      'What do you want to achieve? (e.g., Drive awareness, increase sign-ups, boost engagement)',
+    icon: '🎯',
   },
   {
     id: 'audience',
     type: 'audience',
     title: 'Target Audience',
     content: '',
-    placeholder: 'Who are you targeting? (e.g., Young families, budget-conscious shoppers, existing members)',
-    icon: '👥'
+    placeholder:
+      'Who are you targeting? (e.g., Young families, budget-conscious shoppers, existing members)',
+    icon: '👥',
   },
   {
     id: 'message',
     type: 'message',
     title: 'Key Message',
     content: '',
-    placeholder: 'What\'s the main message? (e.g., Everyday value, exclusive benefits, smart savings)',
-    icon: '💬'
+    placeholder:
+      "What's the main message? (e.g., Everyday value, exclusive benefits, smart savings)",
+    icon: '💬',
   },
   {
     id: 'context',
     type: 'context',
     title: 'Market Context',
     content: '',
-    placeholder: 'What\'s happening in the market? (e.g., Black Friday, back to school, economic pressures)',
-    icon: '📊'
+    placeholder:
+      "What's happening in the market? (e.g., Black Friday, back to school, economic pressures)",
+    icon: '📊',
   },
   {
     id: 'tone',
@@ -53,7 +65,7 @@ const briefBlocks: BriefBlock[] = [
     title: 'Tone & Style',
     content: '',
     placeholder: 'How should it sound? (e.g., Friendly, urgent, premium, conversational)',
-    icon: '🎨'
+    icon: '🎨',
   },
   {
     id: 'channels',
@@ -61,7 +73,7 @@ const briefBlocks: BriefBlock[] = [
     title: 'Channels',
     content: '',
     placeholder: 'Where will this run? (e.g., Social media, email, in-store, digital display)',
-    icon: '📱'
+    icon: '📱',
   },
   {
     id: 'kpi',
@@ -69,19 +81,23 @@ const briefBlocks: BriefBlock[] = [
     title: 'Success Metrics',
     content: '',
     placeholder: 'How will you measure success? (e.g., Click-through rate, sign-ups, brand recall)',
-    icon: '📈'
+    icon: '📈',
   },
   {
     id: 'constraints',
     type: 'constraints',
     title: 'Constraints',
     content: '',
-    placeholder: 'Any limitations or requirements? (e.g., Legal requirements, brand guidelines, budget)',
-    icon: '⚠️'
-  }
+    placeholder:
+      'Any limitations or requirements? (e.g., Legal requirements, brand guidelines, budget)',
+    icon: '⚠️',
+  },
 ];
 
-export const BriefBuilder: React.FC<BriefBuilderProps> = ({ onBriefChange, initialBrief = '' }) => {
+export const BriefBuilder: React.FC<BriefBuilderProps> = ({
+  onBriefChange,
+  _initialBrief = '',
+}) => {
   const [availableBlocks, setAvailableBlocks] = useState<BriefBlock[]>(briefBlocks);
   const [usedBlocks, setUsedBlocks] = useState<BriefBlock[]>([]);
   const [draggedBlock, setDraggedBlock] = useState<BriefBlock | null>(null);
@@ -94,7 +110,7 @@ export const BriefBuilder: React.FC<BriefBuilderProps> = ({ onBriefChange, initi
       .filter(block => block.content.trim())
       .map(block => `${block.title}: ${block.content}`)
       .join('\n\n');
-    
+
     onBriefChange(briefParts);
   };
 
@@ -117,14 +133,14 @@ export const BriefBuilder: React.FC<BriefBuilderProps> = ({ onBriefChange, initi
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDraggedOver(false);
-    
+
     if (draggedBlock) {
       // Add block to used blocks
       setUsedBlocks(prev => [...prev, { ...draggedBlock }]);
-      
+
       // Remove from available blocks
       setAvailableBlocks(prev => prev.filter(block => block.id !== draggedBlock.id));
-      
+
       setDraggedBlock(null);
     }
   };
@@ -142,7 +158,7 @@ export const BriefBuilder: React.FC<BriefBuilderProps> = ({ onBriefChange, initi
     if (blockToRemove) {
       // Add back to available blocks
       setAvailableBlocks(prev => [...prev, { ...blockToRemove, content: '' }]);
-      
+
       // Remove from used blocks
       const updatedBlocks = usedBlocks.filter(block => block.id !== blockId);
       setUsedBlocks(updatedBlocks);
@@ -162,7 +178,8 @@ export const BriefBuilder: React.FC<BriefBuilderProps> = ({ onBriefChange, initi
       <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
         <h3 className="text-lg font-subheading text-blue-400 mb-2">🏗️ BUILD YOUR BRIEF</h3>
         <p className="text-sm font-body normal-case text-gray-300">
-          Drag building blocks from the palette below into the brief area. Fill in each block to construct your campaign brief.
+          Drag building blocks from the palette below into the brief area. Fill in each block to
+          construct your campaign brief.
         </p>
       </div>
 
@@ -173,10 +190,10 @@ export const BriefBuilder: React.FC<BriefBuilderProps> = ({ onBriefChange, initi
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={`min-h-64 bg-gradient-to-br from-yellow-400/10 to-orange-400/10 border-2 border-dashed rounded-xl p-6 transition-all duration-300 ${
-          isDraggedOver 
-            ? 'border-yellow-400 bg-yellow-400/20 scale-105' 
-            : usedBlocks.length > 0 
-              ? 'border-yellow-400/30' 
+          isDraggedOver
+            ? 'border-yellow-400 bg-yellow-400/20 scale-105'
+            : usedBlocks.length > 0
+              ? 'border-yellow-400/30'
               : 'border-gray-600'
         }`}
       >
@@ -199,7 +216,7 @@ export const BriefBuilder: React.FC<BriefBuilderProps> = ({ onBriefChange, initi
                 Clear All
               </button>
             </div>
-            
+
             {usedBlocks.map((block, index) => (
               <div
                 key={`${block.id}-${index}`}
@@ -219,7 +236,7 @@ export const BriefBuilder: React.FC<BriefBuilderProps> = ({ onBriefChange, initi
                 </div>
                 <textarea
                   value={block.content}
-                  onChange={(e) => handleBlockContentChange(block.id, e.target.value)}
+                  onChange={e => handleBlockContentChange(block.id, e.target.value)}
                   placeholder={block.placeholder}
                   className="w-full bg-transparent border border-white/20 rounded-lg p-3 text-white placeholder-gray-400 font-body normal-case text-sm resize-none focus:outline-none focus:border-yellow-400/50"
                   rows={2}
@@ -234,11 +251,11 @@ export const BriefBuilder: React.FC<BriefBuilderProps> = ({ onBriefChange, initi
       <div>
         <h3 className="text-lg font-subheading text-gray-300 mb-4">Available Building Blocks</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {availableBlocks.map((block) => (
+          {availableBlocks.map(block => (
             <div
               key={block.id}
               draggable
-              onDragStart={(e) => handleDragStart(e, block)}
+              onDragStart={e => handleDragStart(e, block)}
               className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-lg p-3 cursor-grab active:cursor-grabbing transition-all duration-300 hover:scale-105 group"
             >
               <div className="text-center">
@@ -252,7 +269,7 @@ export const BriefBuilder: React.FC<BriefBuilderProps> = ({ onBriefChange, initi
             </div>
           ))}
         </div>
-        
+
         {availableBlocks.length === 0 && (
           <div className="text-center py-8">
             <div className="text-2xl mb-2">✨</div>
