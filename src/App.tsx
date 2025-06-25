@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { generateWithOpenAI, generateWithClaude } from './services/secureApiService';
+import { generateWithOpenAI } from './services/secureApiService';
 import { analyzeBrief, enhanceGeneratedOutput, EnhancedGeneratedOutput, BriefAnalysis } from './services/enhancementService';
 import { AdminPanel } from './components/AdminPanel';
 import { BriefEnhancement } from './components/BriefEnhancement';
 import { TerritoryOutput } from './components/TerritoryOutput';
 import { BriefInput } from './components/BriefInput';
+import { GenerationErrorBoundary } from './components/ErrorBoundary';
 import { Toast } from './components/Toast';
 import { ProgressBar } from './components/ProgressBar';
 
@@ -611,15 +612,17 @@ Please provide a structured response with territories, headlines, and compliance
       <div className={`relative z-10 max-w-6xl mx-auto p-8 transition-all duration-500 ${showAdmin ? 'opacity-50 scale-95' : 'opacity-100 scale-100'}`}>
         {/* Brief Input Section */}
         <div className="mb-12">
-          <BriefInput
-            brief={brief}
-            setBrief={setBrief}
-            apiKeys={apiKeys}
-            error={error}
-            isGenerating={isGenerating}
-            onGenerate={handleGenerate}
-            onMomentSelect={handleMomentSelect}
-          />
+          <GenerationErrorBoundary>
+            <BriefInput
+              brief={brief}
+              setBrief={setBrief}
+              apiKeys={apiKeys}
+              error={error}
+              isGenerating={isGenerating}
+              onGenerate={handleGenerate}
+              onMomentSelect={handleMomentSelect}
+            />
+          </GenerationErrorBoundary>
 
           {/* Smart Brief Analysis */}
           {showBriefAnalysis && (
@@ -634,20 +637,22 @@ Please provide a structured response with territories, headlines, and compliance
 
         {/* Output Section */}
         {showOutput && generatedOutput && (
-          <TerritoryOutput
-            generatedOutput={generatedOutput}
-            onNewBrief={() => {
-              setShowOutput(false);
-              setBrief('');
-              setGeneratedOutput(null);
-              setShowBriefAnalysis(false);
-              setStarredItems({ territories: [], headlines: {} });
-            }}
-            onRegenerateUnstarred={() => handleGenerate(true)}
-            onToggleTerritoryStarred={toggleTerritoryStarred}
-            onToggleHeadlineStarred={toggleHeadlineStarred}
-            starredItems={starredItems}
-          />
+          <GenerationErrorBoundary>
+            <TerritoryOutput
+              generatedOutput={generatedOutput}
+              onNewBrief={() => {
+                setShowOutput(false);
+                setBrief('');
+                setGeneratedOutput(null);
+                setShowBriefAnalysis(false);
+                setStarredItems({ territories: [], headlines: {} });
+              }}
+              onRegenerateUnstarred={() => handleGenerate(true)}
+              onToggleTerritoryStarred={toggleTerritoryStarred}
+              onToggleHeadlineStarred={toggleHeadlineStarred}
+              starredItems={starredItems}
+            />
+          </GenerationErrorBoundary>
         )}
       </div>
 

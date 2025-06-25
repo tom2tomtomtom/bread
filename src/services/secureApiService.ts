@@ -1,25 +1,5 @@
 // Secure API service that calls server-side functions instead of exposing API keys in browser
-
-export interface GeneratedOutput {
-  territories: Array<{
-    id: string;
-    title: string;
-    positioning: string;
-    tone: string;
-    headlines: Array<{
-      text: string;
-      followUp: string;
-      reasoning: string;
-      confidence: number;
-      imageUrl?: string;
-    }>;
-  }>;
-  compliance?: {
-    overallRisk: string;
-    recommendations: string[];
-    flaggedContent: string[];
-  };
-}
+import { GeneratedOutput } from '../App';
 
 interface ApiResponse {
   success: boolean;
@@ -218,13 +198,17 @@ export const mockResponse = (): GeneratedOutput => ({
     }
   ],
   compliance: {
-    overallRisk: 'LOW',
-    recommendations: [
+    powerBy: [
       'All headlines comply with advertising standards',
       'Claims are substantiated and truthful',
       'No misleading or deceptive content identified'
     ],
-    flaggedContent: []
+    output: 'LOW RISK - All content meets compliance requirements',
+    notes: [
+      'Content reviewed for accuracy and truthfulness',
+      'No regulatory concerns identified',
+      'Suitable for all advertising channels'
+    ]
   }
 });
 
