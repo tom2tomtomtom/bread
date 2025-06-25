@@ -1,94 +1,187 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { MainLayout } from './components/layout/MainLayout';
 import { GenerationController } from './components/generation/GenerationController';
 import { ConfigurationManager } from './components/configuration/ConfigurationManager';
-import { useConfiguration } from './hooks/useConfiguration';
-import { useGeneration } from './hooks/useGeneration';
-import { useStarredItems } from './hooks/useStarredItems';
+import { useAppStore } from './stores/appStore';
+import { generateWithOpenAI } from './services/secureApiService';
+import { analyzeBrief, enhanceGeneratedOutput, mergeWithStarredContent } from './services/enhancementService';
+import { APP_CONFIG } from './config/app';
 
 // Types are now imported from types/index.ts
 export type { Headline, Territory, ComplianceData, GeneratedOutput, Prompts, ApiKeys } from './types';
 
 const BreadApp: React.FC = () => {
-  // Brief state
-  const [brief, setBrief] = useState<string>('');
+  // Zustand store - centralized state management
+  const {
+    // State
+    brief,
+    isGenerating,
+    showOutput,
+    generatedOutput,
+    error,
+    showBriefAnalysis,
+    briefAnalysis,
+    prompts,
+    apiKeys,
+    apiKeysSaved,
+    generateImages,
+    showAdmin,
+    showToast,
+    toastMessage,
+    toastType,
+    starredItems,
 
-  // Custom hooks for organized state management
-  const configuration = useConfiguration();
-  const starredItems = useStarredItems();
-  const generation = useGeneration({
-    prompts: configuration.prompts,
-    generateImages: configuration.generateImages,
-    starredItems: starredItems.starredItems,
-    onShowToast: configuration.showToastMessage
-  });
+    // Actions
+    setBrief,
+    setIsGenerating,
+    setShowOutput,
+    setGeneratedOutput,
+    setError,
+    setShowBriefAnalysis,
+    setBriefAnalysis,
+    updatePrompt,
+    updateApiKey,
+    setApiKeysSaved,
+    setGenerateImages,
+    setShowAdmin,
+    showToastMessage,
+    hideToast,
+    toggleTerritoryStarred,
+    toggleHeadlineStarred,
+    clearStarredItems,
+    resetGeneration
+  } = useAppStore();
 
   // Event handlers
   const handleMomentSelect = (moment: { name: string; date: string }) => {
     const momentText = `\n\n📅 CAMPAIGN MOMENT: ${moment.name} (${moment.date})`;
-    setBrief(prev => prev + momentText);
+    setBrief(brief + momentText);
   };
 
-  const handleGenerate = () => {
-    generation.handleGenerate(brief);
+  const handleGenerate = async (regenerateMode: boolean = false) => {
+    if (!brief.trim()) {
+      setError(APP_CONFIG.errors.generation.noBrief);
+      return;
+    }
+
+    setIsGenerating(true);
+    setError('');
+    if (!regenerateMode) {
+      setShowOutput(false);
+    }
+    setShowBriefAnalysis(false);
+
+    try {
+      console.log('🚀 Starting generation process...');
+
+      // Analyze brief for insights
+      const analysis = await analyzeBrief(brief);
+      setBriefAnalysis(analysis);
+      setShowBriefAnalysis(true);
+
+      // Build the full prompt
+      const fullPrompt = `${prompts.systemInstructions}
+
+${prompts.brandGuidelines}
+
+${prompts.territoryPrompt}
+
+${prompts.headlinePrompt}
+
+${prompts.compliancePrompt}
+
+BRIEF TO ADDRESS:
+${brief}
+
+Please provide a structured response with territories, headlines, and compliance guidance that DIRECTLY ADDRESSES THE BRIEF.`;
+
+      // Generate with OpenAI (now secure server-side)
+      const result = await generateWithOpenAI(fullPrompt, generateImages, brief);
+
+      // Enhance the output with confidence scoring
+      let enhancedResult = enhanceGeneratedOutput(result, brief);
+
+      // If regenerating, merge with existing starred content
+      if (regenerateMode && generatedOutput) {
+        enhancedResult = mergeWithStarredContent(enhancedResult, generatedOutput, starredItems);
+      }
+
+      setGeneratedOutput(enhancedResult);
+      setShowOutput(true);
+
+      showToastMessage(APP_CONFIG.success.generation, 'success');
+      console.log('✅ Generation completed successfully');
+
+    } catch (error: any) {
+      console.error('❌ Generation failed:', error);
+      const errorMessage = error.message || APP_CONFIG.errors.generation.apiError;
+      setError(errorMessage);
+      showToastMessage(errorMessage, 'error');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleNewBrief = () => {
-    setBrief('');
-    generation.handleNewBrief();
-    starredItems.clearStarredItems();
+    resetGeneration();
+    clearStarredItems();
   };
 
   const handleRegenerateUnstarred = () => {
-    generation.handleRegenerateUnstarred(brief);
+    handleGenerate(true);
   };
 
   return (
     <MainLayout
-      showAdmin={configuration.showAdmin}
-      onAdminToggle={configuration.toggleAdmin}
-      generateImages={configuration.generateImages}
+      showAdmin={showAdmin}
+      onAdminToggle={() => setShowAdmin(!showAdmin)}
+      generateImages={generateImages}
       apiStatus={{
         openaiReady: true, // Always true with server-side setup
-        imagesEnabled: configuration.generateImages
+        imagesEnabled: generateImages
       }}
     >
       <GenerationController
         brief={brief}
         setBrief={setBrief}
-        isGenerating={generation.isGenerating}
-        error={generation.error}
-        showOutput={generation.showOutput}
-        generatedOutput={generation.generatedOutput}
-        showBriefAnalysis={generation.showBriefAnalysis}
-        briefAnalysis={generation.briefAnalysis}
-        starredItems={starredItems.starredItems}
-        apiKeys={configuration.apiKeys}
-        onGenerate={handleGenerate}
+        isGenerating={isGenerating}
+        error={error}
+        showOutput={showOutput}
+        generatedOutput={generatedOutput}
+        showBriefAnalysis={showBriefAnalysis}
+        briefAnalysis={briefAnalysis}
+        starredItems={starredItems}
+        apiKeys={apiKeys}
+        onGenerate={() => handleGenerate()}
         onMomentSelect={handleMomentSelect}
         onNewBrief={handleNewBrief}
         onRegenerateUnstarred={handleRegenerateUnstarred}
-        onToggleTerritoryStarred={starredItems.toggleTerritoryStarred}
-        onToggleHeadlineStarred={starredItems.toggleHeadlineStarred}
-        onBriefAnalysisToggle={() => generation.setShowBriefAnalysis(prev => !prev)}
+        onToggleTerritoryStarred={toggleTerritoryStarred}
+        onToggleHeadlineStarred={toggleHeadlineStarred}
+        onBriefAnalysisToggle={() => setShowBriefAnalysis(!showBriefAnalysis)}
       />
 
       <ConfigurationManager
-        showAdmin={configuration.showAdmin}
-        onAdminClose={configuration.toggleAdmin}
-        prompts={configuration.prompts}
-        apiKeys={configuration.apiKeys}
-        apiKeysSaved={configuration.apiKeysSaved}
-        generateImages={configuration.generateImages}
-        showToast={configuration.showToast}
-        toastMessage={configuration.toastMessage}
-        toastType={configuration.toastType}
-        onPromptUpdate={configuration.updatePrompt}
-        onApiKeyUpdate={configuration.updateApiKey}
-        onSaveApiKeys={configuration.saveApiKeys}
-        onSaveConfiguration={configuration.saveConfiguration}
-        onGenerateImagesToggle={configuration.toggleGenerateImages}
-        onToastClose={configuration.hideToast}
+        showAdmin={showAdmin}
+        onAdminClose={() => setShowAdmin(false)}
+        prompts={prompts}
+        apiKeys={apiKeys}
+        apiKeysSaved={apiKeysSaved}
+        generateImages={generateImages}
+        showToast={showToast}
+        toastMessage={toastMessage}
+        toastType={toastType}
+        onPromptUpdate={updatePrompt}
+        onApiKeyUpdate={updateApiKey}
+        onSaveApiKeys={() => {
+          setApiKeysSaved(true);
+          showToastMessage(APP_CONFIG.success.apiKey, 'success');
+        }}
+        onSaveConfiguration={() => {
+          showToastMessage(APP_CONFIG.success.save, 'success');
+        }}
+        onGenerateImagesToggle={setGenerateImages}
+        onToastClose={hideToast}
       />
     </MainLayout>
   );

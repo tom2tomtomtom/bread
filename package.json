@@ -10,7 +10,8 @@
     "openai": "^4.104.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-scripts": "5.0.1"
+    "react-scripts": "5.0.1",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@netlify/functions": "^4.1.6",
