@@ -8,109 +8,94 @@ const ENABLE_MOCK_FALLBACK = false;
 // Helper function to add delay between requests
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Generate smart image prompt based on headline content - much more specific to the actual headline
+// Generate beautiful scenery background image prompts
 const generateImagePrompt = (headline: { text: string; followUp: string }, territory: { title: string; tone: string }, brief: string): string => {
-  const headlineText = headline.text.toLowerCase();
-  const followUpText = headline.followUp.toLowerCase();
   const briefContext = brief.toLowerCase();
-  
-  // Analyze headline content to determine visual theme
-  let visualConcept = '';
-  let visualElements = '';
-  let colorMood = '';
-  
-  // Headline-specific visual analysis
-  if (headlineText.includes('every day') || headlineText.includes('everyday')) {
-    visualConcept = 'everyday life, daily routines, morning sunlight, fresh starts';
-    visualElements = 'sunrise, coffee cups, fresh produce, clean home spaces';
-    colorMood = 'warm morning light, soft yellows, gentle oranges';
-  } else if (headlineText.includes('save') || headlineText.includes('saving') || followUpText.includes('save')) {
-    visualConcept = 'abundance, prosperity, financial growth, smart choices';
-    visualElements = 'overflowing baskets, golden coins, flourishing plants, treasure chests';
-    colorMood = 'rich golds, prosperity greens, warm amber tones';
-  } else if (headlineText.includes('smart') || headlineText.includes('clever') || headlineText.includes('intelligent')) {
-    visualConcept = 'intelligence, strategy, modern thinking, innovation';
-    visualElements = 'lightbulbs, brain connections, geometric patterns, clean modern spaces';
-    colorMood = 'cool blues, electric whites, smart purple accents';
-  } else if (headlineText.includes('trust') || headlineText.includes('reliable') || headlineText.includes('mate')) {
-    visualConcept = 'friendship, reliability, Australian culture, loyalty';
-    visualElements = 'handshakes, Australian landscapes, loyal dogs, steady foundations';
-    colorMood = 'earth tones, honest browns, loyal blues';
-  } else if (headlineText.includes('fast') || headlineText.includes('quick') || headlineText.includes('instant')) {
-    visualConcept = 'speed, efficiency, momentum, quick solutions';
-    visualElements = 'motion blur, racing lines, swift birds, flowing water';
-    colorMood = 'dynamic blues, energetic greens, swift silver';
-  } else if (headlineText.includes('stress') || headlineText.includes('pressure') || headlineText.includes('rush')) {
-    visualConcept = 'calm, relaxation, peace, stress relief';
-    visualElements = 'peaceful lakes, zen gardens, flowing silk, gentle waves';
-    colorMood = 'calming blues, peaceful greens, serene whites';
-  } else if (headlineText.includes('club') || headlineText.includes('member') || headlineText.includes('join')) {
-    visualConcept = 'community, belonging, exclusive groups, membership';
-    visualElements = 'circles of people, exclusive spaces, VIP areas, community gatherings';
-    colorMood = 'premium purples, exclusive golds, welcoming warm tones';
-  } else if (headlineText.includes('value') || headlineText.includes('worth') || headlineText.includes('deserve')) {
-    visualConcept = 'worth, value, precious things, quality';
-    visualElements = 'precious gems, quality materials, fine craftsmanship, valuable items';
-    colorMood = 'rich jewel tones, valuable golds, quality silvers';
-  } else if (headlineText.includes('time') || headlineText.includes('wait') || headlineText.includes('schedule')) {
-    visualConcept = 'time freedom, flexibility, perfect timing';
-    visualElements = 'flowing clocks, flexible schedules, perfect moments, time flowing';
-    colorMood = 'timeless blues, flexible whites, perfect timing golds';
-  } else {
-    // Fallback to general positive concepts
-    visualConcept = 'success, happiness, positive outcomes, satisfaction';
-    visualElements = 'success symbols, happy moments, positive energy, satisfaction';
-    colorMood = 'happy yellows, positive blues, satisfied greens';
-  }
-  
-  // Add seasonal context from brief
-  let seasonalElements = '';
-  if (briefContext.includes('christmas') || briefContext.includes('holiday')) {
-    seasonalElements = ', festive decorations, holiday warmth, celebration atmosphere';
-    colorMood += ', festive reds, holiday greens';
-  } else if (briefContext.includes('black friday') || briefContext.includes('sale')) {
-    seasonalElements = ', shopping excitement, deal discovery, retail energy';
-    colorMood += ', dynamic energy, shopping excitement';
-  } else if (briefContext.includes('summer')) {
-    seasonalElements = ', summer vibes, bright sunshine, outdoor freshness';
-    colorMood += ', bright summer tones, fresh outdoor colors';
-  } else if (briefContext.includes('winter')) {
-    seasonalElements = ', winter coziness, warm comfort, seasonal warmth';
-    colorMood += ', cozy winter tones, warm comfort colors';
-  }
-  
-  return `Create a beautiful, headline-specific image representing: "${headline.text}" and "${headline.followUp}".
 
-VISUAL CONCEPT: ${visualConcept}${seasonalElements}
-VISUAL ELEMENTS: ${visualElements}
-COLOR MOOD: ${colorMood}
+  // Define beautiful scenery options
+  const sceneryOptions = [
+    {
+      concept: 'serene mountain landscape',
+      elements: 'rolling hills, distant mountains, soft clouds, peaceful valley',
+      colors: 'soft blues, gentle greens, warm earth tones, golden light'
+    },
+    {
+      concept: 'tranquil ocean scene',
+      elements: 'calm ocean waves, sandy beach, horizon line, gentle surf',
+      colors: 'ocean blues, sandy beiges, soft whites, sunset oranges'
+    },
+    {
+      concept: 'peaceful forest setting',
+      elements: 'tall trees, dappled sunlight, forest path, natural greenery',
+      colors: 'forest greens, warm browns, golden sunlight, natural earth tones'
+    },
+    {
+      concept: 'beautiful sky and clouds',
+      elements: 'fluffy clouds, open sky, soft light, atmospheric depth',
+      colors: 'sky blues, cloud whites, sunset pinks, gentle purples'
+    },
+    {
+      concept: 'gentle countryside',
+      elements: 'rolling fields, distant trees, open landscape, natural beauty',
+      colors: 'field greens, sky blues, earth browns, natural tones'
+    }
+  ];
+
+  // Select scenery based on simple rotation or random selection
+  const sceneryIndex = Math.abs(headline.text.length + territory.title.length) % sceneryOptions.length;
+  const selectedScenery = sceneryOptions[sceneryIndex];
+
+  // Add seasonal context from brief if present
+  let seasonalModifier = '';
+  if (briefContext.includes('christmas') || briefContext.includes('holiday')) {
+    seasonalModifier = ' with subtle winter atmosphere and cozy warmth';
+  } else if (briefContext.includes('summer')) {
+    seasonalModifier = ' with bright, fresh summer lighting';
+  } else if (briefContext.includes('winter')) {
+    seasonalModifier = ' with soft winter light and peaceful atmosphere';
+  } else if (briefContext.includes('spring')) {
+    seasonalModifier = ' with fresh spring colors and new growth';
+  } else if (briefContext.includes('autumn') || briefContext.includes('fall')) {
+    seasonalModifier = ' with warm autumn colors and golden light';
+  }
+
+  return `Create a beautiful, peaceful scenery background image.
+
+SCENERY CONCEPT: ${selectedScenery.concept}${seasonalModifier}
+VISUAL ELEMENTS: ${selectedScenery.elements}
+COLOR PALETTE: ${selectedScenery.colors}
 
 STYLE REQUIREMENTS:
-- Clean, professional, premium photography or illustration
+- Clean, professional nature photography style
 - Mobile-friendly vertical composition (9:16 ratio)
-- Soft, subtle imagery that enhances text readability
-- Modern, minimalist aesthetic
-- High-quality, inspiring visual
+- Soft, subtle imagery perfect for text overlay
+- Peaceful, calming, and inspiring atmosphere
+- High-quality, beautiful natural scenery
+- Gentle lighting and soft focus areas
 
 STRICT REQUIREMENTS - MUST AVOID:
 - NO text, letters, words, or writing of any kind
-- NO phones, screens, devices, or technology
-- NO people's faces or recognizable individuals
+- NO people, faces, or human figures
+- NO buildings, structures, or man-made objects
 - NO busy patterns or overwhelming details
 - NO logos, brands, or commercial signage
-- NO fake interfaces or mock-ups
+- NO vehicles, technology, or modern elements
 
-FOCUS: Create a beautiful, relevant background that emotionally supports the headline's message about "${headline.text}" while being perfect for text overlay.`;
+FOCUS: Create a beautiful, peaceful natural scenery background that provides a calming, inspiring backdrop perfect for text overlay.`;
 };
 
-// Generate a simpler fallback prompt if the main one fails
+// Generate a simpler fallback scenery prompt if the main one fails
 const generateFallbackPrompt = (headline: { text: string; followUp: string }): string => {
-  return `Create a simple, elegant background image suitable for mobile advertising.
-Style: Clean, minimalist, professional
-Colors: Soft blues, warm yellows, gentle whites
-Elements: Abstract shapes, subtle gradients, peaceful atmosphere
-Avoid: Text, logos, devices, busy patterns, people
-Focus: Simple, calming background perfect for text overlay.`;
+  return `Create a simple, beautiful natural scenery background image suitable for mobile advertising.
+
+SCENERY: Peaceful natural landscape - could be gentle hills, calm water, soft sky, or simple forest scene
+STYLE: Clean, minimalist, natural photography
+COLORS: Soft natural tones - gentle blues, warm earth colors, peaceful greens, soft whites
+ELEMENTS: Simple natural scenery, subtle gradients, peaceful atmosphere
+LIGHTING: Soft, natural lighting perfect for text overlay
+
+AVOID: Text, logos, people, buildings, vehicles, technology, busy patterns, man-made objects
+FOCUS: Simple, calming natural scenery background perfect for text overlay.`;
 };
 
 // Generate a single image with retry logic
