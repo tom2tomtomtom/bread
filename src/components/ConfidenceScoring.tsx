@@ -8,7 +8,6 @@ interface ConfidenceScoringProps {
 
 export const ConfidenceScoring: React.FC<ConfidenceScoringProps> = ({
   confidence,
-  _territoryId,
 }) => {
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-400';

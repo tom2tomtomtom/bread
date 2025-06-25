@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { MainLayout } from './components/layout/MainLayout';
 import { GenerationController } from './components/generation/GenerationController';
 import { ConfigurationManager } from './components/configuration/ConfigurationManager';
+import { AuthModal, UserProfile } from './components/auth';
 import { useAppStore } from './stores/appStore';
+import { useAuthStore } from './stores/authStore';
 import { generateWithOpenAI } from './services/secureApiService';
 import {
   analyzeBrief,
@@ -22,6 +24,11 @@ export type {
 } from './types';
 
 const BreadApp: React.FC = () => {
+  // Authentication state
+  const { isAuthenticated, user, getCurrentUser } = useAuthStore();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
+
   // Zustand store - centralized state management
   const {
     // State
@@ -63,6 +70,26 @@ const BreadApp: React.FC = () => {
     resetGeneration,
   } = useAppStore();
 
+  // Check authentication on app load
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      getCurrentUser().catch(() => {
+        // If getCurrentUser fails, user will be logged out automatically
+      });
+    }
+  }, [isAuthenticated, user, getCurrentUser]);
+
+  // Authentication handlers
+  const handleShowLogin = () => {
+    setAuthModalMode('login');
+    setShowAuthModal(true);
+  };
+
+  const handleShowRegister = () => {
+    setAuthModalMode('register');
+    setShowAuthModal(true);
+  };
+
   // Event handlers
   const handleMomentSelect = (moment: { name: string; date: string }) => {
     const momentText = `\n\n📅 CAMPAIGN MOMENT: ${moment.name} (${moment.date})`;
@@ -70,6 +97,13 @@ const BreadApp: React.FC = () => {
   };
 
   const handleGenerate = async (regenerateMode: boolean = false) => {
+    // Check authentication first
+    if (!isAuthenticated) {
+      setError('Please sign in to generate content');
+      handleShowLogin();
+      return;
+    }
+
     if (!brief.trim()) {
       setError(APP_CONFIG.errors.generation.noBrief);
       return;
@@ -150,6 +184,8 @@ Please provide a structured response with territories, headlines, and compliance
         openaiReady: true, // Always true with server-side setup
         imagesEnabled: generateImages,
       }}
+      onShowLogin={handleShowLogin}
+      onShowRegister={handleShowRegister}
     >
       <GenerationController
         brief={brief}
@@ -192,6 +228,13 @@ Please provide a structured response with territories, headlines, and compliance
         }}
         onGenerateImagesToggle={setGenerateImages}
         onToastClose={hideToast}
+      />
+
+      {/* Authentication Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        initialMode={authModalMode}
       />
     </MainLayout>
   );

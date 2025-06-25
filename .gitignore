@@ -37,3 +37,6 @@ config/keys.json
 # Temporary files
 tmp/
 temp/
+
+# Local Netlify folder
+.netlify

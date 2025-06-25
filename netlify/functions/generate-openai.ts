@@ -1,5 +1,16 @@
 import { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
 import OpenAI from 'openai';
+import { authenticateRequest, updateUserUsage } from './utils/auth';
+import {
+  successResponse,
+  errorResponse,
+  unauthorizedResponse,
+  validateMethod,
+  parseRequestBody,
+  logRequest,
+  logError,
+  validationErrorResponse,
+} from './utils/response';
 
 interface GenerateRequest {
   prompt: string;
@@ -14,51 +25,65 @@ interface GenerateResponse {
 }
 
 const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
-  // Only allow POST requests
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: JSON.stringify({ error: 'Method not allowed' })
-    };
-  }
-
-  // Handle CORS preflight
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: ''
-    };
-  }
+  const functionName = 'generate-openai';
+  let authResult: any;
+  let requestBody: GenerateRequest | undefined;
 
   try {
+    // Validate HTTP method
+    const methodValidation = validateMethod(event.httpMethod, ['POST']);
+    if (methodValidation) return methodValidation;
+
+    logRequest(functionName, event.httpMethod);
+
+    // Authenticate request
+    authResult = authenticateRequest(event);
+    if (!authResult.success || !authResult.user) {
+      logRequest(functionName, event.httpMethod, undefined, {
+        action: 'authentication_failed',
+        error: authResult.error
+      });
+      return unauthorizedResponse(authResult.error);
+    }
+
+    const user = authResult.user;
+
+    // Parse and validate request body
+    try {
+      requestBody = parseRequestBody<GenerateRequest>(event.body);
+    } catch (error: any) {
+      logError(functionName, error, user.id);
+      return errorResponse('Invalid request body', 400);
+    }
+
+    const { prompt, generateImages, brief } = requestBody;
+
+    // Validate required fields
+    const validationErrors: string[] = [];
+    if (!prompt || prompt.trim().length === 0) {
+      validationErrors.push('Prompt is required');
+    }
+    if (prompt && prompt.length > 10000) {
+      validationErrors.push('Prompt is too long (max 10,000 characters)');
+    }
+
+    if (validationErrors.length > 0) {
+      return validationErrorResponse(validationErrors);
+    }
+
     // Get API key from environment variables
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
-      throw new Error('OpenAI API key not configured');
+      logError(functionName, new Error('OpenAI API key not configured'), user.id);
+      return errorResponse('Service configuration error', 500);
     }
 
-    // Parse request body
-    const body: GenerateRequest = JSON.parse(event.body || '{}');
-    const { prompt, generateImages, brief } = body;
-
-    if (!prompt) {
-      throw new Error('Prompt is required');
-    }
-
-    console.log('🔄 Starting OpenAI API call...');
-    console.log('Prompt length:', prompt.length);
-    console.log('Generate images:', generateImages);
+    logRequest(functionName, event.httpMethod, user.id, {
+      action: 'openai_generation_start',
+      promptLength: prompt.length,
+      generateImages,
+      plan: user.plan
+    });
 
     // Initialize OpenAI client securely on server-side
     const openai = new OpenAI({
@@ -68,6 +93,7 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
 
     // Generate text content
     console.log('🚀 Making OpenAI API request...');
+    const startTime = Date.now();
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
@@ -137,43 +163,35 @@ Generate exactly 6 territories, each with 3 headlines. For each headline, provid
       throw new Error('Failed to parse AI response');
     }
 
+    // Update user usage
+    updateUserUsage(user.id);
+
+    // Log successful generation
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+
+    logRequest(functionName, event.httpMethod, user.id, {
+      action: 'openai_generation_success',
+      duration,
+      territoriesGenerated: parsed.territories?.length || 0,
+      generateImages,
+      plan: user.plan
+    });
+
     // TODO: Add image generation logic here if generateImages is true
     // This will be implemented in a separate function to keep this one focused
 
-    const result: GenerateResponse = {
-      success: true,
-      data: parsed
-    };
-
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: JSON.stringify(result)
-    };
+    return successResponse(parsed, 'Content generated successfully');
 
   } catch (error: any) {
-    console.error('❌ OpenAI API Error:', error);
-    
-    const errorResponse: GenerateResponse = {
-      success: false,
-      error: error.message || 'Unknown error occurred'
-    };
+    const user = authResult?.user;
+    logError(functionName, error, user?.id, {
+      action: 'openai_generation_failed',
+      promptLength: requestBody?.prompt?.length,
+      plan: user?.plan
+    });
 
-    return {
-      statusCode: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: JSON.stringify(errorResponse)
-    };
+    return errorResponse(error.message || 'Failed to generate content', 500);
   }
 };
 

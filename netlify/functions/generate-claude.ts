@@ -1,5 +1,16 @@
 import { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
 import Anthropic from '@anthropic-ai/sdk';
+import { authenticateRequest, updateUserUsage } from './utils/auth';
+import {
+  successResponse,
+  errorResponse,
+  unauthorizedResponse,
+  validateMethod,
+  parseRequestBody,
+  logRequest,
+  logError,
+  validationErrorResponse,
+} from './utils/response';
 
 interface GenerateRequest {
   prompt: string;
@@ -12,50 +23,64 @@ interface GenerateResponse {
 }
 
 const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
-  // Only allow POST requests
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: JSON.stringify({ error: 'Method not allowed' })
-    };
-  }
-
-  // Handle CORS preflight
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: ''
-    };
-  }
+  const functionName = 'generate-claude';
+  let authResult: any;
+  let requestBody: GenerateRequest | undefined;
 
   try {
+    // Validate HTTP method
+    const methodValidation = validateMethod(event.httpMethod, ['POST']);
+    if (methodValidation) return methodValidation;
+
+    logRequest(functionName, event.httpMethod);
+
+    // Authenticate request
+    authResult = authenticateRequest(event);
+    if (!authResult.success || !authResult.user) {
+      logRequest(functionName, event.httpMethod, undefined, {
+        action: 'authentication_failed',
+        error: authResult.error
+      });
+      return unauthorizedResponse(authResult.error);
+    }
+
+    const user = authResult.user;
+
+    // Parse and validate request body
+    try {
+      requestBody = parseRequestBody<GenerateRequest>(event.body);
+    } catch (error: any) {
+      logError(functionName, error, user.id);
+      return errorResponse('Invalid request body', 400);
+    }
+
+    const { prompt } = requestBody;
+
+    // Validate required fields
+    const validationErrors: string[] = [];
+    if (!prompt || prompt.trim().length === 0) {
+      validationErrors.push('Prompt is required');
+    }
+    if (prompt && prompt.length > 10000) {
+      validationErrors.push('Prompt is too long (max 10,000 characters)');
+    }
+
+    if (validationErrors.length > 0) {
+      return validationErrorResponse(validationErrors);
+    }
+
     // Get API key from environment variables
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
-      throw new Error('Claude API key not configured');
+      logError(functionName, new Error('Claude API key not configured'), user.id);
+      return errorResponse('Service configuration error', 500);
     }
 
-    // Parse request body
-    const body: GenerateRequest = JSON.parse(event.body || '{}');
-    const { prompt } = body;
-
-    if (!prompt) {
-      throw new Error('Prompt is required');
-    }
-
-    console.log('🔄 Starting Claude API call...');
-    console.log('Prompt length:', prompt.length);
+    logRequest(functionName, event.httpMethod, user.id, {
+      action: 'claude_generation_start',
+      promptLength: prompt.length,
+      plan: user.plan
+    });
 
     // Initialize Claude client securely on server-side
     const anthropic = new Anthropic({
@@ -64,6 +89,7 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
 
     // Generate content with Claude
     console.log('🚀 Making Claude API request...');
+    const startTime = Date.now();
     const message = await anthropic.messages.create({
       model: "claude-3-sonnet-20240229",
       max_tokens: 4000,
@@ -131,40 +157,31 @@ ${prompt}`
       throw new Error('Failed to parse AI response');
     }
 
-    const result: GenerateResponse = {
-      success: true,
-      data: parsed
-    };
+    // Update user usage
+    updateUserUsage(user.id);
 
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: JSON.stringify(result)
-    };
+    // Log successful generation
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+
+    logRequest(functionName, event.httpMethod, user.id, {
+      action: 'claude_generation_success',
+      duration,
+      territoriesGenerated: parsed.territories?.length || 0,
+      plan: user.plan
+    });
+
+    return successResponse(parsed, 'Content generated successfully');
 
   } catch (error: any) {
-    console.error('❌ Claude API Error:', error);
-    
-    const errorResponse: GenerateResponse = {
-      success: false,
-      error: error.message || 'Unknown error occurred'
-    };
+    const user = authResult?.user;
+    logError(functionName, error, user?.id, {
+      action: 'claude_generation_failed',
+      promptLength: requestBody?.prompt?.length,
+      plan: user?.plan
+    });
 
-    return {
-      statusCode: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: JSON.stringify(errorResponse)
-    };
+    return errorResponse(error.message || 'Failed to generate content', 500);
   }
 };
 

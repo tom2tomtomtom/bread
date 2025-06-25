@@ -7,6 +7,10 @@
     "@anthropic-ai/sdk": "^0.55.0",
     "@supabase/supabase-js": "^2.50.1",
     "@tailwindcss/forms": "^0.5.7",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2",
     "openai": "^4.104.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -60,17 +64,32 @@
       "react-app/jest",
       "prettier"
     ],
-    "plugins": ["prettier"],
+    "plugins": [
+      "prettier"
+    ],
     "rules": {
       "prettier/prettier": "error",
-      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "argsIgnorePattern": "^_"
+        }
+      ],
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "@typescript-eslint/no-explicit-any": "warn",
       "react/prop-types": "off",
       "react/react-in-jsx-scope": "off",
       "react-hooks/exhaustive-deps": "warn",
-      "no-console": ["warn", { "allow": ["warn", "error"] }],
+      "no-console": [
+        "warn",
+        {
+          "allow": [
+            "warn",
+            "error"
+          ]
+        }
+      ],
       "prefer-const": "error",
       "no-var": "error",
       "object-shorthand": "error",
@@ -78,7 +97,12 @@
     },
     "overrides": [
       {
-        "files": ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"],
+        "files": [
+          "**/*.test.ts",
+          "**/*.test.tsx",
+          "**/*.spec.ts",
+          "**/*.spec.tsx"
+        ],
         "rules": {
           "@typescript-eslint/no-explicit-any": "off",
           "no-console": "off"

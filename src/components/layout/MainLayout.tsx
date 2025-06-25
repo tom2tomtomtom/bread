@@ -1,4 +1,6 @@
 import React from 'react';
+import { UserProfile } from '../auth';
+import { useAuthStore } from '../../stores/authStore';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -9,6 +11,8 @@ interface MainLayoutProps {
     openaiReady: boolean;
     imagesEnabled: boolean;
   };
+  onShowLogin?: () => void;
+  onShowRegister?: () => void;
 }
 
 export const MainLayout: React.FC<MainLayoutProps> = ({
@@ -17,7 +21,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   onAdminToggle,
   generateImages,
   _apiStatus,
+  onShowLogin,
+  onShowRegister,
 }) => {
+  const { isAuthenticated } = useAuthStore();
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
       {/* Animated Background Elements */}
@@ -43,8 +50,29 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
             </div>
           </div>
 
-          {/* Admin Controls */}
+          {/* Header Controls */}
           <div className="flex items-center gap-4">
+            {/* Authentication Section */}
+            {isAuthenticated ? (
+              <UserProfile />
+            ) : (
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={onShowLogin}
+                  className="bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 px-4 py-2 rounded-xl text-white transition-all duration-300"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={onShowRegister}
+                  className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-black font-semibold px-4 py-2 rounded-xl transition-all duration-300"
+                >
+                  Sign Up
+                </button>
+              </div>
+            )}
+
+            {/* Admin Controls */}
             <div className="text-right">
               <button
                 onClick={onAdminToggle}

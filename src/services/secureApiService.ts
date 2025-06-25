@@ -1,5 +1,6 @@
 // Secure API service that calls server-side functions instead of exposing API keys in browser
 import { GeneratedOutput } from '../App';
+import { useAuthStore } from '../stores/authStore';
 
 interface ApiResponse {
   success: boolean;
@@ -17,6 +18,41 @@ const getApiBaseUrl = (): string => {
   return '/.netlify/functions';
 };
 
+// Get authentication headers
+const getAuthHeaders = (): Record<string, string> => {
+  const token = useAuthStore.getState().getAuthToken();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  return headers;
+};
+
+// Handle API errors with authentication retry
+const handleApiError = async (response: Response, retryFn?: () => Promise<Response>): Promise<ApiResponse> => {
+  if (response.status === 401 && retryFn) {
+    // Try to refresh token and retry
+    try {
+      await useAuthStore.getState().refreshToken();
+      const retryResponse = await retryFn();
+      if (retryResponse.ok) {
+        return await retryResponse.json();
+      }
+    } catch (refreshError) {
+      // If refresh fails, logout user
+      useAuthStore.getState().logout();
+      throw new Error('Authentication failed. Please log in again.');
+    }
+  }
+
+  const result: ApiResponse = await response.json();
+  throw new Error(result.error || `HTTP error! status: ${response.status}`);
+};
+
 // Generate content using OpenAI via secure server-side function
 export const generateWithOpenAI = async (
   prompt: string,
@@ -27,23 +63,25 @@ export const generateWithOpenAI = async (
   console.log('Prompt length:', prompt.length);
   console.log('Generate images:', generateImages);
 
-  try {
+  const makeRequest = async (): Promise<Response> => {
     const apiUrl = `${getApiBaseUrl()}/generate-openai`;
-
-    const response = await fetch(apiUrl, {
+    return fetch(apiUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         prompt,
         generateImages,
         brief,
       }),
     });
+  };
+
+  try {
+    const response = await makeRequest();
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const result = await handleApiError(response, makeRequest);
+      return result.data;
     }
 
     const result: ApiResponse = await response.json();
@@ -80,21 +118,23 @@ export const generateWithClaude = async (prompt: string): Promise<GeneratedOutpu
   console.log('🔄 Starting secure Claude API call...');
   console.log('Prompt length:', prompt.length);
 
-  try {
+  const makeRequest = async (): Promise<Response> => {
     const apiUrl = `${getApiBaseUrl()}/generate-claude`;
-
-    const response = await fetch(apiUrl, {
+    return fetch(apiUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         prompt,
       }),
     });
+  };
+
+  try {
+    const response = await makeRequest();
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const result = await handleApiError(response, makeRequest);
+      return result.data;
     }
 
     const result: ApiResponse = await response.json();
@@ -115,22 +155,24 @@ export const generateWithClaude = async (prompt: string): Promise<GeneratedOutpu
 const generateImages_API = async (territories: any[], brief: string): Promise<any[]> => {
   console.log('🎨 Starting secure image generation...');
 
-  try {
+  const makeRequest = async (): Promise<Response> => {
     const apiUrl = `${getApiBaseUrl()}/generate-images`;
-
-    const response = await fetch(apiUrl, {
+    return fetch(apiUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         territories,
         brief,
       }),
     });
+  };
+
+  try {
+    const response = await makeRequest();
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const result = await handleApiError(response, makeRequest);
+      return result.data || [];
     }
 
     const result: ApiResponse = await response.json();

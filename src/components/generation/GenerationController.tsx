@@ -53,7 +53,6 @@ export const GenerationController: React.FC<GenerationControllerProps> = ({
   onRegenerateUnstarred,
   onToggleTerritoryStarred,
   onToggleHeadlineStarred,
-  _onBriefAnalysisToggle,
 }) => {
   return (
     <div className="max-w-6xl mx-auto p-8">

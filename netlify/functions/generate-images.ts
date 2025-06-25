@@ -1,5 +1,16 @@
 import { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
 import OpenAI from 'openai';
+import { authenticateRequest, updateUserUsage } from './utils/auth';
+import {
+  successResponse,
+  errorResponse,
+  unauthorizedResponse,
+  validateMethod,
+  parseRequestBody,
+  logRequest,
+  logError,
+  validationErrorResponse,
+} from './utils/response';
 
 interface ImageRequest {
   territories: Array<{
@@ -101,49 +112,64 @@ FOCUS: Create a beautiful, peaceful natural scenery background that provides a c
 };
 
 const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
-  // Only allow POST requests
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: JSON.stringify({ error: 'Method not allowed' })
-    };
-  }
-
-  // Handle CORS preflight
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: ''
-    };
-  }
+  const functionName = 'generate-images';
+  let authResult: any;
+  let requestBody: ImageRequest | undefined;
 
   try {
+    // Validate HTTP method
+    const methodValidation = validateMethod(event.httpMethod, ['POST']);
+    if (methodValidation) return methodValidation;
+
+    logRequest(functionName, event.httpMethod);
+
+    // Authenticate request
+    authResult = authenticateRequest(event);
+    if (!authResult.success || !authResult.user) {
+      logRequest(functionName, event.httpMethod, undefined, {
+        action: 'authentication_failed',
+        error: authResult.error
+      });
+      return unauthorizedResponse(authResult.error);
+    }
+
+    const user = authResult.user;
+
+    // Parse and validate request body
+    try {
+      requestBody = parseRequestBody<ImageRequest>(event.body);
+    } catch (error: any) {
+      logError(functionName, error, user.id);
+      return errorResponse('Invalid request body', 400);
+    }
+
+    const { territories, brief } = requestBody;
+
+    // Validate required fields
+    const validationErrors: string[] = [];
+    if (!territories || territories.length === 0) {
+      validationErrors.push('Territories are required');
+    }
+    if (territories && territories.length > 10) {
+      validationErrors.push('Too many territories (max 10)');
+    }
+
+    if (validationErrors.length > 0) {
+      return validationErrorResponse(validationErrors);
+    }
+
     // Get API key from environment variables
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
-      throw new Error('OpenAI API key not configured');
+      logError(functionName, new Error('OpenAI API key not configured'), user.id);
+      return errorResponse('Service configuration error', 500);
     }
 
-    // Parse request body
-    const body: ImageRequest = JSON.parse(event.body || '{}');
-    const { territories, brief } = body;
-
-    if (!territories || territories.length === 0) {
-      throw new Error('Territories are required');
-    }
-
-    console.log('🎨 Starting image generation for', territories.length, 'territories...');
+    logRequest(functionName, event.httpMethod, user.id, {
+      action: 'image_generation_start',
+      territoriesCount: territories.length,
+      plan: user.plan
+    });
 
     // Initialize OpenAI client
     const openai = new OpenAI({
@@ -218,42 +244,29 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
       }
     }
 
+    // Update user usage
+    updateUserUsage(user.id);
+
+    logRequest(functionName, event.httpMethod, user.id, {
+      action: 'image_generation_success',
+      imagesGenerated: results.length,
+      territoriesProcessed: territories.length,
+      plan: user.plan
+    });
+
     console.log(`✅ Generated ${results.length} images successfully`);
 
-    const response: ImageResponse = {
-      success: true,
-      data: results
-    };
-
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: JSON.stringify(response)
-    };
+    return successResponse(results, `Generated ${results.length} images successfully`);
 
   } catch (error: any) {
-    console.error('❌ Image generation error:', error);
-    
-    const errorResponse: ImageResponse = {
-      success: false,
-      error: error.message || 'Unknown error occurred'
-    };
+    const user = authResult?.user;
+    logError(functionName, error, user?.id, {
+      action: 'image_generation_failed',
+      territoriesCount: requestBody?.territories?.length,
+      plan: user?.plan
+    });
 
-    return {
-      statusCode: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: JSON.stringify(errorResponse)
-    };
+    return errorResponse(error.message || 'Failed to generate images', 500);
   }
 };
 
