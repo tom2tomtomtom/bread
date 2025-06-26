@@ -12,6 +12,13 @@ const GenerationController = lazy(() =>
   }))
 );
 
+// Create a wrapper component that connects stores to GenerationController
+const ConnectedGenerationController = lazy(() =>
+  import('./components/generation/ConnectedGenerationController').then(module => ({
+    default: module.ConnectedGenerationController
+  }))
+);
+
 const ConfigurationManager = lazy(() =>
   import('./components/configuration/ConfigurationManager').then(module => ({
     default: module.ConfigurationManager
@@ -124,7 +131,7 @@ const BreadApp: React.FC = () => {
       >
         {/* Generation Interface */}
         <Suspense fallback={<LoadingSpinner message="Loading Generation Controller..." />}>
-          <GenerationController />
+          <ConnectedGenerationController />
         </Suspense>
 
         {/* Configuration Panel */}
