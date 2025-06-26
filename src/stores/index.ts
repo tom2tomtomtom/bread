@@ -27,6 +27,7 @@ export { useConfigStore } from './configStore';
 export { useTerritoryStore } from './territoryStore';
 export { useStarredStore } from './starredStore';
 export { useAssetStore } from './assetStore';
+export { useAuthStore } from './authStore';
 
 // Keep the old store for backward compatibility during migration
 export { useAppStore } from './appStore';

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, ReactNode } from 'react';
 import { AuthModal } from '../auth';
-import { useAuthStore } from '../../stores/authStore';
+import { useAuthStore } from '../../stores';
 
 interface AuthenticationProviderProps {
   children: ReactNode;
