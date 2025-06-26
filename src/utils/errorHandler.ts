@@ -298,3 +298,93 @@ export const createErrorBoundary = (componentName: string) => {
     return enhancedError;
   };
 };
+
+/**
+ * Circuit Breaker Pattern Implementation for Service Resilience
+ */
+export enum CircuitState {
+  CLOSED = 'CLOSED',     // Normal operation
+  OPEN = 'OPEN',         // Failing, reject requests
+  HALF_OPEN = 'HALF_OPEN' // Testing if service recovered
+}
+
+export class CircuitBreaker {
+  private state: CircuitState = CircuitState.CLOSED;
+  private failureCount: number = 0;
+  private lastFailureTime: number = 0;
+  private successCount: number = 0;
+
+  constructor(
+    private readonly failureThreshold: number = 5,
+    private readonly recoveryTimeout: number = 60000, // 1 minute
+    private readonly successThreshold: number = 3
+  ) {}
+
+  async execute<T>(operation: () => Promise<T>): Promise<T> {
+    if (this.state === CircuitState.OPEN) {
+      if (Date.now() - this.lastFailureTime > this.recoveryTimeout) {
+        this.state = CircuitState.HALF_OPEN;
+        this.successCount = 0;
+      } else {
+        throw handleError(
+          new Error('Service temporarily unavailable'),
+          {
+            circuitState: this.state,
+            failureCount: this.failureCount,
+            category: ErrorCategory.NETWORK
+          }
+        );
+      }
+    }
+
+    try {
+      const result = await operation();
+      this.onSuccess();
+      return result;
+    } catch (error) {
+      this.onFailure();
+      throw error;
+    }
+  }
+
+  private onSuccess(): void {
+    this.failureCount = 0;
+
+    if (this.state === CircuitState.HALF_OPEN) {
+      this.successCount++;
+      if (this.successCount >= this.successThreshold) {
+        this.state = CircuitState.CLOSED;
+      }
+    }
+  }
+
+  private onFailure(): void {
+    this.failureCount++;
+    this.lastFailureTime = Date.now();
+
+    if (this.failureCount >= this.failureThreshold) {
+      this.state = CircuitState.OPEN;
+    }
+  }
+
+  getState(): CircuitState {
+    return this.state;
+  }
+
+  getStats() {
+    return {
+      state: this.state,
+      failureCount: this.failureCount,
+      successCount: this.successCount,
+      lastFailureTime: this.lastFailureTime,
+    };
+  }
+}
+
+// Global circuit breakers for different services
+export const circuitBreakers = {
+  openai: new CircuitBreaker(3, 30000, 2),
+  claude: new CircuitBreaker(3, 30000, 2),
+  storage: new CircuitBreaker(5, 60000, 3),
+  auth: new CircuitBreaker(3, 120000, 2),
+};

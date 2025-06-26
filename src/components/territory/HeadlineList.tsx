@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo, useCallback } from 'react';
 import { Headline } from '../../types';
 
 interface HeadlineListProps {
@@ -9,26 +9,36 @@ interface HeadlineListProps {
 }
 
 /**
- * HeadlineList - Display and manage headlines for a territory
- * 
+ * HeadlineList - Display and manage headlines for a territory (PERFORMANCE OPTIMIZED)
+ *
  * Responsibilities:
  * - Display all headlines for a territory
  * - Handle headline starring/unstarring
  * - Show headline confidence scores
  * - Display follow-up content and reasoning
+ *
+ * Performance Optimizations:
+ * - React.memo for preventing unnecessary re-renders
+ * - useMemo for expensive calculations
+ * - useCallback for stable function references
  */
-export const HeadlineList: React.FC<HeadlineListProps> = ({
+const HeadlineListComponent: React.FC<HeadlineListProps> = ({
   territoryId,
   headlines,
   starredHeadlines,
   onToggleHeadlineStarred,
 }) => {
-  // Get confidence color class for headlines
-  const getHeadlineConfidenceColor = (confidence: number) => {
+  // Memoized confidence color calculation
+  const getHeadlineConfidenceColor = useCallback((confidence: number) => {
     if (confidence >= 80) return 'text-green-600 bg-green-100';
     if (confidence >= 60) return 'text-yellow-600 bg-yellow-100';
     return 'text-red-600 bg-red-100';
-  };
+  }, []);
+
+  // Memoized headline toggle handler
+  const handleToggleHeadlineStarred = useCallback((headlineIndex: number) => {
+    onToggleHeadlineStarred(territoryId, headlineIndex);
+  }, [onToggleHeadlineStarred, territoryId]);
 
   return (
     <div>
@@ -47,7 +57,7 @@ export const HeadlineList: React.FC<HeadlineListProps> = ({
                 <div className="flex items-start gap-2 flex-1">
                   {/* Star Button */}
                   <button
-                    onClick={() => onToggleHeadlineStarred(territoryId, headlineIndex)}
+                    onClick={() => handleToggleHeadlineStarred(headlineIndex)}
                     className={`text-sm transition-all duration-300 hover:scale-110 mt-0.5 ${
                       isHeadlineStarred
                         ? 'text-yellow-500 drop-shadow-lg'
@@ -121,5 +131,20 @@ export const HeadlineList: React.FC<HeadlineListProps> = ({
     </div>
   );
 };
+
+// Memoized component to prevent unnecessary re-renders
+export const HeadlineList = memo(HeadlineListComponent, (prevProps, nextProps) => {
+  // Custom comparison for optimal performance
+  return (
+    prevProps.territoryId === nextProps.territoryId &&
+    prevProps.headlines.length === nextProps.headlines.length &&
+    prevProps.starredHeadlines.length === nextProps.starredHeadlines.length &&
+    JSON.stringify(prevProps.starredHeadlines) === JSON.stringify(nextProps.starredHeadlines) &&
+    prevProps.headlines.every((headline, index) =>
+      headline.text === nextProps.headlines[index]?.text &&
+      headline.confidence === nextProps.headlines[index]?.confidence
+    )
+  );
+});
 
 export default HeadlineList;

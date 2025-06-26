@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo, useCallback } from 'react';
 import { EnhancedTerritory, TerritoryEvolution, PerformancePrediction } from '../../types';
 import { HeadlineList } from './HeadlineList';
 import { TerritoryActions } from './TerritoryActions';
@@ -19,16 +19,21 @@ interface TerritoryCardProps {
 }
 
 /**
- * TerritoryCard - Individual territory display component
- * 
+ * TerritoryCard - Individual territory display component (PERFORMANCE OPTIMIZED)
+ *
  * Responsibilities:
  * - Display territory information (title, positioning, tone)
  * - Show confidence scoring
  * - Handle territory-level actions (star, evolve, predict)
  * - Display performance indicators
  * - Render associated headlines
+ *
+ * Performance Optimizations:
+ * - React.memo for preventing unnecessary re-renders
+ * - useMemo for expensive calculations
+ * - useCallback for stable function references
  */
-export const TerritoryCard: React.FC<TerritoryCardProps> = ({
+const TerritoryCardComponent: React.FC<TerritoryCardProps> = ({
   territory,
   index,
   starredItems,
@@ -39,22 +44,42 @@ export const TerritoryCard: React.FC<TerritoryCardProps> = ({
   territoryEvolutions,
   performancePrediction,
 }) => {
-  const isStarred = starredItems.territories.includes(territory.id);
-  const territoryHeadlines = starredItems.headlines[territory.id] || [];
-
-  // Calculate average confidence
-  const averageConfidence = Math.round(
-    (territory.confidence.marketFit +
-      territory.confidence.complianceConfidence +
-      territory.confidence.audienceResonance) / 3
+  // Memoized calculations to prevent recalculation on every render
+  const isStarred = useMemo(
+    () => starredItems.territories.includes(territory.id),
+    [starredItems.territories, territory.id]
   );
 
-  // Get confidence color class
-  const getConfidenceColorClass = (confidence: number) => {
-    if (confidence >= 80) return 'bg-green-400 text-white';
-    if (confidence >= 60) return 'bg-yellow-600 text-white';
+  const territoryHeadlines = useMemo(
+    () => starredItems.headlines[territory.id] || [],
+    [starredItems.headlines, territory.id]
+  );
+
+  // Calculate average confidence (memoized for performance)
+  const averageConfidence = useMemo(
+    () => Math.round(
+      (territory.confidence.marketFit +
+        territory.confidence.complianceConfidence +
+        territory.confidence.audienceResonance) / 3
+    ),
+    [territory.confidence.marketFit, territory.confidence.complianceConfidence, territory.confidence.audienceResonance]
+  );
+
+  // Memoized confidence color class calculation
+  const confidenceColorClass = useMemo(() => {
+    if (averageConfidence >= 80) return 'bg-green-400 text-white';
+    if (averageConfidence >= 60) return 'bg-yellow-600 text-white';
     return 'bg-red-500 text-white';
-  };
+  }, [averageConfidence]);
+
+  // Stable callback functions to prevent child re-renders
+  const handleToggleStarred = useCallback(() => {
+    onToggleTerritoryStarred(territory.id);
+  }, [onToggleTerritoryStarred, territory.id]);
+
+  const handleToggleHeadlineStarred = useCallback((headlineIndex: number) => {
+    onToggleHeadlineStarred(territory.id, headlineIndex);
+  }, [onToggleHeadlineStarred, territory.id]);
 
   return (
     <div
@@ -71,7 +96,7 @@ export const TerritoryCard: React.FC<TerritoryCardProps> = ({
 
           {/* Star Button */}
           <button
-            onClick={() => onToggleTerritoryStarred(territory.id)}
+            onClick={handleToggleStarred}
             className={`text-lg transition-all duration-300 hover:scale-110 ${
               isStarred
                 ? 'text-yellow-500 drop-shadow-lg'
@@ -91,7 +116,7 @@ export const TerritoryCard: React.FC<TerritoryCardProps> = ({
         </div>
 
         {/* Confidence Badge */}
-        <div className={`text-xs font-bold px-2 py-1 rounded-full ${getConfidenceColorClass(averageConfidence)}`}>
+        <div className={`text-xs font-bold px-2 py-1 rounded-full ${confidenceColorClass}`}>
           {averageConfidence}% CONF
         </div>
       </div>
@@ -146,10 +171,32 @@ export const TerritoryCard: React.FC<TerritoryCardProps> = ({
         territoryId={territory.id}
         headlines={territory.headlines}
         starredHeadlines={territoryHeadlines}
-        onToggleHeadlineStarred={onToggleHeadlineStarred}
+        onToggleHeadlineStarred={handleToggleHeadlineStarred}
       />
     </div>
   );
 };
+
+// Memoized component to prevent unnecessary re-renders
+export const TerritoryCard = memo(TerritoryCardComponent, (prevProps, nextProps) => {
+  // Custom comparison function for optimal performance
+  return (
+    prevProps.territory.id === nextProps.territory.id &&
+    prevProps.territory.title === nextProps.territory.title &&
+    prevProps.territory.positioning === nextProps.territory.positioning &&
+    prevProps.territory.tone === nextProps.territory.tone &&
+    prevProps.territory.confidence.marketFit === nextProps.territory.confidence.marketFit &&
+    prevProps.territory.confidence.complianceConfidence === nextProps.territory.confidence.complianceConfidence &&
+    prevProps.territory.confidence.audienceResonance === nextProps.territory.confidence.audienceResonance &&
+    prevProps.territory.confidence.riskLevel === nextProps.territory.confidence.riskLevel &&
+    prevProps.territory.headlines.length === nextProps.territory.headlines.length &&
+    prevProps.starredItems.territories.includes(prevProps.territory.id) ===
+      nextProps.starredItems.territories.includes(nextProps.territory.id) &&
+    JSON.stringify(prevProps.starredItems.headlines[prevProps.territory.id]) ===
+      JSON.stringify(nextProps.starredItems.headlines[nextProps.territory.id]) &&
+    prevProps.territoryEvolutions?.length === nextProps.territoryEvolutions?.length &&
+    prevProps.performancePrediction?.overallScore === nextProps.performancePrediction?.overallScore
+  );
+});
 
 export default TerritoryCard;
