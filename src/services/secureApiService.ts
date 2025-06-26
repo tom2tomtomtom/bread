@@ -1,10 +1,10 @@
 // Secure API service that calls server-side functions instead of exposing API keys in browser
-import { GeneratedOutput } from '../App';
+import { GeneratedOutput, Territory, StarredItems, BrandGuidelines } from '../types';
 import { useAuthStore } from '../stores/authStore';
 
-interface ApiResponse {
+interface ApiResponse<T = unknown> {
   success: boolean;
-  data?: any;
+  data?: T;
   error?: string;
 }
 
@@ -24,7 +24,7 @@ const isDevelopmentMode = (): boolean => {
 };
 
 // Mock responses for development mode
-const getMockResponse = (endpoint: string): any => {
+const getMockResponse = (endpoint: string): ApiResponse => {
   switch (endpoint) {
     case 'auth-login':
     case 'auth-register':
@@ -169,9 +169,10 @@ export const generateWithOpenAI = async (
     }
 
     return generatedOutput;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ Secure OpenAI API Error:', error);
-    throw new Error(`Failed to generate content: ${error.message}`);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Failed to generate content: ${errorMessage}`);
   }
 };
 
@@ -207,14 +208,15 @@ export const generateWithClaude = async (prompt: string): Promise<GeneratedOutpu
 
     console.log('✅ Secure Claude API response received');
     return result.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ Secure Claude API Error:', error);
-    throw new Error(`Failed to generate content: ${error.message}`);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Failed to generate content: ${errorMessage}`);
   }
 };
 
 // Generate images via secure server-side function
-const generateImages_API = async (territories: any[], brief: string): Promise<any[]> => {
+const generateImages_API = async (territories: Territory[], brief: string): Promise<string[]> => {
   console.log('🎨 Starting secure image generation...');
 
   const makeRequest = async (): Promise<Response> => {
@@ -341,4 +343,161 @@ export const mergeWithStarredContent = (
 ): GeneratedOutput => {
   // Add merge logic here
   return newOutput;
+};
+
+// ===== MULTIMEDIA GENERATION API FUNCTIONS =====
+
+// Enhanced image generation via secure server-side function
+export const generateEnhancedImages_API = async (
+  territories: any[],
+  brief: string,
+  options: {
+    imageType?: string;
+    culturalContext?: string;
+    styleConsistency?: boolean;
+    quality?: string;
+    provider?: string;
+    brandGuidelines?: any;
+  } = {}
+): Promise<any[]> => {
+  console.log('🎨 Starting enhanced image generation...');
+
+  const makeRequest = async (): Promise<Response> => {
+    const apiUrl = `${getApiBaseUrl()}/generate-images`;
+    return fetch(apiUrl, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({
+        territories,
+        brief,
+        ...options,
+      }),
+    });
+  };
+
+  try {
+    const response = await retryRequest(makeRequest, 3);
+    const result: ApiResponse = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || 'Unknown error from enhanced image API');
+    }
+
+    console.log('✅ Enhanced image generation completed');
+    return result.data || [];
+  } catch (error: any) {
+    console.error('❌ Enhanced image generation error:', error);
+    throw error;
+  }
+};
+
+// Video generation via secure server-side function
+export const generateVideo_API = async (
+  sourceImageId: string,
+  sourceImageUrl: string,
+  animationType: string,
+  duration: number,
+  options: {
+    outputFormat?: string;
+    platformOptimization?: string;
+    provider?: string;
+    quality?: string;
+    fps?: number;
+    customPrompt?: string;
+    territory?: any;
+  } = {}
+): Promise<any> => {
+  console.log('🎬 Starting video generation...');
+
+  const makeRequest = async (): Promise<Response> => {
+    const apiUrl = `${getApiBaseUrl()}/generate-videos`;
+    return fetch(apiUrl, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({
+        sourceImageId,
+        sourceImageUrl,
+        animationType,
+        duration,
+        ...options,
+      }),
+    });
+  };
+
+  try {
+    const response = await retryRequest(makeRequest, 3);
+    const result: ApiResponse = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || 'Unknown error from video API');
+    }
+
+    console.log('✅ Video generation completed');
+    return result.data;
+  } catch (error: any) {
+    console.error('❌ Video generation error:', error);
+    throw error;
+  }
+};
+
+// Batch multimedia generation
+export const batchGenerateMultimedia_API = async (
+  requests: Array<{
+    type: 'image' | 'video';
+    data: any;
+  }>,
+  options: {
+    priority?: string;
+    callback?: string;
+  } = {}
+): Promise<any> => {
+  console.log('📦 Starting batch multimedia generation...');
+
+  try {
+    // Process requests in parallel with rate limiting
+    const batchSize = 3;
+    const results = [];
+
+    for (let i = 0; i < requests.length; i += batchSize) {
+      const batch = requests.slice(i, i + batchSize);
+
+      const batchPromises = batch.map(async (request) => {
+        if (request.type === 'image') {
+          return await generateEnhancedImages_API(
+            request.data.territories,
+            request.data.brief,
+            request.data.options
+          );
+        } else if (request.type === 'video') {
+          return await generateVideo_API(
+            request.data.sourceImageId,
+            request.data.sourceImageUrl,
+            request.data.animationType,
+            request.data.duration,
+            request.data.options
+          );
+        }
+        return null;
+      });
+
+      const batchResults = await Promise.all(batchPromises);
+      results.push(...batchResults.filter(result => result !== null));
+
+      // Small delay between batches to respect rate limits
+      if (i + batchSize < requests.length) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+    }
+
+    console.log('✅ Batch multimedia generation completed');
+    return {
+      batchId: `batch_${Date.now()}`,
+      totalRequests: requests.length,
+      completedRequests: results.length,
+      results,
+    };
+  } catch (error: any) {
+    console.error('❌ Batch multimedia generation error:', error);
+    throw error;
+  }
 };

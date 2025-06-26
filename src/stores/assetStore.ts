@@ -19,11 +19,27 @@ import {
   BrandGuidelines,
   Territory,
   LayoutGenerationRequest,
+  // Multimedia generation types
+  TextToImageRequest,
+  ImageToVideoRequest,
+  GenerationQueue,
+  GeneratedAsset,
+  PromptEnhancement,
+  QualityAssessment,
+  BatchGenerationRequest,
+  BatchGenerationResult,
+  AIProvider,
+  ImageType,
+  CulturalContext,
+  AnimationType,
+  VideoFormat,
+  PlatformOptimization,
 } from '../types';
 import { APP_CONFIG } from '../config/app';
 import { assetService } from '../services/assetService';
 import { layoutGenerationService } from '../services/layoutGenerationService';
 import { visualIntelligenceService } from '../services/visualIntelligenceService';
+import { multimediaGenerationService } from '../services/multimediaGenerationService';
 
 interface AssetState {
   // Asset data
@@ -57,6 +73,18 @@ interface AssetState {
   isGeneratingLayouts: boolean;
   isAnalyzingVisuals: boolean;
   layoutGenerationError: string | null;
+
+  // Multimedia Generation State
+  generationQueue: GenerationQueue[];
+  generatedAssets: GeneratedAsset[];
+  currentGeneration: GenerationQueue | null;
+  isGeneratingImage: boolean;
+  isGeneratingVideo: boolean;
+  generationProgress: number;
+  generationError: string | null;
+  promptEnhancements: PromptEnhancement[];
+  qualityAssessments: QualityAssessment[];
+  batchGenerations: BatchGenerationResult[];
 
   // Actions - Asset Management
   uploadAssets: (files: File[]) => Promise<void>;
@@ -104,6 +132,18 @@ interface AssetState {
   exportLayout: (layoutId: string, config: ExportConfiguration) => Promise<string>;
   clearLayouts: () => void;
   clearLayoutError: () => void;
+
+  // Actions - Multimedia Generation
+  generateImage: (request: TextToImageRequest) => Promise<string>; // Returns queue ID
+  generateVideo: (request: ImageToVideoRequest) => Promise<string>; // Returns queue ID
+  enhancePrompt: (prompt: string, territory: Territory, brandGuidelines: BrandGuidelines, imageType: ImageType, culturalContext: CulturalContext) => Promise<PromptEnhancement>;
+  assessQuality: (assetId: string, territory: Territory, brandGuidelines: BrandGuidelines) => Promise<QualityAssessment>;
+  batchGenerate: (request: BatchGenerationRequest) => Promise<string>; // Returns batch ID
+  getGenerationStatus: (queueId: string) => GenerationQueue | undefined;
+  cancelGeneration: (queueId: string) => Promise<void>;
+  retryGeneration: (queueId: string) => Promise<void>;
+  clearGenerationQueue: () => void;
+  clearGenerationError: () => void;
 
   // Utility actions
   getAssetById: (id: string) => UploadedAsset | undefined;
@@ -176,6 +216,18 @@ export const useAssetStore = create<AssetState>()(
       isGeneratingLayouts: false,
       isAnalyzingVisuals: false,
       layoutGenerationError: null,
+
+      // Multimedia Generation State
+      generationQueue: [],
+      generatedAssets: [],
+      currentGeneration: null,
+      isGeneratingImage: false,
+      isGeneratingVideo: false,
+      generationProgress: 0,
+      generationError: null,
+      promptEnhancements: [],
+      qualityAssessments: [],
+      batchGenerations: [],
 
       // Asset Management Actions
       uploadAssets: async (files: File[]) => {
@@ -754,6 +806,214 @@ export const useAssetStore = create<AssetState>()(
       clearLayoutError: () => {
         set({ layoutGenerationError: null });
       },
+
+      // Multimedia Generation Actions
+      generateImage: async (request: TextToImageRequest) => {
+        set({ isGeneratingImage: true, generationError: null, generationProgress: 0 });
+
+        try {
+          console.log('🎨 Starting image generation...', request);
+
+          // Queue the generation request
+          const queueId = await multimediaGenerationService.queueGeneration(request, 'normal');
+
+          const queueItem = multimediaGenerationService.getQueueStatus(queueId);
+          if (queueItem) {
+            set(state => ({
+              generationQueue: [...state.generationQueue, queueItem],
+              currentGeneration: queueItem,
+            }));
+          }
+
+          console.log(`✅ Image generation queued: ${queueId}`);
+          return queueId;
+
+        } catch (error) {
+          console.error('Image generation failed:', error);
+          set({
+            isGeneratingImage: false,
+            generationError: error instanceof Error ? error.message : 'Image generation failed',
+          });
+          throw error;
+        }
+      },
+
+      generateVideo: async (request: ImageToVideoRequest) => {
+        set({ isGeneratingVideo: true, generationError: null, generationProgress: 0 });
+
+        try {
+          console.log('🎬 Starting video generation...', request);
+
+          // Queue the generation request
+          const queueId = await multimediaGenerationService.queueGeneration(request, 'normal');
+
+          const queueItem = multimediaGenerationService.getQueueStatus(queueId);
+          if (queueItem) {
+            set(state => ({
+              generationQueue: [...state.generationQueue, queueItem],
+              currentGeneration: queueItem,
+            }));
+          }
+
+          console.log(`✅ Video generation queued: ${queueId}`);
+          return queueId;
+
+        } catch (error) {
+          console.error('Video generation failed:', error);
+          set({
+            isGeneratingVideo: false,
+            generationError: error instanceof Error ? error.message : 'Video generation failed',
+          });
+          throw error;
+        }
+      },
+
+      enhancePrompt: async (
+        prompt: string,
+        territory: Territory,
+        brandGuidelines: BrandGuidelines,
+        imageType: ImageType,
+        culturalContext: CulturalContext
+      ) => {
+        try {
+          console.log('✨ Enhancing prompt for territory-driven generation...');
+
+          const enhancement = await multimediaGenerationService.enhancePromptForTerritory(
+            prompt,
+            territory,
+            brandGuidelines,
+            imageType,
+            culturalContext
+          );
+
+          set(state => ({
+            promptEnhancements: [...state.promptEnhancements, enhancement],
+          }));
+
+          console.log('✅ Prompt enhanced successfully');
+          return enhancement;
+
+        } catch (error) {
+          console.error('Prompt enhancement failed:', error);
+          throw error;
+        }
+      },
+
+      assessQuality: async (assetId: string, territory: Territory, brandGuidelines: BrandGuidelines) => {
+        try {
+          console.log('🔍 Assessing asset quality...', assetId);
+
+          // Mock quality assessment (in production, this would use AI analysis)
+          const assessment: QualityAssessment = {
+            score: 85,
+            brandCompliance: 90,
+            technicalQuality: 88,
+            creativityScore: 82,
+            territoryAlignment: 87,
+            issues: [],
+            recommendations: [
+              'Consider adjusting color saturation for better brand alignment',
+              'Optimize composition for mobile viewing',
+            ],
+            approved: true,
+          };
+
+          set(state => ({
+            qualityAssessments: [...state.qualityAssessments, assessment],
+          }));
+
+          console.log('✅ Quality assessment completed');
+          return assessment;
+
+        } catch (error) {
+          console.error('Quality assessment failed:', error);
+          throw error;
+        }
+      },
+
+      batchGenerate: async (request: BatchGenerationRequest) => {
+        try {
+          console.log('📦 Starting batch generation...', request);
+
+          // Mock batch generation (in production, this would handle multiple requests)
+          const batchResult: BatchGenerationResult = {
+            batchId: `batch_${Date.now()}`,
+            totalRequests: request.requests.length,
+            completedRequests: 0,
+            failedRequests: 0,
+            results: [],
+            errors: [],
+            startTime: new Date(),
+          };
+
+          set(state => ({
+            batchGenerations: [...state.batchGenerations, batchResult],
+          }));
+
+          console.log(`✅ Batch generation started: ${batchResult.batchId}`);
+          return batchResult.batchId;
+
+        } catch (error) {
+          console.error('Batch generation failed:', error);
+          throw error;
+        }
+      },
+
+      getGenerationStatus: (queueId: string) => {
+        const { generationQueue } = get();
+        return generationQueue.find(item => item.id === queueId);
+      },
+
+      cancelGeneration: async (queueId: string) => {
+        try {
+          console.log('❌ Cancelling generation...', queueId);
+
+          set(state => ({
+            generationQueue: state.generationQueue.map(item =>
+              item.id === queueId ? { ...item, status: 'cancelled' } : item
+            ),
+          }));
+
+          console.log('✅ Generation cancelled');
+
+        } catch (error) {
+          console.error('Failed to cancel generation:', error);
+          throw error;
+        }
+      },
+
+      retryGeneration: async (queueId: string) => {
+        try {
+          console.log('🔄 Retrying generation...', queueId);
+
+          set(state => ({
+            generationQueue: state.generationQueue.map(item =>
+              item.id === queueId
+                ? { ...item, status: 'queued', retryCount: item.retryCount + 1, updatedAt: new Date() }
+                : item
+            ),
+          }));
+
+          console.log('✅ Generation retry queued');
+
+        } catch (error) {
+          console.error('Failed to retry generation:', error);
+          throw error;
+        }
+      },
+
+      clearGenerationQueue: () => {
+        set({
+          generationQueue: [],
+          currentGeneration: null,
+          generatedAssets: [],
+        });
+        console.log('🧹 Cleared generation queue');
+      },
+
+      clearGenerationError: () => {
+        set({ generationError: null });
+      },
     }),
     {
       name: `${APP_CONFIG.storage.keys.appState}-assets`,
@@ -769,6 +1029,11 @@ export const useAssetStore = create<AssetState>()(
         layouts: state.layouts,
         templates: state.templates,
         currentLayout: state.currentLayout,
+        // Multimedia generation data
+        generatedAssets: state.generatedAssets,
+        promptEnhancements: state.promptEnhancements,
+        qualityAssessments: state.qualityAssessments,
+        batchGenerations: state.batchGenerations,
       }),
     }
   )

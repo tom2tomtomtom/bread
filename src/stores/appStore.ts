@@ -10,6 +10,17 @@ import {
   EvolutionSuggestion,
   EvolutionHistory,
   PerformancePrediction,
+  // Campaign Template System Types
+  CampaignTemplate,
+  TemplateRecommendation,
+  TemplateSelectionState,
+  TemplateCustomization,
+  ValidationResult,
+  PreviewAsset,
+  ChannelFormat,
+  // Enhanced types to replace 'any'
+  EnhancedGeneratedOutput,
+  BriefAnalysis,
 } from '../types';
 import { DEFAULT_PROMPTS } from '../config/prompts';
 import { APP_CONFIG } from '../config/app';
@@ -19,20 +30,15 @@ interface AppState {
   brief: string;
   isGenerating: boolean;
   showOutput: boolean;
-  generatedOutput: any | null;
+  generatedOutput: EnhancedGeneratedOutput | null;
   error: string;
   showBriefAnalysis: boolean;
-  briefAnalysis: any | null;
+  briefAnalysis: BriefAnalysis | null;
 
   // Enhanced Brief Intelligence state
   enhancedBriefAnalysis: EnhancedBriefAnalysis | null;
   isAnalyzingBrief: boolean;
-  realTimeAnalysis: {
-    score: number;
-    wordCount: number;
-    completeness: number;
-    suggestions: string[];
-  } | null;
+  realTimeAnalysis: RealTimeAnalysis | null;
   showEnhancedAnalysis: boolean;
 
   // Territory Evolution state
@@ -43,6 +49,17 @@ interface AppState {
   isEvolvingTerritory: boolean;
   showEvolutionPanel: boolean;
   selectedTerritoryForEvolution: string | null;
+
+  // Campaign Template System state
+  availableTemplates: CampaignTemplate[];
+  templateRecommendations: TemplateRecommendation[];
+  templateSelection: TemplateSelectionState;
+  isLoadingTemplates: boolean;
+  isGeneratingRecommendations: boolean;
+  templateError: string | null;
+  showTemplateSelector: boolean;
+  templatePerformanceData: { [templateId: string]: any };
+  templateUsageHistory: { [templateId: string]: any[] };
 
   // Configuration state
   prompts: Prompts;
@@ -64,15 +81,15 @@ interface AppState {
   setBrief: (brief: string) => void;
   setIsGenerating: (generating: boolean) => void;
   setShowOutput: (show: boolean) => void;
-  setGeneratedOutput: (output: any) => void;
+  setGeneratedOutput: (output: EnhancedGeneratedOutput | null) => void;
   setError: (error: string) => void;
   setShowBriefAnalysis: (show: boolean) => void;
-  setBriefAnalysis: (analysis: any) => void;
+  setBriefAnalysis: (analysis: BriefAnalysis | null) => void;
 
   // Enhanced Brief Intelligence actions
   setEnhancedBriefAnalysis: (analysis: EnhancedBriefAnalysis | null) => void;
   setIsAnalyzingBrief: (analyzing: boolean) => void;
-  setRealTimeAnalysis: (analysis: any) => void;
+  setRealTimeAnalysis: (analysis: RealTimeAnalysis | null) => void;
   setShowEnhancedAnalysis: (show: boolean) => void;
   analyzeEnhancedBrief: () => Promise<void>;
   updateRealTimeAnalysis: (brief: string) => void;
@@ -87,6 +104,19 @@ interface AppState {
   generateEvolutionSuggestions: (territoryId: string) => Promise<void>;
   evolveTerritoryWithAI: (territoryId: string, suggestion: EvolutionSuggestion) => Promise<void>;
   predictTerritoryPerformance: (territoryId: string) => Promise<void>;
+
+  // Campaign Template System actions
+  loadAvailableTemplates: () => Promise<void>;
+  generateTemplateRecommendations: (brief?: string) => Promise<void>;
+  selectTemplate: (templateId: string) => void;
+  updateTemplateCustomization: (field: string, value: any) => void;
+  validateTemplateCustomizations: () => ValidationResult[];
+  generateTemplatePreview: (channels: ChannelFormat[]) => Promise<void>;
+  setShowTemplateSelector: (show: boolean) => void;
+  clearTemplateSelection: () => void;
+  saveTemplateConfiguration: () => Promise<void>;
+  getTemplatePerformanceInsights: (templateId: string) => any;
+  optimizeTemplate: (templateId: string, performanceData: any, feedback: string[]) => Promise<void>;
 
   updatePrompt: (key: keyof Prompts, value: string) => void;
   updateApiKey: (provider: keyof ApiKeys, key: string) => void;
@@ -133,6 +163,24 @@ export const useAppStore = create<AppState>()(
       isEvolvingTerritory: false,
       showEvolutionPanel: false,
       selectedTerritoryForEvolution: null,
+
+      // Campaign Template System initial state
+      availableTemplates: [],
+      templateRecommendations: [],
+      templateSelection: {
+        selectedTemplate: null,
+        customizations: [],
+        validationResults: [],
+        previewAssets: [],
+        isCustomizing: false,
+        customizationProgress: 0,
+      },
+      isLoadingTemplates: false,
+      isGeneratingRecommendations: false,
+      templateError: null,
+      showTemplateSelector: false,
+      templatePerformanceData: {},
+      templateUsageHistory: {},
 
       prompts: DEFAULT_PROMPTS,
       apiKeys: { openai: '' },
@@ -279,6 +327,213 @@ export const useAppStore = create<AppState>()(
         }
       },
 
+      // Campaign Template System actions
+      loadAvailableTemplates: async () => {
+        set({ isLoadingTemplates: true, templateError: null });
+        try {
+          const { templateService } = await import('../services/templateService');
+          const templates = templateService.getAllTemplates();
+          set({
+            availableTemplates: templates,
+            isLoadingTemplates: false
+          });
+        } catch (error) {
+          console.error('Failed to load templates:', error);
+          set({
+            templateError: error instanceof Error ? error.message : 'Failed to load templates',
+            isLoadingTemplates: false
+          });
+        }
+      },
+
+      generateTemplateRecommendations: async (brief?: string) => {
+        set({ isGeneratingRecommendations: true, templateError: null });
+        try {
+          const { templateService } = await import('../services/templateService');
+          const { enhancedBriefAnalysis } = get();
+          const currentBrief = brief || get().brief;
+
+          if (!enhancedBriefAnalysis || !currentBrief) {
+            throw new Error('Brief analysis required for template recommendations');
+          }
+
+          const recommendations = await templateService.recommendTemplates(
+            enhancedBriefAnalysis,
+            currentBrief,
+            get().generatedOutput?.territories
+          );
+
+          set({
+            templateRecommendations: recommendations,
+            isGeneratingRecommendations: false
+          });
+        } catch (error) {
+          console.error('Failed to generate template recommendations:', error);
+          set({
+            templateError: error instanceof Error ? error.message : 'Failed to generate recommendations',
+            isGeneratingRecommendations: false
+          });
+        }
+      },
+
+      selectTemplate: (templateId: string) => {
+        const template = get().availableTemplates.find(t => t.id === templateId);
+        if (template) {
+          set(state => ({
+            templateSelection: {
+              ...state.templateSelection,
+              selectedTemplate: template,
+              customizations: [],
+              validationResults: [],
+              previewAssets: [],
+              isCustomizing: true,
+              customizationProgress: 0,
+            }
+          }));
+        }
+      },
+
+      updateTemplateCustomization: (field: string, value: any) => {
+        set(state => {
+          const existingCustomization = state.templateSelection.customizations.find(c => c.field === field);
+          let updatedCustomizations;
+
+          if (existingCustomization) {
+            updatedCustomizations = state.templateSelection.customizations.map(c =>
+              c.field === field ? { ...c, value, isValid: true } : c
+            );
+          } else {
+            updatedCustomizations = [
+              ...state.templateSelection.customizations,
+              { field, value, isValid: true, brandAlignment: 85 }
+            ];
+          }
+
+          return {
+            templateSelection: {
+              ...state.templateSelection,
+              customizations: updatedCustomizations,
+              customizationProgress: Math.min(
+                (updatedCustomizations.length / (state.templateSelection.selectedTemplate?.templateConfiguration.requiredInputs.length || 1)) * 100,
+                100
+              ),
+            }
+          };
+        });
+      },
+
+      validateTemplateCustomizations: () => {
+        const { templateSelection } = get();
+        if (!templateSelection.selectedTemplate) return [];
+
+        const { templateService } = require('../services/templateService');
+        const validationResults = templateService.validateCustomizations(
+          templateSelection.selectedTemplate.id,
+          templateSelection.customizations
+        );
+
+        set(state => ({
+          templateSelection: {
+            ...state.templateSelection,
+            validationResults,
+          }
+        }));
+
+        return validationResults;
+      },
+
+      generateTemplatePreview: async (channels: ChannelFormat[]) => {
+        const { templateSelection } = get();
+        if (!templateSelection.selectedTemplate) return;
+
+        try {
+          const { templateService } = await import('../services/templateService');
+          const previewAssets = await templateService.generatePreviewAssets(
+            templateSelection.selectedTemplate.id,
+            templateSelection.customizations,
+            channels
+          );
+
+          set(state => ({
+            templateSelection: {
+              ...state.templateSelection,
+              previewAssets,
+            }
+          }));
+        } catch (error) {
+          console.error('Failed to generate template preview:', error);
+          set({ templateError: error instanceof Error ? error.message : 'Failed to generate preview' });
+        }
+      },
+
+      setShowTemplateSelector: (show: boolean) => {
+        set({ showTemplateSelector: show });
+      },
+
+      clearTemplateSelection: () => {
+        set(state => ({
+          templateSelection: {
+            selectedTemplate: null,
+            customizations: [],
+            validationResults: [],
+            previewAssets: [],
+            isCustomizing: false,
+            customizationProgress: 0,
+          }
+        }));
+      },
+
+      saveTemplateConfiguration: async () => {
+        const { templateSelection } = get();
+        if (!templateSelection.selectedTemplate) return;
+
+        try {
+          // In a real implementation, this would save to backend
+          console.log('Saving template configuration:', templateSelection);
+
+          // Update usage history
+          const templateId = templateSelection.selectedTemplate.id;
+          set(state => ({
+            templateUsageHistory: {
+              ...state.templateUsageHistory,
+              [templateId]: [
+                ...(state.templateUsageHistory[templateId] || []),
+                {
+                  timestamp: new Date(),
+                  customizations: templateSelection.customizations,
+                  channels: templateSelection.previewAssets.map(p => p.channel),
+                }
+              ]
+            }
+          }));
+        } catch (error) {
+          console.error('Failed to save template configuration:', error);
+          set({ templateError: error instanceof Error ? error.message : 'Failed to save configuration' });
+        }
+      },
+
+      getTemplatePerformanceInsights: (templateId: string) => {
+        const { templateService } = require('../services/templateService');
+        return templateService.getTemplatePerformanceInsights(templateId);
+      },
+
+      optimizeTemplate: async (templateId: string, performanceData: any, feedback: string[]) => {
+        try {
+          const { templateService } = await import('../services/templateService');
+          const optimizedTemplate = await templateService.optimizeTemplate(templateId, performanceData, feedback);
+
+          // Update the template in the store
+          set(state => ({
+            availableTemplates: state.availableTemplates.map(t =>
+              t.id === templateId ? optimizedTemplate : t
+            )
+          }));
+        } catch (error) {
+          console.error('Failed to optimize template:', error);
+          set({ templateError: error instanceof Error ? error.message : 'Failed to optimize template' });
+        }
+      },
+
       // Configuration actions
       updatePrompt: (key, value) =>
         set(state => ({
@@ -395,6 +650,19 @@ export const useAppStore = create<AppState>()(
           isEvolvingTerritory: false,
           showEvolutionPanel: false,
           selectedTerritoryForEvolution: null,
+          // Reset template state
+          templateRecommendations: [],
+          templateSelection: {
+            selectedTemplate: null,
+            customizations: [],
+            validationResults: [],
+            previewAssets: [],
+            isCustomizing: false,
+            customizationProgress: 0,
+          },
+          isGeneratingRecommendations: false,
+          templateError: null,
+          showTemplateSelector: false,
         }),
 
       resetAll: () =>

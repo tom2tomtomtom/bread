@@ -4,6 +4,7 @@ import { GenerationController } from './components/generation/GenerationControll
 import { ConfigurationManager } from './components/configuration/ConfigurationManager';
 import { AssetManager } from './components/assets/AssetManager';
 import { AuthModal } from './components/auth';
+import { AppErrorBoundary } from './components/common/AppErrorBoundary';
 import { useAppStore } from './stores/appStore';
 import { useAuthStore } from './stores/authStore';
 import { generateWithOpenAI } from './services/secureApiService';
@@ -35,7 +36,7 @@ const BreadApp: React.FC = () => {
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
 
   // Asset integration state
-  const [selectedAssets, setSelectedAssets] = useState<any[]>([]);
+  const [selectedAssets, setSelectedAssets] = useState<string[]>([]);
 
   // Zustand store - centralized state management
   const {
@@ -271,18 +272,19 @@ Please provide a structured response with territories, headlines, and compliance
   }
 
   return (
-    <MainLayout
-      showAdmin={showAdmin}
-      onAdminToggle={() => setShowAdmin(!showAdmin)}
-      generateImages={generateImages}
-      apiStatus={{
-        openaiReady: true, // Always true with server-side setup
-        imagesEnabled: generateImages,
-      }}
-      onShowLogin={handleShowLogin}
-      onShowRegister={handleShowRegister}
-      onShowAssets={() => setShowAssets(true)}
-    >
+    <AppErrorBoundary>
+      <MainLayout
+        showAdmin={showAdmin}
+        onAdminToggle={() => setShowAdmin(!showAdmin)}
+        generateImages={generateImages}
+        apiStatus={{
+          openaiReady: true, // Always true with server-side setup
+          imagesEnabled: generateImages,
+        }}
+        onShowLogin={handleShowLogin}
+        onShowRegister={handleShowRegister}
+        onShowAssets={() => setShowAssets(true)}
+      >
       <GenerationController
         brief={brief}
         setBrief={handleBriefChange}
@@ -374,13 +376,14 @@ Please provide a structured response with territories, headlines, and compliance
         </div>
       )}
 
-      {/* Authentication Modal */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        initialMode={authModalMode}
-      />
-    </MainLayout>
+        {/* Authentication Modal */}
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          initialMode={authModalMode}
+        />
+      </MainLayout>
+    </AppErrorBoundary>
   );
 };
 

@@ -1,30 +1,12 @@
-import { Territory, GeneratedOutput, StarredItems } from '../types';
-
-export interface BriefAnalysis {
-  score: number; // 0-100
-  suggestions: string[];
-  strengths: string[];
-  warnings: string[];
-  marketInsights: string[];
-}
-
-export interface TerritoryConfidence {
-  marketFit: number; // 0-100
-  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
-  complianceConfidence: number; // 0-100
-  audienceResonance: number; // 0-100
-  reasoning: string;
-}
-
-// Enhanced territory with confidence scoring
-export interface EnhancedTerritory extends Territory {
-  confidence: TerritoryConfidence;
-}
-
-export interface EnhancedGeneratedOutput extends Omit<GeneratedOutput, 'territories'> {
-  territories: EnhancedTerritory[];
-  overallConfidence: number;
-}
+import {
+  Territory,
+  GeneratedOutput,
+  StarredItems,
+  BriefAnalysis,
+  TerritoryConfidence,
+  EnhancedTerritory,
+  EnhancedGeneratedOutput
+} from '../types';
 
 // Analyze brief quality and provide suggestions
 export const analyzeBrief = (brief: string): BriefAnalysis => {

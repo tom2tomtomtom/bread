@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { EnhancedGeneratedOutput } from '../services/enhancementService';
 import { ConfidenceScoring } from './ConfidenceScoring';
+import { pdfExportService, PDFExportOptions } from '../services/pdfExportService';
+import { TerritoryEvolution, PerformancePrediction } from '../types';
 
 interface TerritoryOutputProps {
   generatedOutput: EnhancedGeneratedOutput;
@@ -14,8 +16,8 @@ interface TerritoryOutputProps {
   onSelectTerritoryForEvolution?: (territoryId: string | null) => void;
   onGenerateEvolutionSuggestions?: (territoryId: string) => void;
   onPredictTerritoryPerformance?: (territoryId: string) => void;
-  territoryEvolutions?: { [territoryId: string]: any[] };
-  performancePredictions?: { [territoryId: string]: any };
+  territoryEvolutions?: { [territoryId: string]: TerritoryEvolution[] };
+  performancePredictions?: { [territoryId: string]: PerformancePrediction };
 }
 
 export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
@@ -46,98 +48,37 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
     setShowConfidenceReport(true);
   };
 
-  const exportToPDF = () => {
-    // Create formatted content for PDF
-    const content = {
-      title: 'AIdeas Creative Territories Report',
-      timestamp: new Date().toLocaleString(),
-      overallConfidence: generatedOutput.overallConfidence,
-      territories: generatedOutput.territories.map(territory => ({
-        id: territory.id,
-        title: territory.title,
-        positioning: territory.positioning,
-        tone: territory.tone,
-        confidence: Math.round(
-          (territory.confidence.marketFit +
-            territory.confidence.complianceConfidence +
-            territory.confidence.audienceResonance) /
-            3
-        ),
-        riskLevel: territory.confidence.riskLevel,
-        headlines: territory.headlines.map(h => ({
-          text: h.text,
-          followUp: h.followUp,
-          reasoning: h.reasoning,
-          confidence: h.confidence,
-        })),
-      })),
-      compliance: generatedOutput.compliance,
-    };
+  const exportToPDF = async () => {
+    try {
+      const options: PDFExportOptions = {
+        includeImages: false,
+        includeConfidenceScores: true,
+        includeCompliance: true,
+        format: 'a4',
+        orientation: 'portrait'
+      };
 
-    // Simple PDF generation using browser print
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>AIdeas Creative Report</title>
-            <style>
-              body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
-              .header { text-align: center; margin-bottom: 30px; }
-              .confidence-score { background: #f0f0f0; padding: 10px; border-radius: 5px; margin: 10px 0; }
-              .territory { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
-              .headline { margin: 10px 0; padding: 10px; background: #f9f9f9; border-radius: 3px; }
-              .confidence-high { color: #22c55e; font-weight: bold; }
-              .confidence-medium { color: #f59e0b; font-weight: bold; }
-              .confidence-low { color: #ef4444; font-weight: bold; }
-            </style>
-          </head>
-          <body>
-            <div class="header">
-              <h1>AIdeas Creative Territories Report</h1>
-              <p>Generated: ${content.timestamp}</p>
-              <div class="confidence-score">
-                <h2>Overall Confidence: <span class="${content.overallConfidence >= 80 ? 'confidence-high' : content.overallConfidence >= 60 ? 'confidence-medium' : 'confidence-low'}">${content.overallConfidence}%</span></h2>
-              </div>
-            </div>
-            ${content.territories
-              .map(
-                territory => `
-              <div class="territory">
-                <h3>${territory.id}: "${territory.title}"</h3>
-                <p><strong>Positioning:</strong> ${territory.positioning}</p>
-                <p><strong>Tone:</strong> ${territory.tone}</p>
-                <p><strong>Confidence:</strong> <span class="${territory.confidence >= 80 ? 'confidence-high' : territory.confidence >= 60 ? 'confidence-medium' : 'confidence-low'}">${territory.confidence}%</span></p>
-                <p><strong>Risk Level:</strong> ${territory.riskLevel}</p>
-                <h4>Headlines:</h4>
-                ${territory.headlines
-                  .map(
-                    headline => `
-                  <div class="headline">
-                    <p><strong>"${headline.text}"</strong></p>
-                    <p>${headline.followUp}</p>
-                    <p><em>Why this works:</em> ${headline.reasoning}</p>
-                    <p><strong>Confidence:</strong> <span class="${headline.confidence >= 80 ? 'confidence-high' : headline.confidence >= 60 ? 'confidence-medium' : 'confidence-low'}">${headline.confidence}%</span></p>
-                  </div>
-                `
-                  )
-                  .join('')}
-              </div>
-            `
-              )
-              .join('')}
-            <div class="territory">
-              <h3>Compliance Summary</h3>
-              <p><strong>Output:</strong> ${content.compliance.output}</p>
-              <p><strong>Powered by:</strong> ${content.compliance.powerBy.join(', ')}</p>
-              <p><strong>Notes:</strong></p>
-              <ul>${content.compliance.notes.map(note => `<li>${note}</li>`).join('')}</ul>
-            </div>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.print();
+      const result = await pdfExportService.exportTerritoriesToPDF(generatedOutput, options);
+
+      if (result.success) {
+        console.log(`✅ PDF exported successfully: ${result.filename}`);
+        // Show success toast if available
+        if (window.showToast) {
+          window.showToast(`PDF exported: ${result.filename}`, 'success');
+        }
+      } else {
+        console.error('❌ PDF export failed:', result.error);
+        // Show error toast if available
+        if (window.showToast) {
+          window.showToast(`PDF export failed: ${result.error}`, 'error');
+        }
+      }
+    } catch (error) {
+      console.error('❌ PDF export error:', error);
+      // Show error toast if available
+      if (window.showToast) {
+        window.showToast('PDF export failed. Please try again.', 'error');
+      }
     }
   };
 
