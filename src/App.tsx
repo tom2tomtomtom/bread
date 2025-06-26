@@ -25,6 +25,12 @@ const ConfigurationManager = lazy(() =>
   }))
 );
 
+const ConnectedConfigurationManager = lazy(() =>
+  import('./components/configuration/ConnectedConfigurationManager').then(module => ({
+    default: module.ConnectedConfigurationManager
+  }))
+);
+
 const AssetManager = lazy(() =>
   import('./components/assets/AssetManager').then(module => ({
     default: module.AssetManager
@@ -136,7 +142,7 @@ const BreadApp: React.FC = () => {
 
         {/* Configuration Panel */}
         <Suspense fallback={<LoadingSpinner message="Loading Configuration..." />}>
-          <ConfigurationManager />
+          <ConnectedConfigurationManager />
         </Suspense>
 
         {/* Asset Management */}
