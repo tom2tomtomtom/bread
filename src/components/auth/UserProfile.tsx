@@ -69,14 +69,12 @@ export const UserProfile: React.FC<UserProfileProps> = ({ onClose }) => {
         </div>
         <div className="text-left">
           <p className="text-white font-medium text-sm">{user.name}</p>
-          <p className={`text-xs capitalize ${getPlanColor(user.plan)}`}>
-            {user.plan} Plan
-          </p>
+          <p className={`text-xs capitalize ${getPlanColor(user.plan)}`}>{user.plan} Plan</p>
         </div>
-        <svg 
+        <svg
           className={`w-4 h-4 text-white/70 transition-transform ${showDropdown ? 'rotate-180' : ''}`}
-          fill="none" 
-          stroke="currentColor" 
+          fill="none"
+          stroke="currentColor"
           viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -95,7 +93,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({ onClose }) => {
               <div>
                 <h3 className="text-white font-semibold">{user.name}</h3>
                 <p className="text-white/70 text-sm">{user.email}</p>
-                <span className={`inline-block px-2 py-1 rounded-full text-xs border ${getPlanBadge(user.plan)} mt-1`}>
+                <span
+                  className={`inline-block px-2 py-1 rounded-full text-xs border ${getPlanBadge(user.plan)} mt-1`}
+                >
                   {user.plan.toUpperCase()} PLAN
                 </span>
               </div>
@@ -111,7 +111,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ onClose }) => {
                   </span>
                 </div>
                 <div className="w-full bg-white/10 rounded-full h-2">
-                  <div 
+                  <div
                     className={`h-2 rounded-full transition-all ${getUsageColor()}`}
                     style={{ width: `${getUsagePercentage()}%` }}
                   />
@@ -163,10 +163,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ onClose }) => {
 
       {/* Click outside to close */}
       {showDropdown && (
-        <div 
-          className="fixed inset-0 z-40" 
-          onClick={() => setShowDropdown(false)}
-        />
+        <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
       )}
     </div>
   );

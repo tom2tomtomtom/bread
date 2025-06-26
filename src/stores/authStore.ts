@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { APP_CONFIG } from '../config/app';
+import { handleError, EnhancedError, getErrorMessage, shouldRetry, getRetryDelay } from '../utils/errorHandler';
 
 // Types for authentication
 export interface User {
@@ -42,10 +43,11 @@ interface AuthState {
   tokens: AuthTokens | null;
   isLoading: boolean;
   error: string | null;
-  
+  enhancedError: EnhancedError | null;
+
   // Usage tracking
   usageStats: UsageStats | null;
-  
+
   // Actions
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (credentials: RegisterCredentials) => Promise<void>;
@@ -54,7 +56,8 @@ interface AuthState {
   getCurrentUser: () => Promise<void>;
   getUsageStats: () => Promise<void>;
   clearError: () => void;
-  
+  setEnhancedError: (error: EnhancedError | null) => void;
+
   // Token management
   getAuthToken: () => string | null;
   setTokens: (tokens: AuthTokens) => void;
@@ -86,13 +89,46 @@ export const useAuthStore = create<AuthState>()(
       tokens: null,
       isLoading: false,
       error: null,
+      enhancedError: null,
       usageStats: null,
 
       // Login action
       login: async (credentials: LoginCredentials) => {
         set({ isLoading: true, error: null });
-        
+
         try {
+          // In development mode, use mock authentication
+          if (process.env.NODE_ENV === 'development') {
+            try {
+              const testResponse = await fetch(`${getApiBaseUrl()}/auth-login`, { method: 'HEAD' });
+              if (!testResponse.ok) {
+                throw new Error('Backend not available');
+              }
+            } catch (error) {
+              console.log('🔧 Using mock authentication for development');
+              const mockUser: User = {
+                id: `dev-user-${Date.now()}`,
+                email: credentials.email,
+                name: 'Development User',
+                plan: 'pro',
+                createdAt: new Date().toISOString(),
+                lastLogin: new Date().toISOString(),
+              };
+
+              set({
+                isAuthenticated: true,
+                user: mockUser,
+                tokens: {
+                  token: 'dev-access-token',
+                  refreshToken: 'dev-refresh-token',
+                },
+                isLoading: false,
+                error: null,
+              });
+              return;
+            }
+          }
+
           const response = await fetch(`${getApiBaseUrl()}/auth-login`, {
             method: 'POST',
             headers: {
@@ -120,23 +156,24 @@ export const useAuthStore = create<AuthState>()(
 
           // Fetch usage stats after successful login
           get().getUsageStats();
-
         } catch (error: any) {
+          const enhancedError = handleError(error, { action: 'login', credentials: { email: credentials.email } });
           set({
             isLoading: false,
-            error: error.message || 'Login failed',
+            error: getErrorMessage(enhancedError),
+            enhancedError,
             isAuthenticated: false,
             user: null,
             tokens: null,
           });
-          throw error;
+          throw enhancedError;
         }
       },
 
       // Register action
       register: async (credentials: RegisterCredentials) => {
-        set({ isLoading: true, error: null });
-        
+        set({ isLoading: true, error: null, enhancedError: null });
+
         try {
           const response = await fetch(`${getApiBaseUrl()}/auth-register`, {
             method: 'POST',
@@ -165,7 +202,6 @@ export const useAuthStore = create<AuthState>()(
 
           // Fetch usage stats after successful registration
           get().getUsageStats();
-
         } catch (error: any) {
           set({
             isLoading: false,
@@ -218,7 +254,6 @@ export const useAuthStore = create<AuthState>()(
             tokens: newTokens,
             user,
           });
-
         } catch (error: any) {
           // If refresh fails, logout user
           get().logout();
@@ -237,7 +272,7 @@ export const useAuthStore = create<AuthState>()(
           const response = await fetch(`${getApiBaseUrl()}/auth-me`, {
             method: 'GET',
             headers: {
-              'Authorization': `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
             },
           });
@@ -249,7 +284,6 @@ export const useAuthStore = create<AuthState>()(
           }
 
           set({ user: result.data });
-
         } catch (error: any) {
           // If getting user fails, try to refresh token
           try {
@@ -274,7 +308,7 @@ export const useAuthStore = create<AuthState>()(
           const response = await fetch(`${getApiBaseUrl()}/usage-stats`, {
             method: 'GET',
             headers: {
-              'Authorization': `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
             },
           });
@@ -284,7 +318,6 @@ export const useAuthStore = create<AuthState>()(
           if (result.success) {
             set({ usageStats: result.data });
           }
-
         } catch (error) {
           // Silently fail for usage stats - not critical
           console.warn('Failed to fetch usage stats:', error);
@@ -293,7 +326,15 @@ export const useAuthStore = create<AuthState>()(
 
       // Clear error action
       clearError: () => {
-        set({ error: null });
+        set({ error: null, enhancedError: null });
+      },
+
+      // Set enhanced error
+      setEnhancedError: (error: EnhancedError | null) => {
+        set({
+          enhancedError: error,
+          error: error ? getErrorMessage(error) : null
+        });
       },
 
       // Get auth token helper
@@ -314,7 +355,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: `${APP_CONFIG.storage.keys.appState}-auth`,
-      partialize: (state) => ({
+      partialize: state => ({
         // Only persist authentication data
         isAuthenticated: state.isAuthenticated,
         user: state.user,

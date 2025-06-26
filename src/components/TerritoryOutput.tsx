@@ -9,6 +9,13 @@ interface TerritoryOutputProps {
   onToggleTerritoryStarred: (territoryId: string) => void;
   onToggleHeadlineStarred: (territoryId: string, headlineIndex: number) => void;
   starredItems: { territories: string[]; headlines: { [territoryId: string]: number[] } };
+
+  // Enhanced features (optional for backward compatibility)
+  onSelectTerritoryForEvolution?: (territoryId: string | null) => void;
+  onGenerateEvolutionSuggestions?: (territoryId: string) => void;
+  onPredictTerritoryPerformance?: (territoryId: string) => void;
+  territoryEvolutions?: { [territoryId: string]: any[] };
+  performancePredictions?: { [territoryId: string]: any };
 }
 
 export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
@@ -18,6 +25,10 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
   onToggleTerritoryStarred,
   onToggleHeadlineStarred,
   starredItems,
+  onSelectTerritoryForEvolution,
+  onPredictTerritoryPerformance,
+  territoryEvolutions,
+  performancePredictions,
 }) => {
   const [showConfidenceReport, setShowConfidenceReport] = useState(false);
 
@@ -270,6 +281,29 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
                     >
                       {starredItems.territories.includes(territory.id) ? '⭐' : '☆'}
                     </button>
+
+                    {/* Enhanced Features Buttons */}
+                    {onSelectTerritoryForEvolution && (
+                      <button
+                        onClick={() => onSelectTerritoryForEvolution(territory.id)}
+                        className="text-sm bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 px-2 py-1 rounded-lg text-blue-600 transition-all flex items-center gap-1"
+                        title="Evolve this territory"
+                      >
+                        <span>🧬</span>
+                        Evolve
+                      </button>
+                    )}
+
+                    {onPredictTerritoryPerformance && (
+                      <button
+                        onClick={() => onPredictTerritoryPerformance(territory.id)}
+                        className="text-sm bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 px-2 py-1 rounded-lg text-purple-600 transition-all flex items-center gap-1"
+                        title="Predict performance"
+                      >
+                        <span>📊</span>
+                        Predict
+                      </button>
+                    )}
                   </div>
                   <div
                     className={`text-xs font-bold px-2 py-1 rounded-full ${
@@ -305,6 +339,31 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
                   <p className="font-body font-normal text-sm text-gray-800 normal-case">
                     {territory.positioning}
                   </p>
+                </div>
+
+                {/* Enhanced Features Indicators */}
+                <div className="flex gap-2 mb-3">
+                  {/* Performance Prediction Indicator */}
+                  {performancePredictions?.[territory.id] && (
+                    <div className="bg-purple-500/20 border border-purple-500/30 px-2 py-1 rounded-lg">
+                      <div className="text-xs font-bold text-purple-600 flex items-center gap-1">
+                        <span>📊</span>
+                        Performance: {performancePredictions[territory.id].overallScore}/100
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Evolution Count Indicator */}
+                  {territoryEvolutions?.[territory.id] &&
+                    territoryEvolutions[territory.id].length > 0 && (
+                      <div className="bg-blue-500/20 border border-blue-500/30 px-2 py-1 rounded-lg">
+                        <div className="text-xs font-bold text-blue-600 flex items-center gap-1">
+                          <span>🧬</span>
+                          {territoryEvolutions[territory.id].length} Evolution
+                          {territoryEvolutions[territory.id].length !== 1 ? 's' : ''}
+                        </div>
+                      </div>
+                    )}
                 </div>
 
                 {/* Risk Level Indicator */}

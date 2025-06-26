@@ -13,6 +13,7 @@ interface MainLayoutProps {
   };
   onShowLogin?: () => void;
   onShowRegister?: () => void;
+  onShowAssets?: () => void;
 }
 
 export const MainLayout: React.FC<MainLayoutProps> = ({
@@ -20,9 +21,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   showAdmin,
   onAdminToggle,
   generateImages,
-  _apiStatus,
+  // _apiStatus,
   onShowLogin,
   onShowRegister,
+  onShowAssets,
 }) => {
   const { isAuthenticated } = useAuthStore();
   return (
@@ -39,12 +41,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         <div className="max-w-6xl mx-auto flex justify-between items-start">
           {/* Logo and Title */}
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/25">
-              <span className="text-white font-bold text-xl">🍞</span>
-            </div>
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent">
-                BREAD®
+                AIDEA
               </h1>
               <p className="text-gray-400 font-medium">Creative Territory Generator</p>
             </div>
@@ -72,26 +71,37 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
               </div>
             )}
 
-            {/* Admin Controls */}
-            <div className="text-right">
+            {/* Control Buttons */}
+            <div className="flex items-center gap-4">
+              {/* Assets Button */}
               <button
-                onClick={onAdminToggle}
+                onClick={onShowAssets}
                 className="bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 px-6 py-3 rounded-xl font-bold text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
               >
-                ⚙️ ADMIN
+                📁 ASSETS
               </button>
-              <div className="text-sm text-gray-400">
-                <div className="flex items-center gap-2 justify-end mb-1">
-                  <div className="w-2 h-2 rounded-full bg-green-400"></div>
-                  OpenAI (Server-side Secure)
+
+              {/* Admin Controls */}
+              <div className="text-right">
+                <button
+                  onClick={onAdminToggle}
+                  className="bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 px-6 py-3 rounded-xl font-bold text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+                >
+                  ⚙️ ADMIN
+                </button>
+                <div className="text-sm text-gray-400">
+                  <div className="flex items-center gap-2 justify-end mb-1">
+                    <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                    OpenAI (Server-side Secure)
+                  </div>
+                  <div className="flex items-center gap-2 justify-end mb-1">
+                    <div
+                      className={`w-2 h-2 rounded-full ${generateImages ? 'bg-purple-400' : 'bg-gray-400'}`}
+                    ></div>
+                    Images {generateImages ? 'Enabled' : 'Disabled'}
+                  </div>
+                  <div className="text-xs text-gray-500">🔒 Secure & Ready</div>
                 </div>
-                <div className="flex items-center gap-2 justify-end mb-1">
-                  <div
-                    className={`w-2 h-2 rounded-full ${generateImages ? 'bg-purple-400' : 'bg-gray-400'}`}
-                  ></div>
-                  Images {generateImages ? 'Enabled' : 'Disabled'}
-                </div>
-                <div className="text-xs text-gray-500">🔒 Secure & Ready</div>
               </div>
             </div>
           </div>

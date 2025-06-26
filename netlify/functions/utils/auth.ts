@@ -3,6 +3,17 @@ import bcrypt from 'bcryptjs';
 import { HandlerEvent } from '@netlify/functions';
 import * as fs from 'fs';
 import * as path from 'path';
+import {
+  checkRateLimit,
+  checkLoginAttempts,
+  recordFailedLogin,
+  resetLoginAttempts,
+  validatePasswordStrength,
+  getSecurityHeaders,
+  getClientIP,
+  logSecurityEvent,
+  hashForLogging,
+} from './security';
 
 // Types
 export interface User {
@@ -34,6 +45,7 @@ export interface AuthResult {
   token?: string;
   refreshToken?: string;
   error?: string;
+  retryAfter?: number;
 }
 
 // Environment variables
@@ -231,30 +243,63 @@ export const checkRateLimit = (user: User): boolean => {
   return user.usage.monthlyRequests < limit.requests;
 };
 
-// Authentication middleware
+// Enhanced authentication middleware with security features
 export const authenticateRequest = (event: HandlerEvent): AuthResult => {
+  const clientIP = getClientIP(event);
+  const userAgent = event.headers['user-agent'] || 'unknown';
+
+  // Check rate limiting first
+  const rateLimitResult = checkRateLimit(clientIP);
+  if (!rateLimitResult.allowed) {
+    logSecurityEvent('rate_limit_exceeded', undefined, clientIP, {
+      remaining: rateLimitResult.remaining,
+      retryAfter: rateLimitResult.retryAfter,
+    }, 'medium');
+    return {
+      success: false,
+      error: 'Rate limit exceeded',
+      retryAfter: rateLimitResult.retryAfter,
+    };
+  }
+
   const authHeader = event.headers.authorization || event.headers.Authorization;
-  
+
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    logSecurityEvent('missing_auth_header', undefined, clientIP, { userAgent }, 'low');
     return { success: false, error: 'No valid authorization header' };
   }
 
   const token = authHeader.substring(7);
   const payload = verifyToken(token);
-  
+
   if (!payload) {
+    logSecurityEvent('invalid_token', undefined, clientIP, {
+      tokenHash: hashForLogging(token),
+      userAgent
+    }, 'medium');
     return { success: false, error: 'Invalid or expired token' };
   }
 
   const user = getUserById(payload.userId);
   if (!user || !user.isActive) {
+    logSecurityEvent('user_not_found_or_inactive', payload.userId, clientIP, { userAgent }, 'medium');
     return { success: false, error: 'User not found or inactive' };
   }
 
-  // Check rate limiting
+  // Check legacy rate limiting (plan-based)
   if (!checkRateLimit(user)) {
-    return { success: false, error: 'Rate limit exceeded' };
+    logSecurityEvent('plan_rate_limit_exceeded', user.id, clientIP, {
+      plan: user.plan,
+      usage: user.usage
+    }, 'medium');
+    return { success: false, error: 'Plan rate limit exceeded' };
   }
+
+  // Log successful authentication
+  logSecurityEvent('successful_auth', user.id, clientIP, {
+    plan: user.plan,
+    userAgent
+  }, 'low');
 
   return { success: true, user };
 };
@@ -268,20 +313,7 @@ export const validateEmail = (email: string): boolean => {
 };
 
 export const validatePassword = (password: string): { valid: boolean; errors: string[] } => {
-  const errors: string[] = [];
-  
-  if (password.length < 8) {
-    errors.push('Password must be at least 8 characters long');
-  }
-  if (!/[A-Z]/.test(password)) {
-    errors.push('Password must contain at least one uppercase letter');
-  }
-  if (!/[a-z]/.test(password)) {
-    errors.push('Password must contain at least one lowercase letter');
-  }
-  if (!/\d/.test(password)) {
-    errors.push('Password must contain at least one number');
-  }
-  
-  return { valid: errors.length === 0, errors };
+  // Use enhanced password validation from security module
+  const result = validatePasswordStrength(password);
+  return { valid: result.valid, errors: result.errors };
 };

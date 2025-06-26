@@ -5,7 +5,7 @@
   "private": true,
   "dependencies": {
     "@anthropic-ai/sdk": "^0.55.0",
-    "@supabase/supabase-js": "^2.50.1",
+    "@supabase/supabase-js": "^2.50.2",
     "@tailwindcss/forms": "^0.5.7",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@netlify/functions": "^4.1.6",
+    "@playwright/test": "^1.53.1",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -48,6 +49,10 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest --watch",
     "test:legacy": "react-scripts test",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report",
     "eject": "react-scripts eject",
     "lint": "eslint src --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "eslint src --ext .ts,.tsx,.js,.jsx --fix",
@@ -56,7 +61,14 @@
     "type-check": "tsc --noEmit",
     "quality": "npm run type-check && npm run lint && npm run format:check",
     "quality:fix": "npm run type-check && npm run lint:fix && npm run format",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "generate-secrets": "node scripts/generate-secrets.js",
+    "security-audit": "node scripts/generate-secrets.js && echo 'Security audit completed'",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:integration": "vitest run src/tests/integration",
+    "test:security": "vitest run src/tests/security",
+    "test:performance": "artillery run tests/performance/load-test.yml"
   },
   "eslintConfig": {
     "extends": [

@@ -94,9 +94,7 @@ const briefBlocks: BriefBlock[] = [
   },
 ];
 
-export const BriefBuilder: React.FC<BriefBuilderProps> = ({
-  onBriefChange,
-}) => {
+export const BriefBuilder: React.FC<BriefBuilderProps> = ({ onBriefChange }) => {
   const [availableBlocks, setAvailableBlocks] = useState<BriefBlock[]>(briefBlocks);
   const [usedBlocks, setUsedBlocks] = useState<BriefBlock[]>([]);
   const [draggedBlock, setDraggedBlock] = useState<BriefBlock | null>(null);

@@ -7,6 +7,14 @@ import {
   validateEmail,
 } from './utils/auth';
 import {
+  checkLoginAttempts,
+  recordFailedLogin,
+  resetLoginAttempts,
+  getClientIP,
+  logSecurityEvent,
+  getSecurityHeaders,
+} from './utils/security';
+import {
   successResponse,
   errorResponse,
   validateMethod,
@@ -35,11 +43,15 @@ interface LoginResponse {
 
 const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
   const functionName = 'auth-login';
-  
+
   try {
     // Validate HTTP method
     const methodValidation = validateMethod(event.httpMethod, ['POST']);
     if (methodValidation) return methodValidation;
+
+    // Get client information for security tracking
+    const clientIP = getClientIP(event);
+    const userAgent = event.headers['user-agent'] || 'unknown';
 
     logRequest(functionName, event.httpMethod);
 
@@ -71,23 +83,52 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
       return validationErrorResponse(validationErrors);
     }
 
+    // Check login attempts before proceeding
+    const loginAttemptCheck = checkLoginAttempts(clientIP);
+    if (!loginAttemptCheck.allowed) {
+      const lockedUntil = loginAttemptCheck.lockedUntil;
+      const retryAfter = lockedUntil ? Math.ceil((lockedUntil - Date.now()) / 1000) : 900;
+
+      logSecurityEvent('login_attempt_blocked', undefined, clientIP, {
+        attemptsRemaining: loginAttemptCheck.attemptsRemaining,
+        lockedUntil,
+        userAgent,
+      }, 'high');
+
+      return {
+        statusCode: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'Retry-After': retryAfter.toString(),
+          ...getSecurityHeaders(),
+        },
+        body: JSON.stringify({
+          success: false,
+          error: 'Too many failed login attempts. Account temporarily locked.',
+          retryAfter,
+        }),
+      };
+    }
+
     // Find user by email
     const user = getUserByEmail(email.toLowerCase());
     if (!user) {
-      logRequest(functionName, event.httpMethod, undefined, { 
-        action: 'login_failed', 
+      recordFailedLogin(clientIP);
+      logSecurityEvent('login_failed', undefined, clientIP, {
         reason: 'user_not_found',
-        email: email.toLowerCase() 
-      });
+        email: email.toLowerCase(),
+        userAgent,
+      }, 'medium');
       return errorResponse('Invalid email or password', 401);
     }
 
     // Check if user is active
     if (!user.isActive) {
-      logRequest(functionName, event.httpMethod, user.id, { 
-        action: 'login_failed', 
-        reason: 'user_inactive' 
-      });
+      recordFailedLogin(clientIP);
+      logSecurityEvent('login_failed', user.id, clientIP, {
+        reason: 'user_inactive',
+        userAgent,
+      }, 'medium');
       return errorResponse('Account is deactivated', 403);
     }
 
@@ -100,12 +141,16 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
 
     const isPasswordValid = await comparePassword(password, storedPassword);
     if (!isPasswordValid) {
-      logRequest(functionName, event.httpMethod, user.id, { 
-        action: 'login_failed', 
-        reason: 'invalid_password' 
-      });
+      recordFailedLogin(clientIP);
+      logSecurityEvent('login_failed', user.id, clientIP, {
+        reason: 'invalid_password',
+        userAgent,
+      }, 'medium');
       return errorResponse('Invalid email or password', 401);
     }
+
+    // Reset login attempts on successful password verification
+    resetLoginAttempts(clientIP);
 
     // Generate tokens
     try {
@@ -126,12 +171,25 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
         refreshToken,
       };
 
-      logRequest(functionName, event.httpMethod, user.id, { 
-        action: 'login_success',
-        plan: user.plan 
-      });
+      logSecurityEvent('login_success', user.id, clientIP, {
+        plan: user.plan,
+        userAgent,
+      }, 'low');
 
-      return successResponse(response, 'Login successful');
+      // Return response with security headers
+      return {
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          ...getSecurityHeaders(),
+        },
+        body: JSON.stringify({
+          success: true,
+          data: response,
+          message: 'Login successful',
+          timestamp: new Date().toISOString(),
+        }),
+      };
 
     } catch (error: any) {
       logError(functionName, error, user.id, { action: 'token_generation_failed' });

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuthStore, RegisterCredentials } from '../../stores/authStore';
+import { ErrorDisplay } from '../common/ErrorDisplay';
 
 interface RegisterFormProps {
   onSuccess?: () => void;
@@ -15,7 +16,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onSwitchT
   const [confirmPassword, setConfirmPassword] = useState('');
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-  const { register, isLoading, error, clearError } = useAuthStore();
+  const { register, isLoading, error, enhancedError, clearError } = useAuthStore();
 
   const validateForm = (): boolean => {
     const errors: string[] = [];
@@ -37,7 +38,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onSwitchT
     } else if (credentials.password.length < 8) {
       errors.push('Password must be at least 8 characters long');
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(credentials.password)) {
-      errors.push('Password must contain at least one uppercase letter, one lowercase letter, and one number');
+      errors.push(
+        'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+      );
     }
 
     if (!confirmPassword) {
@@ -66,13 +69,16 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onSwitchT
     }
   };
 
-  const handleInputChange = (field: keyof RegisterCredentials | 'confirmPassword', value: string) => {
+  const handleInputChange = (
+    field: keyof RegisterCredentials | 'confirmPassword',
+    value: string
+  ) => {
     if (field === 'confirmPassword') {
       setConfirmPassword(value);
     } else {
       setCredentials(prev => ({ ...prev, [field]: value }));
     }
-    
+
     // Clear validation errors when user starts typing
     if (validationErrors.length > 0) {
       setValidationErrors([]);
@@ -85,9 +91,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onSwitchT
   return (
     <div className="backdrop-blur-xl bg-yellow-400/10 border border-yellow-400/20 rounded-3xl p-8 shadow-2xl max-w-md mx-auto">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-subheading text-yellow-400 drop-shadow-lg mb-2">
-          Join BREAD
-        </h2>
+        <h2 className="text-3xl font-subheading text-yellow-400 drop-shadow-lg mb-2">Join BREAD</h2>
         <p className="text-white/70">Create your account to get started</p>
       </div>
 
@@ -101,7 +105,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onSwitchT
             type="text"
             id="name"
             value={credentials.name}
-            onChange={(e) => handleInputChange('name', e.target.value)}
+            onChange={e => handleInputChange('name', e.target.value)}
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all"
             placeholder="Enter your full name"
             disabled={isLoading}
@@ -117,7 +121,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onSwitchT
             type="email"
             id="email"
             value={credentials.email}
-            onChange={(e) => handleInputChange('email', e.target.value)}
+            onChange={e => handleInputChange('email', e.target.value)}
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all"
             placeholder="Enter your email"
             disabled={isLoading}
@@ -133,7 +137,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onSwitchT
             type="password"
             id="password"
             value={credentials.password}
-            onChange={(e) => handleInputChange('password', e.target.value)}
+            onChange={e => handleInputChange('password', e.target.value)}
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all"
             placeholder="Create a strong password"
             disabled={isLoading}
@@ -149,7 +153,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onSwitchT
             type="password"
             id="confirmPassword"
             value={confirmPassword}
-            onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+            onChange={e => handleInputChange('confirmPassword', e.target.value)}
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all"
             placeholder="Confirm your password"
             disabled={isLoading}

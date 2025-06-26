@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuthStore, LoginCredentials } from '../../stores/authStore';
+import { ErrorDisplay } from '../common/ErrorDisplay';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -13,7 +14,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToRegis
   });
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-  const { login, isLoading, error, clearError } = useAuthStore();
+  const { login, isLoading, error, enhancedError, clearError } = useAuthStore();
 
   const validateForm = (): boolean => {
     const errors: string[] = [];
@@ -78,7 +79,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToRegis
             type="email"
             id="email"
             value={credentials.email}
-            onChange={(e) => handleInputChange('email', e.target.value)}
+            onChange={e => handleInputChange('email', e.target.value)}
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all"
             placeholder="Enter your email"
             disabled={isLoading}
@@ -94,7 +95,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToRegis
             type="password"
             id="password"
             value={credentials.password}
-            onChange={(e) => handleInputChange('password', e.target.value)}
+            onChange={e => handleInputChange('password', e.target.value)}
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all"
             placeholder="Enter your password"
             disabled={isLoading}
@@ -112,11 +113,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToRegis
           </div>
         )}
 
-        {/* API Error */}
-        {error && (
-          <div className="bg-red-500/20 border border-red-500/30 rounded-xl p-4">
-            <p className="text-red-200 text-sm">{error}</p>
-          </div>
+        {/* Enhanced Error Display */}
+        {enhancedError && (
+          <ErrorDisplay
+            error={enhancedError}
+            onRetry={() => handleSubmit({ preventDefault: () => {} } as React.FormEvent)}
+            onDismiss={clearError}
+            className="mb-4"
+          />
         )}
 
         {/* Submit Button */}

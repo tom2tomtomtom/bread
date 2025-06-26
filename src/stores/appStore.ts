@@ -1,6 +1,16 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Prompts, ApiKeys, StarredItems, ToastType } from '../types';
+import {
+  Prompts,
+  ApiKeys,
+  StarredItems,
+  ToastType,
+  EnhancedBriefAnalysis,
+  TerritoryEvolution,
+  EvolutionSuggestion,
+  EvolutionHistory,
+  PerformancePrediction,
+} from '../types';
 import { DEFAULT_PROMPTS } from '../config/prompts';
 import { APP_CONFIG } from '../config/app';
 
@@ -14,6 +24,26 @@ interface AppState {
   showBriefAnalysis: boolean;
   briefAnalysis: any | null;
 
+  // Enhanced Brief Intelligence state
+  enhancedBriefAnalysis: EnhancedBriefAnalysis | null;
+  isAnalyzingBrief: boolean;
+  realTimeAnalysis: {
+    score: number;
+    wordCount: number;
+    completeness: number;
+    suggestions: string[];
+  } | null;
+  showEnhancedAnalysis: boolean;
+
+  // Territory Evolution state
+  territoryEvolutions: { [territoryId: string]: TerritoryEvolution[] };
+  evolutionSuggestions: EvolutionSuggestion[];
+  evolutionHistory: { [territoryId: string]: EvolutionHistory };
+  performancePredictions: { [territoryId: string]: PerformancePrediction };
+  isEvolvingTerritory: boolean;
+  showEvolutionPanel: boolean;
+  selectedTerritoryForEvolution: string | null;
+
   // Configuration state
   prompts: Prompts;
   apiKeys: ApiKeys;
@@ -22,6 +52,7 @@ interface AppState {
 
   // UI state
   showAdmin: boolean;
+  showAssets: boolean;
   showToast: boolean;
   toastMessage: string;
   toastType: ToastType;
@@ -38,12 +69,32 @@ interface AppState {
   setShowBriefAnalysis: (show: boolean) => void;
   setBriefAnalysis: (analysis: any) => void;
 
+  // Enhanced Brief Intelligence actions
+  setEnhancedBriefAnalysis: (analysis: EnhancedBriefAnalysis | null) => void;
+  setIsAnalyzingBrief: (analyzing: boolean) => void;
+  setRealTimeAnalysis: (analysis: any) => void;
+  setShowEnhancedAnalysis: (show: boolean) => void;
+  analyzeEnhancedBrief: () => Promise<void>;
+  updateRealTimeAnalysis: (brief: string) => void;
+
+  // Territory Evolution actions
+  addTerritoryEvolution: (territoryId: string, evolution: TerritoryEvolution) => void;
+  setEvolutionSuggestions: (suggestions: EvolutionSuggestion[]) => void;
+  setPerformancePrediction: (territoryId: string, prediction: PerformancePrediction) => void;
+  setIsEvolvingTerritory: (evolving: boolean) => void;
+  setShowEvolutionPanel: (show: boolean) => void;
+  setSelectedTerritoryForEvolution: (territoryId: string | null) => void;
+  generateEvolutionSuggestions: (territoryId: string) => Promise<void>;
+  evolveTerritoryWithAI: (territoryId: string, suggestion: EvolutionSuggestion) => Promise<void>;
+  predictTerritoryPerformance: (territoryId: string) => Promise<void>;
+
   updatePrompt: (key: keyof Prompts, value: string) => void;
   updateApiKey: (provider: keyof ApiKeys, key: string) => void;
   setApiKeysSaved: (saved: boolean) => void;
   setGenerateImages: (enabled: boolean) => void;
 
   setShowAdmin: (show: boolean) => void;
+  setShowAssets: (show: boolean) => void;
   showToastMessage: (message: string, type: ToastType) => void;
   hideToast: () => void;
 
@@ -58,7 +109,7 @@ interface AppState {
 
 export const useAppStore = create<AppState>()(
   persist(
-    (set, _get) => ({
+    (set, get) => ({
       // Initial state
       brief: '',
       isGenerating: false,
@@ -68,12 +119,28 @@ export const useAppStore = create<AppState>()(
       showBriefAnalysis: false,
       briefAnalysis: null,
 
+      // Enhanced Brief Intelligence initial state
+      enhancedBriefAnalysis: null,
+      isAnalyzingBrief: false,
+      realTimeAnalysis: null,
+      showEnhancedAnalysis: false,
+
+      // Territory Evolution initial state
+      territoryEvolutions: {},
+      evolutionSuggestions: [],
+      evolutionHistory: {},
+      performancePredictions: {},
+      isEvolvingTerritory: false,
+      showEvolutionPanel: false,
+      selectedTerritoryForEvolution: null,
+
       prompts: DEFAULT_PROMPTS,
       apiKeys: { openai: '' },
       apiKeysSaved: false,
       generateImages: false,
 
       showAdmin: false,
+      showAssets: false,
       showToast: false,
       toastMessage: '',
       toastType: 'success',
@@ -92,6 +159,126 @@ export const useAppStore = create<AppState>()(
       setShowBriefAnalysis: showBriefAnalysis => set({ showBriefAnalysis }),
       setBriefAnalysis: briefAnalysis => set({ briefAnalysis }),
 
+      // Enhanced Brief Intelligence actions
+      setEnhancedBriefAnalysis: enhancedBriefAnalysis => set({ enhancedBriefAnalysis }),
+      setIsAnalyzingBrief: isAnalyzingBrief => set({ isAnalyzingBrief }),
+      setRealTimeAnalysis: realTimeAnalysis => set({ realTimeAnalysis }),
+      setShowEnhancedAnalysis: showEnhancedAnalysis => set({ showEnhancedAnalysis }),
+
+      analyzeEnhancedBrief: async () => {
+        const { brief } = get();
+        if (!brief.trim()) return;
+
+        set({ isAnalyzingBrief: true });
+        try {
+          // Import here to avoid circular dependencies
+          const { analyzeEnhancedBrief } = await import('../services/briefIntelligenceService');
+          const analysis = await analyzeEnhancedBrief(brief);
+          set({
+            enhancedBriefAnalysis: analysis,
+            isAnalyzingBrief: false,
+            showEnhancedAnalysis: true,
+          });
+        } catch (error) {
+          console.error('Enhanced brief analysis failed:', error);
+          set({ isAnalyzingBrief: false });
+        }
+      },
+
+      updateRealTimeAnalysis: (brief: string) => {
+        // Import here to avoid circular dependencies
+        import('../services/briefIntelligenceService').then(({ analyzeRealTime }) => {
+          const analysis = analyzeRealTime(brief);
+          set({ realTimeAnalysis: analysis });
+        });
+      },
+
+      // Territory Evolution actions
+      addTerritoryEvolution: (territoryId: string, evolution: TerritoryEvolution) => {
+        set(state => ({
+          territoryEvolutions: {
+            ...state.territoryEvolutions,
+            [territoryId]: [...(state.territoryEvolutions[territoryId] || []), evolution],
+          },
+        }));
+      },
+
+      setEvolutionSuggestions: evolutionSuggestions => set({ evolutionSuggestions }),
+      setPerformancePrediction: (territoryId: string, prediction: PerformancePrediction) => {
+        set(state => ({
+          performancePredictions: {
+            ...state.performancePredictions,
+            [territoryId]: prediction,
+          },
+        }));
+      },
+      setIsEvolvingTerritory: isEvolvingTerritory => set({ isEvolvingTerritory }),
+      setShowEvolutionPanel: showEvolutionPanel => set({ showEvolutionPanel }),
+      setSelectedTerritoryForEvolution: selectedTerritoryForEvolution =>
+        set({ selectedTerritoryForEvolution }),
+
+      generateEvolutionSuggestions: async (territoryId: string) => {
+        const { generatedOutput, brief } = get();
+        if (!generatedOutput?.territories) return;
+
+        const territory = generatedOutput.territories.find((t: any) => t.id === territoryId);
+        if (!territory) return;
+
+        try {
+          const { generateEvolutionSuggestions } = await import(
+            '../services/territoryEvolutionService'
+          );
+          const suggestions = await generateEvolutionSuggestions(territory, brief);
+          set({ evolutionSuggestions: suggestions });
+        } catch (error) {
+          console.error('Failed to generate evolution suggestions:', error);
+        }
+      },
+
+      evolveTerritoryWithAI: async (territoryId: string, suggestion: EvolutionSuggestion) => {
+        const { generatedOutput, brief } = get();
+        if (!generatedOutput?.territories) return;
+
+        const territory = generatedOutput.territories.find((t: any) => t.id === territoryId);
+        if (!territory) return;
+
+        set({ isEvolvingTerritory: true });
+        try {
+          const { evolveTerritoryWithAI } = await import('../services/territoryEvolutionService');
+          const evolution = await evolveTerritoryWithAI(
+            territory,
+            suggestion.type,
+            suggestion.prompt,
+            brief
+          );
+
+          // Add evolution to store
+          get().addTerritoryEvolution(territoryId, evolution);
+          set({ isEvolvingTerritory: false });
+        } catch (error) {
+          console.error('Failed to evolve territory:', error);
+          set({ isEvolvingTerritory: false });
+        }
+      },
+
+      predictTerritoryPerformance: async (territoryId: string) => {
+        const { generatedOutput, brief } = get();
+        if (!generatedOutput?.territories) return;
+
+        const territory = generatedOutput.territories.find((t: any) => t.id === territoryId);
+        if (!territory) return;
+
+        try {
+          const { predictTerritoryPerformance } = await import(
+            '../services/territoryEvolutionService'
+          );
+          const prediction = await predictTerritoryPerformance(territory, brief);
+          get().setPerformancePrediction(territoryId, prediction);
+        } catch (error) {
+          console.error('Failed to predict territory performance:', error);
+        }
+      },
+
       // Configuration actions
       updatePrompt: (key, value) =>
         set(state => ({
@@ -106,6 +293,7 @@ export const useAppStore = create<AppState>()(
 
       // UI actions
       setShowAdmin: showAdmin => set({ showAdmin }),
+      setShowAssets: showAssets => set({ showAssets }),
       showToastMessage: (message, type) => {
         set({ toastMessage: message, toastType: type, showToast: true });
         // Auto-hide after configured duration
@@ -197,6 +385,16 @@ export const useAppStore = create<AppState>()(
           error: '',
           showBriefAnalysis: false,
           briefAnalysis: null,
+          enhancedBriefAnalysis: null,
+          isAnalyzingBrief: false,
+          realTimeAnalysis: null,
+          showEnhancedAnalysis: false,
+          territoryEvolutions: {},
+          evolutionSuggestions: [],
+          performancePredictions: {},
+          isEvolvingTerritory: false,
+          showEvolutionPanel: false,
+          selectedTerritoryForEvolution: null,
         }),
 
       resetAll: () =>
@@ -208,11 +406,23 @@ export const useAppStore = create<AppState>()(
           error: '',
           showBriefAnalysis: false,
           briefAnalysis: null,
+          enhancedBriefAnalysis: null,
+          isAnalyzingBrief: false,
+          realTimeAnalysis: null,
+          showEnhancedAnalysis: false,
+          territoryEvolutions: {},
+          evolutionSuggestions: [],
+          evolutionHistory: {},
+          performancePredictions: {},
+          isEvolvingTerritory: false,
+          showEvolutionPanel: false,
+          selectedTerritoryForEvolution: null,
           prompts: DEFAULT_PROMPTS,
           apiKeys: { openai: '' },
           apiKeysSaved: false,
           generateImages: false,
           showAdmin: false,
+          showAssets: false,
           showToast: false,
           toastMessage: '',
           toastType: 'success',

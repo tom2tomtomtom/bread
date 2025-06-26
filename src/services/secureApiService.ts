@@ -18,6 +18,51 @@ const getApiBaseUrl = (): string => {
   return '/.netlify/functions';
 };
 
+// Check if we're in development mode without backend
+const isDevelopmentMode = (): boolean => {
+  return process.env.NODE_ENV === 'development';
+};
+
+// Mock responses for development mode
+const getMockResponse = (endpoint: string): any => {
+  switch (endpoint) {
+    case 'auth-login':
+    case 'auth-register':
+      return {
+        success: true,
+        data: {
+          user: { id: 'dev-user', email: 'dev@example.com', name: 'Development User' },
+          accessToken: 'dev-token',
+          refreshToken: 'dev-refresh-token',
+        },
+      };
+    case 'auth-me':
+      return {
+        success: true,
+        data: { id: 'dev-user', email: 'dev@example.com', name: 'Development User' },
+      };
+    case 'generate-openai':
+    case 'generate-claude':
+      return {
+        success: true,
+        data: {
+          territories: [
+            { id: '1', content: 'Sample Territory 1 - Development Mode', starred: false },
+            { id: '2', content: 'Sample Territory 2 - Development Mode', starred: false },
+            { id: '3', content: 'Sample Territory 3 - Development Mode', starred: false },
+          ],
+          headlines: [
+            { id: '1', content: 'Sample Headline 1 - Development Mode', starred: false },
+            { id: '2', content: 'Sample Headline 2 - Development Mode', starred: false },
+            { id: '3', content: 'Sample Headline 3 - Development Mode', starred: false },
+          ],
+        },
+      };
+    default:
+      return { success: true, data: { message: 'Mock response for development' } };
+  }
+};
+
 // Get authentication headers
 const getAuthHeaders = (): Record<string, string> => {
   const token = useAuthStore.getState().getAuthToken();
@@ -33,7 +78,10 @@ const getAuthHeaders = (): Record<string, string> => {
 };
 
 // Handle API errors with authentication retry
-const handleApiError = async (response: Response, retryFn?: () => Promise<Response>): Promise<ApiResponse> => {
+const handleApiError = async (
+  response: Response,
+  retryFn?: () => Promise<Response>
+): Promise<ApiResponse> => {
   if (response.status === 401 && retryFn) {
     // Try to refresh token and retry
     try {
@@ -62,6 +110,20 @@ export const generateWithOpenAI = async (
   console.log('🔄 Starting secure OpenAI API call...');
   console.log('Prompt length:', prompt.length);
   console.log('Generate images:', generateImages);
+
+  // Use mock response in development mode when backend is not available
+  if (isDevelopmentMode()) {
+    try {
+      const testResponse = await fetch(`${getApiBaseUrl()}/generate-openai`, { method: 'HEAD' });
+      if (!testResponse.ok) {
+        throw new Error('Backend not available');
+      }
+    } catch (error) {
+      console.log('🔧 Backend not available, using mock response');
+      const mockResponse = getMockResponse('generate-openai');
+      return mockResponse.data;
+    }
+  }
 
   const makeRequest = async (): Promise<Response> => {
     const apiUrl = `${getApiBaseUrl()}/generate-openai`;
