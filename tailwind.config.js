@@ -14,9 +14,9 @@ module.exports = {
         'display': ['Druk Wide Super', 'Impact', 'Arial Black', 'sans-serif'],
       },
       colors: {
-        bread: {
+        aideas: {
           yellow: '#FFCC00',
-          blue: '#0099FF', 
+          blue: '#0099FF',
           orange: '#FF4400',
           purple: '#8B5CF6',
           black: '#000000',

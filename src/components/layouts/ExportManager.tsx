@@ -63,7 +63,7 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
           title: targetLayout.name,
           description: targetLayout.description,
           keywords: [targetLayout.metadata.territoryId],
-          copyright: '© BREAD Platform',
+          copyright: '© AIDEAS Platform',
         },
       };
 

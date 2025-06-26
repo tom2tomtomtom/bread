@@ -1,8 +1,8 @@
-# BREAD® Creative Platform
+# AIDEAS® Creative Platform
 
 A tech-enabled platform for generating high-quality advertising territories and headlines at scale. Built for agency workflows with AI-powered creative generation.
 
-![BREAD® Platform](https://img.shields.io/badge/BREAD®-Creative%20Platform-yellow?style=for-the-badge)
+![AIDEAS® Platform](https://img.shields.io/badge/AIDEAS®-Creative%20Platform-yellow?style=for-the-badge)
 
 ## 📊 Project Status
 
@@ -82,7 +82,7 @@ npm start
 
 ## 🎨 Design Philosophy
 
-The BREAD® platform follows the visual language established in our brand deck:
+The AIDEAS® platform follows the visual language established in our brand deck:
 - **Bold Typography**: Heavy, impactful fonts for agency credibility
 - **Color-Coded Sections**: Yellow (territories), Blue (executions), Orange (compliance)
 - **Glassmorphic UI**: Modern floating panels with backdrop blur
@@ -117,4 +117,4 @@ Built by Sunday Gravy Studio for the Everyday Rewards pitch.
 
 ---
 
-**BREAD® - Predictability is the enemy. The scroll is the battlefield.**
+**AIDEAS® - Predictability is the enemy. The scroll is the battlefield.**

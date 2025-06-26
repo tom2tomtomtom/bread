@@ -1,4 +1,4 @@
-# 🎨 **BREAD Asset Management System - Now Live on Port 7001!**
+# 🎨 **AIDEAS Asset Management System - Now Live on Port 7001!**
 
 ## 🌐 **NEW SERVER LOCATION**
 - **URL**: http://localhost:7001
@@ -9,7 +9,7 @@
 ## 🎯 **What You Should See**
 
 ### **🏠 Main Interface**
-- ✅ **BREAD Creative Platform** header with gradient background
+- ✅ **AIDEAS Creative Platform** header with gradient background
 - ✅ **📁 ASSETS** button in top navigation
 - ✅ **⚙️ ADMIN** button for configuration
 - ✅ **Enhanced Brief Builder** with asset integration
@@ -68,7 +68,7 @@
 
 If everything is working correctly, you should see:
 - ✅ **Clean, modern interface** loads without errors
-- ✅ **BREAD logo and navigation** clearly visible
+- ✅ **AIDEAS logo and navigation** clearly visible
 - ✅ **Assets button** triggers authentication modal
 - ✅ **Mock login** works with any credentials
 - ✅ **Asset management** interface opens and functions
@@ -126,7 +126,7 @@ If everything is working correctly, you should see:
 4. Generate territories with asset influence
 5. Compare results with/without assets
 
-**The BREAD Asset Management System is now live and fully operational on port 7001!** 🚀✨
+**The AIDEAS Asset Management System is now live and fully operational on port 7001!** 🚀✨
 
 **Access it at: http://localhost:7001**
 

@@ -1,7 +1,7 @@
 // Application configuration and constants
 export const APP_CONFIG = {
   // Application metadata
-  name: 'BREAD Creative Platform',
+  name: 'AIDEAS Creative Platform',
   version: '2.0.0',
   description: 'AI-powered creative territory and headline generation for Everyday Rewards',
 

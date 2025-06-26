@@ -8,7 +8,7 @@ test.describe('Basic App Functionality', () => {
 
   test('should load the main application', async ({ page }) => {
     // Check if main elements are present
-    await expect(page.locator('text=BREAD')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('text=AIDEAS')).toBeVisible({ timeout: 10000 });
     await expect(page.locator('button:has-text("📁 ASSETS")')).toBeVisible();
     await expect(page.locator('button:has-text("⚙️ ADMIN")')).toBeVisible();
     
@@ -69,7 +69,7 @@ test.describe('Basic App Functionality', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     
     // Check if main elements are still visible
-    await expect(page.locator('text=BREAD')).toBeVisible();
+    await expect(page.locator('text=AIDEAS')).toBeVisible();
     await expect(page.locator('button:has-text("📁 ASSETS")')).toBeVisible();
   });
 
@@ -133,7 +133,7 @@ test.describe('Basic App Functionality', () => {
     await page.waitForTimeout(2000);
     
     // App should still be functional
-    await expect(page.locator('text=BREAD')).toBeVisible();
+    await expect(page.locator('text=AIDEAS')).toBeVisible();
   });
 });
 

@@ -9,7 +9,7 @@ test.describe('Smoke Tests - Asset Management System', () => {
     await page.waitForLoadState('networkidle');
     
     // Check if the main app elements are present
-    await expect(page.locator('text=BREAD')).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('text=AIDEAS')).toBeVisible({ timeout: 15000 });
     
     // Take a screenshot for verification
     await page.screenshot({ path: 'test-results/app-loaded.png' });
@@ -84,7 +84,7 @@ test.describe('Smoke Tests - Asset Management System', () => {
     await page.waitForLoadState('networkidle');
     
     // Check if main elements are still visible on mobile
-    await expect(page.locator('text=BREAD')).toBeVisible();
+    await expect(page.locator('text=AIDEAS')).toBeVisible();
     await expect(page.locator('button:has-text("📁 ASSETS")')).toBeVisible();
     
     // Take a screenshot
@@ -158,7 +158,7 @@ test.describe('Smoke Tests - Asset Management System', () => {
     
     // Check page title
     const title = await page.title();
-    expect(title).toContain('BREAD');
+    expect(title).toContain('AIDEAS');
   });
 
   test('should handle authentication flow', async ({ page }) => {

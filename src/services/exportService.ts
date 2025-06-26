@@ -135,7 +135,7 @@ class ExportService {
           title: layout.name,
           description: layout.description,
           keywords: [layout.metadata.territoryId, format],
-          copyright: '© BREAD Platform',
+          copyright: '© AIDEAS Platform',
         },
       };
       
@@ -374,7 +374,7 @@ class ExportService {
             title: 'Instagram Post',
             description: 'Optimized for Instagram feed',
             keywords: ['social', 'instagram'],
-            copyright: '© BREAD Platform',
+            copyright: '© AIDEAS Platform',
           },
         },
         {
@@ -388,7 +388,7 @@ class ExportService {
             title: 'Instagram Story',
             description: 'Optimized for Instagram Stories',
             keywords: ['social', 'instagram', 'story'],
-            copyright: '© BREAD Platform',
+            copyright: '© AIDEAS Platform',
           },
         },
         {
@@ -402,7 +402,7 @@ class ExportService {
             title: 'Facebook Post',
             description: 'Optimized for Facebook feed',
             keywords: ['social', 'facebook'],
-            copyright: '© BREAD Platform',
+            copyright: '© AIDEAS Platform',
           },
         },
       ],
@@ -419,7 +419,7 @@ class ExportService {
             title: 'Leaderboard Banner',
             description: 'Web banner advertisement',
             keywords: ['digital', 'banner', 'web'],
-            copyright: '© BREAD Platform',
+            copyright: '© AIDEAS Platform',
           },
         },
         {
@@ -433,7 +433,7 @@ class ExportService {
             title: 'Rectangle Banner',
             description: 'Medium rectangle web banner',
             keywords: ['digital', 'banner', 'web'],
-            copyright: '© BREAD Platform',
+            copyright: '© AIDEAS Platform',
           },
         },
       ],
@@ -450,7 +450,7 @@ class ExportService {
             title: 'A4 Print',
             description: 'Print-ready A4 format',
             keywords: ['print', 'a4'],
-            copyright: '© BREAD Platform',
+            copyright: '© AIDEAS Platform',
           },
         },
         {
@@ -464,7 +464,7 @@ class ExportService {
             title: 'Billboard',
             description: 'Large format billboard',
             keywords: ['print', 'billboard', 'outdoor'],
-            copyright: '© BREAD Platform',
+            copyright: '© AIDEAS Platform',
           },
         },
       ],

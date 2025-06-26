@@ -14,12 +14,12 @@ test.describe('Asset Management System', () => {
     await page.goto('/');
     
     // Wait for the app to load
-    await page.waitForSelector('text=BREAD', { timeout: 10000 });
+    await page.waitForSelector('text=AIDEAS', { timeout: 10000 });
   });
 
   test('should display the main app with Assets button', async ({ page }) => {
     // Check if the main elements are present
-    await expect(page.locator('text=BREAD')).toBeVisible();
+    await expect(page.locator('text=AIDEAS')).toBeVisible();
     await expect(page.locator('button:has-text("📁 ASSETS")')).toBeVisible();
     await expect(page.locator('button:has-text("⚙️ ADMIN")')).toBeVisible();
   });

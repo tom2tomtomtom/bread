@@ -1,8 +1,8 @@
-# 📚 BREAD Platform - API Documentation
+# 📚 AIDEAS Platform - API Documentation
 
 ## 📋 Overview
 
-The BREAD platform provides a comprehensive REST API for authentication, AI content generation, and system monitoring. All endpoints are secured with JWT authentication and include comprehensive error handling.
+The AIDEAS platform provides a comprehensive REST API for authentication, AI content generation, and system monitoring. All endpoints are secured with JWT authentication and include comprehensive error handling.
 
 ## 🔐 Authentication
 

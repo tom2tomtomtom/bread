@@ -1,7 +1,7 @@
 {
-  "name": "bread-creative-platform",
+  "name": "aideas-creative-platform",
   "version": "1.0.0",
-  "description": "BREAD® - A tech-enabled creative platform for generating advertising territories and headlines",
+  "description": "AIDEAS® - A tech-enabled creative platform for generating advertising territories and headlines",
   "private": true,
   "dependencies": {
     "@anthropic-ai/sdk": "^0.55.0",

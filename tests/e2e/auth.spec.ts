@@ -103,7 +103,7 @@ test.describe('Authentication Flow', () => {
       
       // Wait for successful registration
       await expect(page.locator('[data-testid="user-menu"]')).toBeVisible();
-      await expect(page.locator('text=Welcome to BREAD')).toBeVisible();
+      await expect(page.locator('text=Welcome to AIDEAS')).toBeVisible();
     });
 
     test('should show error for existing email', async ({ page }) => {
@@ -170,7 +170,7 @@ test.describe('Authentication Flow', () => {
       
       // Should show onboarding
       await expect(page.locator('[data-testid="onboarding-modal"]')).toBeVisible();
-      await expect(page.locator('text=Welcome to BREAD')).toBeVisible();
+      await expect(page.locator('text=Welcome to AIDEAS')).toBeVisible();
     });
 
     test('should navigate through onboarding steps', async ({ page }) => {
@@ -181,7 +181,7 @@ test.describe('Authentication Flow', () => {
       await page.reload();
       
       // Should show first step
-      await expect(page.locator('text=Welcome to BREAD')).toBeVisible();
+      await expect(page.locator('text=Welcome to AIDEAS')).toBeVisible();
       
       // Navigate to next step
       await page.click('[data-testid="onboarding-next"]');

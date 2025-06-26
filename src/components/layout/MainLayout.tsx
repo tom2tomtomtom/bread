@@ -43,7 +43,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
           <div className="flex items-center gap-4">
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent">
-                AIDEA
+                AIDEAS
               </h1>
               <p className="text-gray-400 font-medium">Creative Territory Generator</p>
             </div>
