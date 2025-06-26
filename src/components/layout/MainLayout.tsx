@@ -1,6 +1,6 @@
 import React from 'react';
 import { UserProfile } from '../auth';
-import { useAuthStore } from '../../stores/authStore';
+import { useAuthStore } from '../../stores';
 
 interface MainLayoutProps {
   children: React.ReactNode;

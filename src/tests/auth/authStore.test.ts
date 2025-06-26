@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { useAuthStore } from '../../stores/authStore';
+import { useAuthStore } from '../../stores';
 import { handleError, ErrorCategory } from '../../utils/errorHandler';
 
 // Mock fetch globally

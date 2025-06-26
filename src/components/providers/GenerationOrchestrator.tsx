@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import { useGenerationStore, useConfigStore, useStarredStore, useUIStore } from '../../stores';
-import { useAuthStore } from '../../stores/authStore';
+import { useAuthStore } from '../../stores';
 import { generateWithOpenAI } from '../../services/secureApiService';
 import {
   analyzeBrief,
