@@ -1,5 +1,5 @@
 // Comprehensive test script for the Asset Management System
-console.log('🧪 Testing BREAD Asset Management System...\n');
+console.log('🧪 Testing AIDEAS Asset Management System...\n');
 
 // Test 1: Check if asset store is properly initialized
 function testAssetStore() {
