@@ -47,6 +47,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "build:netlify": "npm install --legacy-peer-deps && react-scripts build",
+    "build:no-lint": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",

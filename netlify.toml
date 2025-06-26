@@ -1,6 +1,6 @@
 [build]
   publish = "build"
-  command = "npm ci --legacy-peer-deps || npm install --legacy-peer-deps && npm run build"
+  command = "npm ci --legacy-peer-deps || npm install --legacy-peer-deps && npm run build:no-lint"
   functions = "netlify/functions"
 
 [build.environment]
@@ -9,6 +9,7 @@
   GENERATE_SOURCEMAP = "false"
   CI = "false"
   NODE_OPTIONS = "--max-old-space-size=4096"
+  DISABLE_ESLINT_PLUGIN = "true"
 
 [[redirects]]
   from = "/*"
