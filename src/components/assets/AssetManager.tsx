@@ -30,16 +30,22 @@ export const AssetManager: React.FC<AssetManagerProps> = ({
   const handlePreviewNext = () => {
     if (previewIndex < filteredAssets.length - 1) {
       const nextIndex = previewIndex + 1;
-      setPreviewIndex(nextIndex);
-      setPreviewAsset(filteredAssets[nextIndex]);
+      const nextAsset = filteredAssets[nextIndex];
+      if (nextAsset) {
+        setPreviewIndex(nextIndex);
+        setPreviewAsset(nextAsset);
+      }
     }
   };
 
   const handlePreviewPrevious = () => {
     if (previewIndex > 0) {
       const prevIndex = previewIndex - 1;
-      setPreviewIndex(prevIndex);
-      setPreviewAsset(filteredAssets[prevIndex]);
+      const prevAsset = filteredAssets[prevIndex];
+      if (prevAsset) {
+        setPreviewIndex(prevIndex);
+        setPreviewAsset(prevAsset);
+      }
     }
   };
 
