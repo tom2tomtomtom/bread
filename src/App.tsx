@@ -1,8 +1,9 @@
-import React, { useEffect, Suspense, lazy } from 'react';
+import React, { useEffect, Suspense, lazy, useState } from 'react';
 import { AppProviders } from './components/providers';
 import { MainLayout } from './components/layout/MainLayout';
 import { migrateFromAppStore, isMigrationComplete } from './stores/migration';
 import { StoreHealthCheck } from './components/StoreHealthCheck';
+import { useConfigStore, useUIStore } from './stores';
 
 // Lazy load components for better performance
 const GenerationController = lazy(() =>
@@ -80,6 +81,21 @@ const BreadApp: React.FC = () => {
   // Check for test mode
   const isTestMode = window.location.search.includes('test=enhanced');
 
+  // UI state from stores
+  const { showAdmin, setShowAdmin } = useUIStore();
+  const { generateImages } = useConfigStore();
+
+  // Local state for handlers
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  // Event handlers
+  const handleAdminToggle = () => setShowAdmin(!showAdmin);
+  const handleShowLogin = () => setShowAuthModal(true);
+  const handleShowRegister = () => setShowAuthModal(true);
+  const handleShowAssets = () => {
+    // Asset management is handled by the AssetManager component
+  };
+
   // Test mode - render enhanced system test
   if (isTestMode) {
     return (
@@ -94,7 +110,18 @@ const BreadApp: React.FC = () => {
   // Main application
   return (
     <AppProviders>
-      <MainLayout>
+      <MainLayout
+        showAdmin={showAdmin}
+        onAdminToggle={handleAdminToggle}
+        generateImages={generateImages}
+        apiStatus={{
+          openaiReady: true, // Always true with server-side setup
+          imagesEnabled: generateImages,
+        }}
+        onShowLogin={handleShowLogin}
+        onShowRegister={handleShowRegister}
+        onShowAssets={handleShowAssets}
+      >
         {/* Generation Interface */}
         <Suspense fallback={<LoadingSpinner message="Loading Generation Controller..." />}>
           <GenerationController />
