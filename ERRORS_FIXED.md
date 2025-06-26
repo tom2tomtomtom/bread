@@ -66,7 +66,7 @@ import { AssetPreview } from './AssetPreview';
 
 ### **1. Basic Functionality**
 - ✅ Page loads without errors
-- ✅ BREAD interface displays properly
+- ✅ AIDEAS interface displays properly
 - ✅ Navigation buttons functional
 - ✅ No JavaScript errors in console
 

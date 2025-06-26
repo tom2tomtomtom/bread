@@ -1,5 +1,5 @@
 /**
- * 🔐 Enhanced Security Utilities for BREAD Authentication System
+ * 🔐 Enhanced Security Utilities for AIDEAS Authentication System
  * 
  * Provides additional security features including:
  * - Enhanced rate limiting

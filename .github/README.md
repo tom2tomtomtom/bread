@@ -1,6 +1,6 @@
 # 🚀 CI/CD Pipeline Documentation
 
-This directory contains GitHub Actions workflows for automated testing, quality checks, and deployment of the BREAD Creative Platform.
+This directory contains GitHub Actions workflows for automated testing, quality checks, and deployment of the AIDEAS Creative Platform.
 
 ## 📋 Workflows Overview
 
@@ -145,4 +145,4 @@ npm run build
 
 ---
 
-*This CI/CD pipeline ensures code quality, security, and reliable deployments for the BREAD Creative Platform.*
+*This CI/CD pipeline ensures code quality, security, and reliable deployments for the AIDEAS Creative Platform.*

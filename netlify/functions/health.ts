@@ -17,7 +17,7 @@ import {
  * 🔍 Health Monitoring Endpoint
  * 
  * Provides comprehensive system health, error analytics, and performance metrics
- * for the BREAD platform authentication and API systems.
+ * for the AIDEAS platform authentication and API systems.
  */
 
 interface HealthResponse {

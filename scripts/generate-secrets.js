@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * 🔐 BREAD Security Secret Generator
+ * 🔐 AIDEAS Security Secret Generator
  * 
  * Generates cryptographically secure secrets for JWT authentication
  * and other security-sensitive configuration values.
@@ -110,7 +110,7 @@ function generateProductionEnv() {
  * Create secure .env.production template
  */
 function createProductionTemplate(secrets) {
-  const template = `# 🔐 BREAD® Creative Platform - Production Environment
+  const template = `# 🔐 AIDEAS® Creative Platform - Production Environment
 # Generated on: ${new Date().toISOString()}
 # 
 # ⚠️  CRITICAL SECURITY NOTICE:
@@ -169,7 +169,7 @@ NODE_ENV=production
  * Main execution function
  */
 function main() {
-  log.header('BREAD Security Secret Generator');
+  log.header('AIDEAS Security Secret Generator');
   console.log();
 
   // Validate current environment

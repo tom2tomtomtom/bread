@@ -1,4 +1,4 @@
-# 🎨 **BREAD Asset Management System - Live Demo Guide**
+# 🎨 **AIDEAS Asset Management System - Live Demo Guide**
 
 ## 🌐 **Server Status: LIVE & RUNNING**
 - **URL**: http://localhost:8888
@@ -9,7 +9,7 @@
 ## 🎯 **What You'll See in the Browser**
 
 ### **🏠 Main Interface**
-1. **BREAD Logo** - Top left corner
+1. **AIDEAS Logo** - Top left corner
 2. **📁 ASSETS Button** - New asset management access point
 3. **⚙️ ADMIN Button** - Configuration panel
 4. **Brief Input Area** - Enhanced with asset integration
@@ -46,7 +46,7 @@
 ## 🧪 **Testing the System**
 
 ### **1. Basic Navigation**
-- ✅ Main page loads with BREAD interface
+- ✅ Main page loads with AIDEAS interface
 - ✅ Assets button visible in header
 - ✅ Admin button functional
 - ✅ Brief input area responsive
@@ -142,6 +142,6 @@
 - ✅ Brief integration works seamlessly
 - ✅ Responsive design adapts to screen size
 
-**The BREAD Asset Management System is now live and fully operational!** 🚀✨
+**The AIDEAS Asset Management System is now live and fully operational!** 🚀✨
 
-Explore the interface and test the new asset management capabilities. The system transforms BREAD from a simple creative tool into a comprehensive visual asset management and creative workflow platform!
+Explore the interface and test the new asset management capabilities. The system transforms AIDEAS from a simple creative tool into a comprehensive visual asset management and creative workflow platform!

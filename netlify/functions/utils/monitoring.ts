@@ -1,5 +1,5 @@
 /**
- * 🔍 Enhanced Monitoring and Error Handling for BREAD Platform
+ * 🔍 Enhanced Monitoring and Error Handling for AIDEAS Platform
  * 
  * Provides comprehensive monitoring, error tracking, and performance analytics
  * for the authentication system and API functions.
