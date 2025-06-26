@@ -2,7 +2,7 @@ import React from 'react';
 import { GenerationErrorBoundary } from '../ErrorBoundary';
 import { BriefInput } from '../BriefInput';
 import { BriefEnhancement } from '../BriefEnhancement';
-import { TerritoryOutput } from '../TerritoryOutput';
+import { TerritoryOutput } from '../territory/TerritoryOutput';
 import { AssetEnhancedBriefBuilder } from './AssetEnhancedBriefBuilder';
 import { BriefAnalyzer } from './BriefAnalyzer';
 import { TerritoryEvolver } from './TerritoryEvolver';
