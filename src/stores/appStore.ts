@@ -25,6 +25,19 @@ import {
 import { DEFAULT_PROMPTS } from '../config/prompts';
 import { APP_CONFIG } from '../config/app';
 
+/**
+ * @deprecated This god object store is being refactored into focused stores.
+ * Use the new focused stores instead:
+ * - useGenerationStore for generation state
+ * - useUIStore for UI state
+ * - useConfigStore for configuration
+ * - useTerritoryStore for territory evolution
+ * - useTemplateStore for campaign templates
+ * - useStarredStore for starred items
+ *
+ * This store will be removed in the next major version.
+ */
+
 interface AppState {
   // Brief and generation state
   brief: string;
@@ -58,8 +71,8 @@ interface AppState {
   isGeneratingRecommendations: boolean;
   templateError: string | null;
   showTemplateSelector: boolean;
-  templatePerformanceData: { [templateId: string]: any };
-  templateUsageHistory: { [templateId: string]: any[] };
+  templatePerformanceData: { [templateId: string]: TemplatePerformanceData };
+  templateUsageHistory: { [templateId: string]: TemplateUsageRecord[] };
 
   // Configuration state
   prompts: Prompts;

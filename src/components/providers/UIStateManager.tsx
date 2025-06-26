@@ -1,5 +1,5 @@
 import React, { useState, ReactNode } from 'react';
-import { useAppStore } from '../../stores/appStore';
+import { useUIStore, useGenerationStore, useStarredStore } from '../../stores';
 
 interface UIStateManagerProps {
   children: ReactNode;
@@ -18,32 +18,42 @@ export const UIStateManager: React.FC<UIStateManagerProps> = ({ children }) => {
   // Local UI state
   const [selectedAssets, setSelectedAssets] = useState<string[]>([]);
 
-  // Global UI state from store
+  // Use focused stores instead of monolithic appStore
   const {
     // UI State
     showAdmin,
     showAssets,
-    showOutput,
-    showBriefAnalysis,
-    showEnhancedAnalysis,
     showEvolutionPanel,
     showToast,
     toastMessage,
     toastType,
-    error,
-    
+
     // UI Actions
     setShowAdmin,
     setShowAssets,
+    setShowEvolutionPanel,
+    hideToast,
+  } = useUIStore();
+
+  const {
+    // Generation UI state
+    showOutput,
+    showBriefAnalysis,
+    showEnhancedAnalysis,
+    error,
+
+    // Generation UI actions
     setShowOutput,
     setShowBriefAnalysis,
     setShowEnhancedAnalysis,
-    setShowEvolutionPanel,
-    hideToast,
     setError,
     resetGeneration,
+  } = useGenerationStore();
+
+  const {
+    // Starred actions
     clearStarredItems,
-  } = useAppStore();
+  } = useStarredStore();
 
   // UI Event Handlers
   const handleAdminToggle = () => {
@@ -145,15 +155,18 @@ export const useUIState = () => {
   const {
     showAdmin,
     showAssets,
-    showOutput,
-    showBriefAnalysis,
-    showEnhancedAnalysis,
     showEvolutionPanel,
     showToast,
     toastMessage,
     toastType,
+  } = useUIStore();
+
+  const {
+    showOutput,
+    showBriefAnalysis,
+    showEnhancedAnalysis,
     error,
-  } = useAppStore();
+  } = useGenerationStore();
 
   return {
     showAdmin,

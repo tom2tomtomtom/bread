@@ -1022,13 +1022,13 @@ export interface OptionalInput {
   field: string;
   type: 'text' | 'image' | 'video' | 'color' | 'selection' | 'number';
   description: string;
-  defaultValue: any;
+  defaultValue: string | number | boolean | null;
   impact: string;
 }
 
 export interface ValidationRule {
   type: 'required' | 'minLength' | 'maxLength' | 'pattern' | 'fileSize' | 'dimensions';
-  value: any;
+  value: string | number | RegExp;
   message: string;
 }
 
@@ -1083,7 +1083,7 @@ export interface CustomizationOption {
 }
 
 export interface CustomizationChoice {
-  value: any;
+  value: string | number | boolean;
   label: string;
   preview: string;
   brandAlignment: number; // 0-100
@@ -1500,13 +1500,43 @@ export interface BatchGenerationResult {
   estimatedCompletion?: Date;
 }
 
+// Template performance and usage tracking types
+export interface TemplatePerformanceData {
+  templateId: string;
+  totalUsage: number;
+  successRate: number;
+  averageRating: number;
+  conversionRate: number;
+  lastUsed: Date;
+  performanceMetrics: {
+    clickThroughRate: number;
+    engagementRate: number;
+    completionRate: number;
+  };
+}
+
+export interface TemplateUsageRecord {
+  id: string;
+  templateId: string;
+  userId: string;
+  timestamp: Date;
+  success: boolean;
+  rating?: number;
+  feedback?: string;
+  generatedContent: {
+    territories: number;
+    headlines: number;
+    assets: number;
+  };
+}
+
 // App state interface for better organization
 export interface AppState {
   brief: string;
   isGenerating: boolean;
   showOutput: boolean;
   showAdmin: boolean;
-  generatedOutput: any | null; // Will be enhanced with proper typing
+  generatedOutput: GeneratedOutput | null;
   error: string;
   apiKeys: ApiKeys;
   apiKeysSaved: boolean;

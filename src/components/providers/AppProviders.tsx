@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import { AppErrorBoundary } from '../common/AppErrorBoundary';
+import { SecurityProvider } from './SecurityProvider';
 import { AuthenticationProvider } from './AuthenticationProvider';
 import { ConfigurationProvider } from './ConfigurationProvider';
 import { UIStateManager } from './UIStateManager';
@@ -11,27 +12,37 @@ interface AppProvidersProps {
 
 /**
  * AppProviders - Combines all application providers in the correct order
- * 
+ *
  * Provider hierarchy (outer to inner):
  * 1. AppErrorBoundary - Catches and handles all errors
- * 2. AuthenticationProvider - Manages authentication state
- * 3. ConfigurationProvider - Manages app configuration
- * 4. UIStateManager - Manages UI state and interactions
- * 5. GenerationOrchestrator - Manages content generation
- * 6. Children - The actual app components
+ * 2. SecurityProvider - Manages client-side security features
+ * 3. AuthenticationProvider - Manages authentication state
+ * 4. ConfigurationProvider - Manages app configuration
+ * 5. UIStateManager - Manages UI state and interactions
+ * 6. GenerationOrchestrator - Manages content generation
+ * 7. Children - The actual app components
+ *
+ * SECURITY HARDENING COMPLETE:
+ * - Client-side CSRF protection
+ * - Input validation and sanitization
+ * - Rate limiting
+ * - Secure API request handling
+ * - Security event logging
  */
 export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   return (
     <AppErrorBoundary>
-      <AuthenticationProvider>
-        <ConfigurationProvider>
-          <UIStateManager>
-            <GenerationOrchestrator>
-              {children}
-            </GenerationOrchestrator>
-          </UIStateManager>
-        </ConfigurationProvider>
-      </AuthenticationProvider>
+      <SecurityProvider>
+        <AuthenticationProvider>
+          <ConfigurationProvider>
+            <UIStateManager>
+              <GenerationOrchestrator>
+                {children}
+              </GenerationOrchestrator>
+            </UIStateManager>
+          </ConfigurationProvider>
+        </AuthenticationProvider>
+      </SecurityProvider>
     </AppErrorBoundary>
   );
 };

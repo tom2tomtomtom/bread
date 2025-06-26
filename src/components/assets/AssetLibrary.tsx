@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, memo, useCallback } from 'react';
 import { useAssetStore } from '../../stores/assetStore';
 import { UploadedAsset, SortBy, SortOrder } from '../../types';
 import { AssetCard } from './AssetCard';
@@ -11,7 +11,7 @@ interface AssetLibraryProps {
   className?: string;
 }
 
-export const AssetLibrary: React.FC<AssetLibraryProps> = ({
+const AssetLibraryComponent: React.FC<AssetLibraryProps> = ({
   onAssetSelect,
   onAssetPreview,
   selectionMode = false,
@@ -76,17 +76,17 @@ export const AssetLibrary: React.FC<AssetLibraryProps> = ({
 
   const usageStats = getAssetUsageStats();
 
-  const handleAssetClick = (asset: UploadedAsset) => {
+  const handleAssetClick = useCallback((asset: UploadedAsset) => {
     if (selectionMode) {
       toggleAssetSelection(asset.id);
     } else {
       onAssetSelect?.(asset);
     }
-  };
+  }, [selectionMode, toggleAssetSelection, onAssetSelect]);
 
-  const handleAssetDoubleClick = (asset: UploadedAsset) => {
+  const handleAssetDoubleClick = useCallback((asset: UploadedAsset) => {
     onAssetPreview?.(asset);
-  };
+  }, [onAssetPreview]);
 
   const handleDeleteSelected = async () => {
     if (selectedAssets.length === 0) return;
@@ -290,3 +290,6 @@ export const AssetLibrary: React.FC<AssetLibraryProps> = ({
     </div>
   );
 };
+
+// Export memoized component for performance optimization
+export const AssetLibrary = memo(AssetLibraryComponent);

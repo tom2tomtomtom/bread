@@ -1,10 +1,39 @@
-import React from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { AppProviders } from './components/providers';
 import { MainLayout } from './components/layout/MainLayout';
-import { GenerationController } from './components/generation/GenerationController';
-import { ConfigurationManager } from './components/configuration/ConfigurationManager';
-import { AssetManager } from './components/assets/AssetManager';
-import TestEnhancedSystem from './test-enhanced-system';
+import { migrateFromAppStore, isMigrationComplete } from './stores/migration';
+import { StoreHealthCheck } from './components/StoreHealthCheck';
+
+// Lazy load components for better performance
+const GenerationController = lazy(() =>
+  import('./components/generation/GenerationController').then(module => ({
+    default: module.GenerationController
+  }))
+);
+
+const ConfigurationManager = lazy(() =>
+  import('./components/configuration/ConfigurationManager').then(module => ({
+    default: module.ConfigurationManager
+  }))
+);
+
+const AssetManager = lazy(() =>
+  import('./components/assets/AssetManager').then(module => ({
+    default: module.AssetManager
+  }))
+);
+
+const TestEnhancedSystem = lazy(() => import('./test-enhanced-system'));
+
+// Loading component for Suspense fallback
+const LoadingSpinner: React.FC<{ message?: string }> = ({ message = 'Loading...' }) => (
+  <div className="flex items-center justify-center p-8">
+    <div className="flex items-center gap-3">
+      <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
+      <span className="text-white">{message}</span>
+    </div>
+  </div>
+);
 
 // Types are now imported from types/index.ts
 export type {
@@ -18,18 +47,36 @@ export type {
 
 /**
  * BreadApp - Main application component with clean architecture
- * 
+ *
  * BEFORE: 388 lines of mixed concerns (authentication, generation, UI state, business logic)
  * AFTER: 97 lines focused on layout and composition (75% reduction)
- * 
+ *
  * Benefits of new architecture:
  * - Single Responsibility: Only handles app composition
  * - Clean Separation: Logic moved to specialized providers
  * - Easy Testing: Isolated concerns are easier to test
  * - Better Maintainability: Changes are localized to specific providers
  * - Improved Readability: Clear component hierarchy
+ *
+ * ARCHITECTURE REFACTORING COMPLETE:
+ * - God object store split into focused stores (GenerationStore, UIStore, ConfigStore, TerritoryStore, StarredStore)
+ * - Automatic migration from legacy appStore
+ * - Clean separation of concerns
+ * - Better performance and maintainability
  */
 const BreadApp: React.FC = () => {
+  // Initialize store migration on app startup
+  useEffect(() => {
+    if (!isMigrationComplete()) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔄 Initializing store migration...');
+      }
+      migrateFromAppStore();
+    } else if (process.env.NODE_ENV === 'development') {
+      console.log('✅ Store migration already complete');
+    }
+  }, []);
+
   // Check for test mode
   const isTestMode = window.location.search.includes('test=enhanced');
 
@@ -37,7 +84,9 @@ const BreadApp: React.FC = () => {
   if (isTestMode) {
     return (
       <AppProviders>
-        <TestEnhancedSystem />
+        <Suspense fallback={<LoadingSpinner message="Loading Enhanced System Test..." />}>
+          <TestEnhancedSystem />
+        </Suspense>
       </AppProviders>
     );
   }
@@ -47,14 +96,23 @@ const BreadApp: React.FC = () => {
     <AppProviders>
       <MainLayout>
         {/* Generation Interface */}
-        <GenerationController />
-        
+        <Suspense fallback={<LoadingSpinner message="Loading Generation Controller..." />}>
+          <GenerationController />
+        </Suspense>
+
         {/* Configuration Panel */}
-        <ConfigurationManager />
-        
+        <Suspense fallback={<LoadingSpinner message="Loading Configuration..." />}>
+          <ConfigurationManager />
+        </Suspense>
+
         {/* Asset Management */}
-        <AssetManager />
+        <Suspense fallback={<LoadingSpinner message="Loading Asset Manager..." />}>
+          <AssetManager />
+        </Suspense>
       </MainLayout>
+
+      {/* Development Store Health Monitor */}
+      <StoreHealthCheck />
     </AppProviders>
   );
 };

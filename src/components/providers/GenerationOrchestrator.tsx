@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { useAppStore } from '../../stores/appStore';
+import { useGenerationStore, useConfigStore, useStarredStore, useUIStore } from '../../stores';
 import { useAuthStore } from '../../stores/authStore';
 import { generateWithOpenAI } from '../../services/secureApiService';
 import {
@@ -16,38 +16,50 @@ interface GenerationOrchestratorProps {
 
 /**
  * GenerationOrchestrator - Handles all content generation logic
- * Responsibilities:
- * - Content generation workflow
- * - Brief analysis and enhancement
- * - Territory evolution management
- * - Generation state management
- * - Error handling for generation processes
+ *
+ * REFACTORED: Now uses focused stores instead of monolithic appStore
+ * - Generation state -> useGenerationStore
+ * - Configuration -> useConfigStore
+ * - Starred items -> useStarredStore
+ * - UI notifications -> useUIStore
+ *
+ * Benefits:
+ * - Better performance (smaller state updates)
+ * - Clearer separation of concerns
+ * - Easier testing and debugging
  */
-export const GenerationOrchestrator: React.FC<GenerationOrchestratorProps> = ({ 
-  children, 
-  onShowLogin 
+export const GenerationOrchestrator: React.FC<GenerationOrchestratorProps> = ({
+  children,
+  onShowLogin
 }) => {
   const { isAuthenticated } = useAuthStore();
-  
+
+  // Use focused stores instead of monolithic appStore
   const {
-    // State
     brief,
     isGenerating,
     generatedOutput,
-    prompts,
-    generateImages,
-    starredItems,
-    
-    // Actions
     setIsGenerating,
     setShowOutput,
     setGeneratedOutput,
     setError,
     setShowBriefAnalysis,
     setBriefAnalysis,
-    showToastMessage,
     updateRealTimeAnalysis,
-  } = useAppStore();
+  } = useGenerationStore();
+
+  const {
+    prompts,
+    generateImages,
+  } = useConfigStore();
+
+  const {
+    starredItems,
+  } = useStarredStore();
+
+  const {
+    showToastMessage,
+  } = useUIStore();
 
   // Real-time brief analysis
   const handleBriefChange = (newBrief: string) => {

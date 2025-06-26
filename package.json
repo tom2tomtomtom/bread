@@ -71,7 +71,15 @@
     "test:coverage": "vitest run --coverage",
     "test:integration": "vitest run src/tests/integration",
     "test:security": "vitest run src/tests/security",
-    "test:performance": "artillery run tests/performance/load-test.yml"
+    "test:performance": "artillery run tests/performance/load-test.yml",
+    "quality:analyze": "node scripts/quality-improvements.js",
+    "quality:test-coverage": "node scripts/test-coverage-enhancement.js",
+    "quality:audit": "node scripts/quality-audit.js",
+    "quality:full-audit": "npm run quality && npm run test:coverage && npm run test:e2e",
+    "quality:performance": "npm run test:performance && npm run build",
+    "quality:accessibility": "npm run test:e2e -- --grep accessibility",
+    "quality:security": "npm run test:security && npm audit",
+    "quality:full": "npm run quality:audit && npm run quality:performance && npm run quality:accessibility && npm run quality:security"
   },
   "eslintConfig": {
     "extends": [
@@ -92,12 +100,16 @@
       ],
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/explicit-module-boundary-types": "off",
-      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/prefer-nullish-coalescing": "error",
+      "@typescript-eslint/prefer-optional-chain": "error",
+      "@typescript-eslint/no-non-null-assertion": "error",
       "react/prop-types": "off",
       "react/react-in-jsx-scope": "off",
-      "react-hooks/exhaustive-deps": "warn",
+      "react-hooks/exhaustive-deps": "error",
+      "react-hooks/rules-of-hooks": "error",
       "no-console": [
-        "warn",
+        "error",
         {
           "allow": [
             "warn",
@@ -108,7 +120,12 @@
       "prefer-const": "error",
       "no-var": "error",
       "object-shorthand": "error",
-      "prefer-template": "error"
+      "prefer-template": "error",
+      "no-duplicate-imports": "error",
+      "no-unused-expressions": "error",
+      "complexity": ["error", 10],
+      "max-lines-per-function": ["error", 50],
+      "max-params": ["error", 5]
     },
     "overrides": [
       {
