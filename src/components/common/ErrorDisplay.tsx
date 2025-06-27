@@ -24,7 +24,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   // Auto-retry logic for retryable errors
   useEffect(() => {
     if (!error || !onRetry || !shouldRetry(error, retryCount)) {
-      return;
+      return undefined;
     }
 
     // Only auto-retry network errors
@@ -44,6 +44,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
 
       return () => clearInterval(countdownInterval);
     }
+    return undefined;
   }, [error, retryCount, onRetry]);
 
   const handleRetry = async (isAutoRetry = false) => {
@@ -229,6 +230,7 @@ export const ErrorToast: React.FC<{
       const timer = setTimeout(onDismiss, duration);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [duration, onDismiss]);
 
   return (

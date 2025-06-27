@@ -1,5 +1,5 @@
 import React from 'react';
-import { BriefAnalysis } from '../services/enhancementService';
+import { BriefAnalysis } from '../types';
 
 interface BriefEnhancementProps {
   analysis: BriefAnalysis;

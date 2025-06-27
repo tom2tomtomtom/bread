@@ -35,7 +35,7 @@ export const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete, onSk
       icon: '📊',
       action: () => {
         // Could open usage stats or plan details
-        setCompletedSteps(prev => new Set([...prev, 'plan']));
+        setCompletedSteps(prev => new Set(Array.from(prev).concat(['plan'])));
       },
       actionLabel: 'View Usage Stats',
     },
@@ -93,7 +93,7 @@ export const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete, onSk
   };
 
   const handleStepAction = () => {
-    if (currentStepData.action) {
+    if (currentStepData?.action) {
       currentStepData.action();
     }
   };
@@ -110,6 +110,7 @@ export const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete, onSk
       }, 3000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [currentStep]);
 
   return (
@@ -135,23 +136,23 @@ export const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete, onSk
         <div className="backdrop-blur-xl bg-yellow-400/10 border border-yellow-400/20 rounded-3xl p-8 shadow-2xl">
           {/* Step Icon */}
           <div className="text-center mb-6">
-            <div className="text-6xl mb-4">{currentStepData.icon}</div>
+            <div className="text-6xl mb-4">{currentStepData?.icon}</div>
             <h2 className="text-2xl font-subheading text-yellow-400 drop-shadow-lg mb-3">
-              {currentStepData.title}
+              {currentStepData?.title}
             </h2>
             <p className="text-white/80 text-lg leading-relaxed max-w-lg mx-auto">
-              {currentStepData.description}
+              {currentStepData?.description}
             </p>
           </div>
 
           {/* Step Action */}
-          {currentStepData.action && currentStepData.actionLabel && (
+          {currentStepData?.action && currentStepData?.actionLabel && (
             <div className="text-center mb-6">
               <button
                 onClick={handleStepAction}
                 className="inline-flex items-center px-6 py-3 bg-white/20 hover:bg-white/30 border border-white/30 rounded-xl text-white font-medium transition-all"
               >
-                {currentStepData.actionLabel}
+                {currentStepData?.actionLabel}
                 <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>

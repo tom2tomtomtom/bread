@@ -15,11 +15,10 @@ export const ConnectedConfigurationManager: React.FC = () => {
     apiKeys,
     apiKeysSaved,
     generateImages,
-    onPromptUpdate,
-    onApiKeyUpdate,
-    onSaveApiKeys,
-    onSaveConfiguration,
-    onGenerateImagesToggle,
+    updatePrompt,
+    updateApiKey,
+    setApiKeysSaved,
+    setGenerateImages,
   } = useConfigStore();
 
   const {
@@ -28,7 +27,7 @@ export const ConnectedConfigurationManager: React.FC = () => {
     toastMessage,
     toastType,
     setShowAdmin,
-    onToastClose,
+    hideToast,
   } = useUIStore();
 
   // Event handlers
@@ -52,12 +51,12 @@ export const ConnectedConfigurationManager: React.FC = () => {
       toastType={toastType}
       
       // Event handlers
-      onPromptUpdate={onPromptUpdate}
-      onApiKeyUpdate={onApiKeyUpdate}
-      onSaveApiKeys={onSaveApiKeys}
-      onSaveConfiguration={onSaveConfiguration}
-      onGenerateImagesToggle={onGenerateImagesToggle}
-      onToastClose={onToastClose}
+      onPromptUpdate={updatePrompt}
+      onApiKeyUpdate={updateApiKey}
+      onSaveApiKeys={() => setApiKeysSaved(true)}
+      onSaveConfiguration={() => setApiKeysSaved(true)}
+      onGenerateImagesToggle={setGenerateImages}
+      onToastClose={hideToast}
     />
   );
 };

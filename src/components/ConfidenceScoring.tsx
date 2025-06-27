@@ -1,5 +1,5 @@
 import React from 'react';
-import { TerritoryConfidence } from '../services/enhancementService';
+import { TerritoryConfidence } from '../types';
 
 interface ConfidenceScoringProps {
   confidence: TerritoryConfidence;
@@ -86,7 +86,9 @@ export const ConfidenceScoring: React.FC<ConfidenceScoringProps> = ({ confidence
       </div>
 
       {/* Reasoning */}
-      <div className="text-xs text-white/70 leading-relaxed">{confidence.reasoning}</div>
+      <div className="text-xs text-white/70 leading-relaxed">
+        {(confidence as any).reasoning || 'Confidence scoring based on market fit, compliance, and audience resonance.'}
+      </div>
 
       {/* Visual Score Bars */}
       <div className="mt-4 space-y-2">

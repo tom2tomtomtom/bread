@@ -72,7 +72,7 @@ export const AssetEnhancedBriefBuilder: React.FC<AssetEnhancedBriefBuilderProps>
     if (updatedAssets.length === 0) {
       // Remove asset section from brief
       const briefParts = brief.split('🎨 SELECTED ASSETS:');
-      if (briefParts.length > 1) {
+      if (briefParts.length > 1 && briefParts[0]) {
         onBriefChange(briefParts[0].trim());
       }
     } else {

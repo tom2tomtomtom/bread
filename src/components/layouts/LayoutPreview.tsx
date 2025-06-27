@@ -121,6 +121,7 @@ export const LayoutPreview: React.FC<LayoutPreviewProps> = ({
         document.removeEventListener('mouseup', handleMouseUp);
       };
     }
+    return undefined;
   }, [isDragging, selectedElement]);
 
   const renderImageElement = (image: ImagePlacement) => {

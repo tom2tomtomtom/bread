@@ -50,9 +50,10 @@ export function VirtualScrollList<T>({
   const visibleItems = useMemo(() => {
     const result = [];
     for (let i = visibleRange.startIndex; i <= visibleRange.endIndex; i++) {
-      if (items[i]) {
+      const item = items[i];
+      if (item !== undefined) {
         result.push({
-          item: items[i],
+          item,
           index: i,
           offsetY: i * itemHeight,
         });

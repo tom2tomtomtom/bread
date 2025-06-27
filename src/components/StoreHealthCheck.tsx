@@ -31,6 +31,7 @@ export const StoreHealthCheck: React.FC = () => {
 
       return () => clearInterval(interval);
     }
+    return undefined;
   }, []);
 
   // Only show in development

@@ -220,9 +220,9 @@ const generateEnhancedImagePrompt = (
 
   return `${basePrompt}
 
-CONCEPT: ${selectedTemplate.concept}${seasonalModifier}
-VISUAL ELEMENTS: ${selectedTemplate.elements}
-COLOR PALETTE: ${selectedTemplate.colors}
+CONCEPT: ${selectedTemplate?.concept || 'modern Australian lifestyle'}${seasonalModifier}
+VISUAL ELEMENTS: ${selectedTemplate?.elements || 'clean, contemporary design'}
+COLOR PALETTE: ${selectedTemplate?.colors || 'warm, natural tones'}
 TERRITORY TONE: ${territory.tone}
 STYLE KEYWORDS: ${styleKeywords.join(', ')}
 CULTURAL CONTEXT: ${culturalContext}
@@ -278,6 +278,10 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
       return errorResponse('Invalid request body', 400);
     }
 
+    if (!requestBody) {
+      return errorResponse('Invalid request body', 400);
+    }
+    
     const { territories, brief } = requestBody;
 
     // Validate required fields
@@ -342,15 +346,15 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
       const batchPromises = batch.map(async (request) => {
         try {
           const imagePrompt = generateEnhancedImagePrompt(request.headline, request.territory, brief, {
-            imageType: requestBody.imageType,
-            culturalContext: requestBody.culturalContext,
-            styleConsistency: requestBody.styleConsistency,
-            brandGuidelines: requestBody.brandGuidelines
+            imageType: requestBody!.imageType,
+            culturalContext: requestBody!.culturalContext,
+            styleConsistency: requestBody!.styleConsistency,
+            brandGuidelines: requestBody!.brandGuidelines
           });
           
           // Enhanced generation parameters based on request options
-          const quality = requestBody.quality || 'standard';
-          const imageType = requestBody.imageType || 'background';
+          const quality = requestBody!.quality || 'standard';
+          const imageType = requestBody!.imageType || 'background';
 
           // Determine optimal size based on image type
           const sizeMap = {
@@ -366,9 +370,9 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
             model: "dall-e-3",
             prompt: imagePrompt,
             n: 1,
-            size: sizeMap[imageType as keyof typeof sizeMap] || "1024x1792",
+            size: (sizeMap[imageType as keyof typeof sizeMap] || "1024x1792") as "1024x1024" | "1792x1024" | "1024x1792",
             quality: quality === 'ultra' ? 'hd' : quality as 'standard' | 'hd',
-            style: requestBody.styleConsistency ? "natural" : "vivid"
+            style: requestBody!.styleConsistency ? "natural" : "vivid"
           });
 
           const imageUrl = response.data?.[0]?.url;
