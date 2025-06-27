@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import {
+  Territory,
   TerritoryEvolution,
   EvolutionSuggestion,
   EvolutionHistory,
@@ -119,22 +120,22 @@ export const useTerritoryStore = create<TerritoryState>()(
           
           const mockSuggestions: EvolutionSuggestion[] = [
             {
-              id: `suggestion-${Date.now()}-1`,
-              type: 'tone_adjustment',
+              type: 'TONE_SHIFT',
               title: 'Adjust tone for better engagement',
               description: 'Consider a more conversational tone to increase audience connection',
-              confidence: 0.85,
+              confidence: 85,
               expectedImpact: 'medium',
-              implementation: 'Update positioning and headline tone',
+              priority: 'MEDIUM',
+              prompt: 'Update positioning and headline tone to be more conversational and engaging',
             },
             {
-              id: `suggestion-${Date.now()}-2`,
-              type: 'positioning_shift',
+              type: 'COMPETITIVE_RESPONSE',
               title: 'Refine positioning strategy',
               description: 'Shift focus to emotional benefits over functional features',
-              confidence: 0.78,
+              confidence: 78,
               expectedImpact: 'high',
-              implementation: 'Revise territory positioning statement',
+              priority: 'HIGH',
+              prompt: 'Revise territory positioning statement to emphasize emotional benefits',
             },
           ];
 
@@ -158,19 +159,43 @@ export const useTerritoryStore = create<TerritoryState>()(
           // Mock implementation
           await new Promise(resolve => setTimeout(resolve, 3000));
           
+          // Create a mock evolved territory based on the suggestion
+          const evolvedTerritory: Territory = {
+            id: `evolved-${territoryId}-${Date.now()}`,
+            title: 'Evolved Territory',
+            positioning: 'Updated positioning based on AI suggestion',
+            tone: 'Refined tone for better engagement',
+            headlines: [
+              {
+                text: 'New evolved headline 1',
+                followUp: 'Evolved follow-up 1',
+                reasoning: 'AI-generated evolution reasoning',
+                confidence: 85,
+              },
+              {
+                text: 'New evolved headline 2',
+                followUp: 'Evolved follow-up 2',
+                reasoning: 'AI-generated evolution reasoning',
+                confidence: 80,
+              },
+            ],
+          };
+
           const evolution: TerritoryEvolution = {
             id: `evolution-${Date.now()}`,
-            territoryId,
-            timestamp: new Date().toISOString(),
-            type: suggestion.type,
-            changes: {
-              positioning: 'Updated positioning based on AI suggestion',
-              tone: 'Refined tone for better engagement',
-              headlines: ['New evolved headline 1', 'New evolved headline 2'],
+            originalTerritoryId: territoryId,
+            evolutionType: suggestion.type,
+            evolutionPrompt: suggestion.prompt,
+            resultingTerritory: evolvedTerritory,
+            improvementScore: suggestion.confidence,
+            evolutionReasoning: suggestion.description,
+            timestamp: new Date(),
+            metadata: {
+              briefContext: 'Brief context for evolution',
+              targetAudience: 'Target audience for evolution',
+              competitiveContext: 'Competitive context for evolution',
+              culturalContext: 'Cultural context for evolution',
             },
-            confidence: suggestion.confidence,
-            performanceImpact: suggestion.expectedImpact,
-            appliedSuggestion: suggestion,
           };
 
           get().addTerritoryEvolution(territoryId, evolution);
@@ -190,26 +215,29 @@ export const useTerritoryStore = create<TerritoryState>()(
           await new Promise(resolve => setTimeout(resolve, 1500));
           
           const prediction: PerformancePrediction = {
-            territoryId,
-            overallScore: Math.random() * 0.4 + 0.6, // 0.6-1.0
-            metrics: {
-              engagement: Math.random() * 0.3 + 0.7,
-              conversion: Math.random() * 0.2 + 0.6,
-              reach: Math.random() * 0.4 + 0.6,
-              resonance: Math.random() * 0.3 + 0.7,
+            overallScore: Math.random() * 40 + 60, // 60-100
+            categoryScores: {
+              audienceResonance: Math.random() * 30 + 70,
+              brandAlignment: Math.random() * 20 + 80,
+              marketFit: Math.random() * 30 + 70,
+              creativePotential: Math.random() * 40 + 60,
+              executionFeasibility: Math.random() * 30 + 70,
             },
-            insights: [
+            strengths: [
               'Strong emotional appeal expected',
               'Good alignment with target audience',
+              'High creative potential',
+            ],
+            weaknesses: [
               'Consider A/B testing different headlines',
+              'May need cultural adaptation',
             ],
             recommendations: [
               'Test with focus groups before launch',
               'Monitor engagement metrics closely',
               'Consider seasonal adjustments',
             ],
-            confidence: Math.random() * 0.2 + 0.8,
-            lastUpdated: new Date().toISOString(),
+            confidence: Math.random() * 20 + 80,
           };
 
           get().setPerformancePrediction(territoryId, prediction);
@@ -272,16 +300,18 @@ export const useTerritoryStore = create<TerritoryState>()(
       // Utility actions
       clearEvolutionData: (territoryId?: string) => {
         if (territoryId) {
-          set((state) => ({
-            territoryEvolutions: {
-              ...state.territoryEvolutions,
-              [territoryId]: [],
-            },
-            performancePredictions: {
-              ...state.performancePredictions,
-              [territoryId]: undefined,
-            },
-          }));
+          set((state) => {
+            const newPerformancePredictions = { ...state.performancePredictions };
+            delete newPerformancePredictions[territoryId];
+            
+            return {
+              territoryEvolutions: {
+                ...state.territoryEvolutions,
+                [territoryId]: [],
+              },
+              performancePredictions: newPerformancePredictions,
+            };
+          });
         } else {
           set({
             territoryEvolutions: {},

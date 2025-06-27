@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { useAuthStore } from '../../stores';
-import { handleError, ErrorCategory } from '../../utils/errorHandler';
+import { handleError, ErrorCategory, ErrorSeverity } from '../../utils/errorHandler';
 
 // Mock fetch globally
 const mockFetch = vi.fn();
@@ -266,7 +266,7 @@ describe('AuthStore', () => {
         enhancedError: {
           id: 'err1',
           category: ErrorCategory.AUTHENTICATION,
-          severity: 'medium' as const,
+          severity: ErrorSeverity.MEDIUM,
           message: 'Test error',
           userMessage: 'Test error message',
           timestamp: '2024-01-01T00:00:00Z',
@@ -286,7 +286,7 @@ describe('AuthStore', () => {
       const testError = {
         id: 'err1',
         category: ErrorCategory.NETWORK,
-        severity: 'high' as const,
+        severity: ErrorSeverity.HIGH,
         message: 'Network error',
         userMessage: 'Connection failed',
         timestamp: '2024-01-01T00:00:00Z',

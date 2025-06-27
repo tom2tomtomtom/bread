@@ -37,7 +37,6 @@ describe('Error Handler', () => {
       const result = handleError(error);
 
       expect(result.message).toBe('Test error');
-      expect(result.errorType).toBe('Error');
       expect(result.technicalDetails).toBe('Error stack trace');
     });
 

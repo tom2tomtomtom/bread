@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ErrorDisplay, ErrorToast } from '../../components/common/ErrorDisplay';
 import { ErrorCategory, ErrorSeverity, handleError } from '../../utils/errorHandler';

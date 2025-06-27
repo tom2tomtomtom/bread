@@ -151,13 +151,17 @@ export const useStarredStore = create<StarredState>()(
             delete newMetadata.headlines[territoryId][headlineIndex];
           }
 
+          const updatedHeadlines = { ...state.starredItems.headlines };
+          if (newHeadlines.length > 0) {
+            updatedHeadlines[territoryId] = newHeadlines;
+          } else {
+            delete updatedHeadlines[territoryId];
+          }
+
           return {
             starredItems: {
               ...state.starredItems,
-              headlines: {
-                ...state.starredItems.headlines,
-                [territoryId]: newHeadlines.length > 0 ? newHeadlines : undefined,
-              },
+              headlines: updatedHeadlines,
             },
             starredMetadata: newMetadata,
           };

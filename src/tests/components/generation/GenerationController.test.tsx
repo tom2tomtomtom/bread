@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { GenerationController } from '../../../components/generation/GenerationController';
-import { useAppStore } from '../../../store/appStore';
+import { useAppStore } from '../../../stores/appStore';
 import { renderWithProviders, createMockGeneratedOutput } from '../../utils/testUtils';
 
 /**
