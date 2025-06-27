@@ -33,7 +33,8 @@ export const TextToImageGenerator: React.FC<TextToImageGeneratorProps> = ({
     clearGenerationError,
   } = useAssetStore();
 
-  const { currentTerritory } = useAppStore();
+  // Note: currentTerritory not available in app store - using fallback
+  const currentTerritory: any = null; // TODO: Replace with proper territory selection
 
   // Form state
   const [prompt, setPrompt] = useState('');

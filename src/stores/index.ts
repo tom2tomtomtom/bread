@@ -20,6 +20,15 @@
  * - Clearer code organization
  */
 
+// Import stores for local use
+import { useGenerationStore } from './generationStore';
+import { useUIStore } from './uiStore';
+import { useConfigStore } from './configStore';
+import { useTerritoryStore } from './territoryStore';
+import { useStarredStore } from './starredStore';
+import { useAssetStore } from './assetStore';
+import { useAuthStore } from './authStore';
+
 // Export all focused stores
 export { useGenerationStore } from './generationStore';
 export { useUIStore } from './uiStore';
@@ -166,11 +175,11 @@ export const getStoreHealth = () => {
   const warnings: string[] = [];
 
   // Check for potential issues
-  if (sizes.total > 1000000) { // 1MB
+  if (sizes.total && sizes.total > 1000000) { // 1MB
     issues.push('Total store size exceeds 1MB');
   }
 
-  if (sizes.generation > 500000) { // 500KB
+  if (sizes.generation && sizes.generation > 500000) { // 500KB
     warnings.push('Generation store is large - consider cleanup');
   }
 

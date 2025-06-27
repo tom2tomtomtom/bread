@@ -6,6 +6,7 @@ import {
   StarredItems,
   ToastType,
   EnhancedBriefAnalysis,
+  RealTimeAnalysis,
   TerritoryEvolution,
   EvolutionSuggestion,
   EvolutionHistory,
@@ -15,6 +16,8 @@ import {
   TemplateRecommendation,
   TemplateSelectionState,
   TemplateCustomization,
+  TemplatePerformanceData,
+  TemplateUsageRecord,
   ValidationResult,
   PreviewAsset,
   ChannelFormat,
@@ -512,7 +515,12 @@ export const useAppStore = create<AppState>()(
               [templateId]: [
                 ...(state.templateUsageHistory[templateId] || []),
                 {
+                  id: `usage_${Date.now()}`,
+                  templateId: templateId,
+                  userId: 'current_user',
                   timestamp: new Date(),
+                  success: true,
+                  generatedContent: { territories: 0, headlines: 0, assets: 0 },
                   customizations: templateSelection.customizations,
                   channels: templateSelection.previewAssets.map(p => p.channel),
                 }

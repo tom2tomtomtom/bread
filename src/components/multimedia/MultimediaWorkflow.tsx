@@ -35,7 +35,8 @@ export const MultimediaWorkflow: React.FC<MultimediaWorkflowProps> = ({
     getGenerationStatus,
   } = useAssetStore();
 
-  const { currentTerritory } = useAppStore();
+  // Note: currentTerritory not available in app store - using fallback
+  const currentTerritory: any = null; // TODO: Replace with proper territory selection
 
   const [currentStep, setCurrentStep] = useState<WorkflowStep>('select');
   const [selectedAsset, setSelectedAsset] = useState<UploadedAsset | null>(null);
@@ -56,7 +57,7 @@ export const MultimediaWorkflow: React.FC<MultimediaWorkflowProps> = ({
       setCompletedAssets(prev => [...prev, ...newAssets]);
       
       // Auto-advance to preview if we have new assets
-      if (currentStep === 'queue' && newAssets.length > 0) {
+      if (currentStep === 'queue' && newAssets.length > 0 && newAssets[0]) {
         setPreviewAsset(newAssets[0]);
         setCurrentStep('preview');
       }
@@ -248,7 +249,7 @@ export const MultimediaWorkflow: React.FC<MultimediaWorkflowProps> = ({
               {/* Video Generation Option */}
               <button
                 onClick={() => {
-                  if (assets.filter(a => a.type === 'image').length === 0) {
+                  if (assets.filter(a => a.format === 'image').length === 0) {
                     alert('Please upload or generate an image first to create videos.');
                     return;
                   }

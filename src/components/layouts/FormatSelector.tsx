@@ -209,7 +209,7 @@ export const FormatSelector: React.FC<FormatSelectorProps> = ({
 
       {/* Format Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {FORMAT_CATEGORIES[activeCategory].formats.map(({ format, name, description, specs }) => {
+        {FORMAT_CATEGORIES[activeCategory]?.formats.map(({ format, name, description, specs }) => {
           const isSelected = selectedFormats.includes(format);
           const canSelect = selectedFormats.length < maxSelections || isSelected;
 

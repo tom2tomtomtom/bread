@@ -185,7 +185,6 @@ export const generateTerritoryConfidence = (
     riskLevel,
     complianceConfidence: Math.min(Math.max(complianceConfidence, 0), 100),
     audienceResonance: Math.min(Math.max(audienceResonance, 0), 100),
-    reasoning,
   };
 };
 
@@ -215,6 +214,11 @@ export const enhanceGeneratedOutput = (
     ...output,
     territories: enhancedTerritories,
     overallConfidence: Math.round(overallConfidence),
+    metadata: {
+      generatedAt: new Date(),
+      model: 'enhancement-service',
+      processingTime: 0, // TODO: Track actual processing time
+    },
   };
 };
 

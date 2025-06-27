@@ -66,6 +66,7 @@ export const TemplatePerformance: React.FC<TemplatePerformanceProps> = ({
   const [activeTab, setActiveTab] = useState<'overview' | 'channels' | 'optimization' | 'history'>('overview');
   const [performanceData, setPerformanceData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [localTimeRange, setTimeRange] = useState(timeRange);
 
   useEffect(() => {
     if (templateId) {
@@ -78,7 +79,7 @@ export const TemplatePerformance: React.FC<TemplatePerformanceProps> = ({
     if (selectedTemplate) {
       loadPerformanceData();
     }
-  }, [selectedTemplate, timeRange]);
+  }, [selectedTemplate, localTimeRange]);
 
   const loadPerformanceData = async () => {
     if (!selectedTemplate) return;
@@ -300,7 +301,7 @@ export const TemplatePerformance: React.FC<TemplatePerformanceProps> = ({
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Template Performance</h2>
           {selectedTemplate && (
-            <p className="text-gray-600 mt-1">{selectedTemplate.name} • {timeRange} view</p>
+            <p className="text-gray-600 mt-1">{selectedTemplate.name} • {localTimeRange} view</p>
           )}
         </div>
         
@@ -308,7 +309,7 @@ export const TemplatePerformance: React.FC<TemplatePerformanceProps> = ({
         <div className="flex items-center space-x-2">
           <label className="text-sm font-medium text-gray-700">Time Range:</label>
           <select
-            value={timeRange}
+            value={localTimeRange}
             onChange={(e) => setTimeRange(e.target.value as any)}
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
@@ -455,7 +456,6 @@ const ChannelsTab: React.FC<ChannelsTabProps> = ({ channelPerformance }) => {
       instagram_post: '📷',
       facebook_post: '📘',
       linkedin_post: '💼',
-      twitter_post: '🐦',
       youtube_thumbnail: '📺',
     };
     return icons[channel] || '📱';

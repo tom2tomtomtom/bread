@@ -8,6 +8,12 @@ import {
   useUIStore,
   useAssetStore 
 } from '../../stores';
+import type {
+  TerritoryEvolution,
+  EvolutionSuggestion,
+  PerformancePrediction,
+  UploadedAsset
+} from '../../types';
 
 /**
  * ConnectedGenerationController - Connects stores to GenerationController
@@ -41,7 +47,7 @@ export const ConnectedGenerationController: React.FC = () => {
   const onBriefAnalysisToggle = () => setShowBriefAnalysis(!showBriefAnalysis);
   const onAnalyzeEnhancedBrief = analyzeEnhancedBrief;
   const onToggleEnhancedAnalysis = () => setShowEnhancedAnalysis(!showEnhancedAnalysis);
-  const onApplyBriefSuggestion = () => {};
+  const onApplyBriefSuggestion = (suggestion: string) => {};
 
   const { apiKeys } = useConfigStore();
   
@@ -50,29 +56,29 @@ export const ConnectedGenerationController: React.FC = () => {
   } = useStarredStore();
   
   // Stub implementations for missing methods
-  const onToggleTerritoryStarred = () => {};
-  const onToggleHeadlineStarred = () => {};
+  const onToggleTerritoryStarred = (territoryId: string) => {};
+  const onToggleHeadlineStarred = (territoryId: string, headlineIndex: number) => {};
 
   // Get basic state from territory store (only what exists)
   const territoryStore = useTerritoryStore();
   const assetStore = useAssetStore();
   
   // Stub implementations for missing territory methods/properties
-  const territoryEvolutions: any[] = [];
-  const evolutionSuggestions: any[] = [];
-  const performancePredictions: any[] = [];
+  const territoryEvolutions: { [territoryId: string]: TerritoryEvolution[] } = {};
+  const evolutionSuggestions: EvolutionSuggestion[] = [];
+  const performancePredictions: { [territoryId: string]: PerformancePrediction } = {};
   const isEvolvingTerritory = false;
   const showEvolutionPanel = false;
-  const selectedTerritoryForEvolution: any = null;
-  const onGenerateEvolutionSuggestions = () => {};
-  const onEvolveTerritoryWithAI = () => {};
-  const onPredictTerritoryPerformance = () => {};
+  const selectedTerritoryForEvolution: string | null = null;
+  const onGenerateEvolutionSuggestions = (territoryId: string) => {};
+  const onEvolveTerritoryWithAI = (territoryId: string, suggestion: EvolutionSuggestion) => {};
+  const onPredictTerritoryPerformance = (territoryId: string) => {};
   const onToggleEvolutionPanel = () => {};
-  const onSelectTerritoryForEvolution = () => {};
+  const onSelectTerritoryForEvolution = (territoryId: string | null) => {};
   
   // Stub implementations for missing asset methods/properties
-  const selectedAssets: any[] = [];
-  const onAssetsChange = () => {};
+  const selectedAssets: UploadedAsset[] = [];
+  const onAssetsChange = (assets: UploadedAsset[]) => {};
 
   // Event handlers
   const handleMomentSelect = (moment: { name: string; date: string }) => {

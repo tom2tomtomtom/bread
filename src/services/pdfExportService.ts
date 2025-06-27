@@ -60,7 +60,6 @@ export class PDFExportService {
         subject: 'AI-Generated Creative Territories',
         author: 'AIDEAS Platform',
         creator: 'AIDEAS Creative Platform',
-        producer: 'AIDEAS PDF Export Service'
       });
 
       // Add header

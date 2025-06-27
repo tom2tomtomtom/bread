@@ -374,7 +374,7 @@ const BrandAdaptationTab: React.FC<BrandAdaptationTabProps> = ({
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {option.options.map((choice) => (
                     <button
-                      key={choice.value}
+                      key={String(choice.value)}
                       onClick={() => onInputChange(option.name.toLowerCase().replace(' ', '_'), choice.value)}
                       className={`p-3 border rounded-lg text-left hover:shadow-md transition-all ${
                         getCustomizationValue(option.name.toLowerCase().replace(' ', '_')) === choice.value
@@ -384,7 +384,7 @@ const BrandAdaptationTab: React.FC<BrandAdaptationTabProps> = ({
                     >
                       <div
                         className="w-full h-8 rounded mb-2"
-                        style={{ backgroundColor: choice.value }}
+                        style={{ backgroundColor: String(choice.value) }}
                       />
                       <div className="text-sm font-medium">{choice.label}</div>
                       <div className="text-xs text-gray-500">
@@ -403,7 +403,7 @@ const BrandAdaptationTab: React.FC<BrandAdaptationTabProps> = ({
                 >
                   <option value="">Select {option.name}</option>
                   {option.options.map((choice) => (
-                    <option key={choice.value} value={choice.value}>
+                    <option key={String(choice.value)} value={String(choice.value)}>
                       {choice.label}
                     </option>
                   ))}
@@ -462,7 +462,6 @@ const ChannelsTab: React.FC<ChannelsTabProps> = ({
       instagram_post: '📷',
       facebook_post: '📘',
       linkedin_post: '💼',
-      twitter_post: '🐦',
       youtube_thumbnail: '📺',
       email: '📧',
       display_ad: '🖼️',

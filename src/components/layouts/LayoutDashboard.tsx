@@ -25,7 +25,7 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
     clearLayouts,
   } = useAssetStore();
 
-  const { currentTerritory } = useAppStore();
+  // Note: currentTerritory not available in app store, using current layout instead
 
   const [activeTab, setActiveTab] = useState<'generate' | 'preview' | 'export' | 'manage'>('generate');
   const [selectedLayouts, setSelectedLayouts] = useState<string[]>([]);
@@ -33,7 +33,7 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
 
   // Auto-select first layout when layouts are generated
   useEffect(() => {
-    if (layouts.length > 0 && !currentLayout) {
+    if (layouts.length > 0 && !currentLayout && layouts[0]) {
       selectLayout(layouts[0]);
     }
   }, [layouts, currentLayout, selectLayout]);
@@ -56,7 +56,9 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
       deleteLayout(layoutId);
       if (currentLayout?.id === layoutId && layouts.length > 1) {
         const remainingLayouts = layouts.filter(l => l.id !== layoutId);
-        selectLayout(remainingLayouts[0]);
+        if (remainingLayouts[0]) {
+          selectLayout(remainingLayouts[0]);
+        }
       }
     }
   };

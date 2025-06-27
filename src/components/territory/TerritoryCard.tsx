@@ -171,7 +171,7 @@ const TerritoryCardComponent: React.FC<TerritoryCardProps> = ({
         territoryId={territory.id}
         headlines={territory.headlines}
         starredHeadlines={territoryHeadlines}
-        onToggleHeadlineStarred={handleToggleHeadlineStarred}
+        onToggleHeadlineStarred={onToggleHeadlineStarred}
       />
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { EnhancedGeneratedOutput } from '../../services/enhancementService';
+import { EnhancedGeneratedOutput } from '../../types';
 import { pdfExportService, PDFExportOptions } from '../../services/pdfExportService';
 
 interface ExportManagerProps {

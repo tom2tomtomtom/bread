@@ -171,8 +171,8 @@ class VisualIntelligenceService {
           .replace('{territory}', JSON.stringify({
             positioning: territory.positioning,
             tone: territory.tone,
-            audience: territory.audience,
-            differentiators: territory.differentiators,
+            title: territory.title,
+            headlines: territory.headlines.map(h => h.text),
           }))
           .replace('{assets}', JSON.stringify({
             id: asset.id,
@@ -182,7 +182,7 @@ class VisualIntelligenceService {
           }));
 
         // Use Claude for detailed analysis
-        const analysis = await generateWithClaude(prompt, false, 'asset_territory_match');
+        const analysis = await generateWithClaude(prompt);
         
         // Generate match analysis (in production, parse AI response)
         const match: AssetTerritoryMatch = {
@@ -232,10 +232,10 @@ class VisualIntelligenceService {
           type: a.type,
           aiAnalysis: a.aiAnalysis,
         }))))
-        .replace('{territoryColors}', JSON.stringify(territory.visualElements?.colors || []))
+        .replace('{territoryColors}', JSON.stringify([]))
         .replace('{brandGuidelines}', JSON.stringify(brandGuidelines || {}));
 
-      await generateWithClaude(prompt, false, 'color_harmony');
+      await generateWithClaude(prompt);
       
       // Generate color harmony analysis
       const analysis: ColorHarmonyAnalysis = {
@@ -273,10 +273,10 @@ class VisualIntelligenceService {
         .replace('{territory}', JSON.stringify(territory))
         .replace('{styleRequirements}', JSON.stringify({
           tone: territory.tone,
-          audience: territory.audience,
+          positioning: territory.positioning,
         }));
 
-      await generateWithClaude(prompt, false, 'style_consistency');
+      await generateWithClaude(prompt);
       
       const check: StyleConsistencyCheck = {
         consistencyScore: this.calculateStyleConsistencyScore(assets),
@@ -317,9 +317,9 @@ class VisualIntelligenceService {
         }))))
         .replace('{territory}', JSON.stringify(territory))
         .replace('{format}', targetFormat || 'general')
-        .replace('{audience}', territory.audience || 'general audience');
+        .replace('{audience}', 'general audience');
 
-      await generateWithOpenAI(prompt, false, 'composition_suggestions');
+      await generateWithOpenAI(prompt, false);
       
       const suggestions: CompositionSuggestion[] = [
         {
@@ -420,7 +420,7 @@ class VisualIntelligenceService {
     const territoryKeywords = [
       ...territory.positioning.toLowerCase().split(' '),
       territory.tone?.toLowerCase() || '',
-      ...(territory.audience?.toLowerCase().split(' ') || []),
+      ...(territory.title?.toLowerCase().split(' ') || []),
     ];
     
     const matchingTags = asset.tags.filter(tag => 
@@ -504,8 +504,8 @@ class VisualIntelligenceService {
     const colors: string[] = [];
     
     assets.forEach(asset => {
-      if (asset.aiAnalysis?.dominant_colors) {
-        colors.push(...asset.aiAnalysis.dominant_colors);
+      if (asset.aiAnalysis?.colors?.palette) {
+        colors.push(...asset.aiAnalysis.colors.palette);
       }
     });
     

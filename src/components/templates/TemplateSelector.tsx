@@ -442,9 +442,8 @@ const TemplateCard: React.FC<TemplateCardProps> = ({
               {channel === 'instagram_post' && '📷'}
               {channel === 'facebook_post' && '📘'}
               {channel === 'linkedin_post' && '💼'}
-              {channel === 'twitter_post' && '🐦'}
               {channel === 'youtube_thumbnail' && '📺'}
-              {!['instagram_post', 'facebook_post', 'linkedin_post', 'twitter_post', 'youtube_thumbnail'].includes(channel) && '📱'}
+              {!['instagram_post', 'facebook_post', 'linkedin_post', 'youtube_thumbnail'].includes(channel) && '📱'}
             </div>
           ))}
           {template.channelSpecs.supportedChannels.length > 4 && (

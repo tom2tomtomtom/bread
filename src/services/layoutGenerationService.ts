@@ -473,9 +473,9 @@ class LayoutGenerationService {
   private prioritizeAssets(assets: UploadedAsset[]): UploadedAsset[] {
     return assets.sort((a, b) => {
       // Prioritize by type: logo > product > lifestyle > background
-      const typeOrder = { logo: 0, product: 1, lifestyle: 2, background: 3, other: 4 };
-      const aOrder = typeOrder[a.type] ?? 4;
-      const bOrder = typeOrder[b.type] ?? 4;
+      const typeOrder = { logo: 0, product: 1, lifestyle: 2, background: 3, texture: 4, icon: 5, other: 6 };
+      const aOrder = typeOrder[a.type] ?? 6;
+      const bOrder = typeOrder[b.type] ?? 6;
       
       if (aOrder !== bOrder) return aOrder - bOrder;
       

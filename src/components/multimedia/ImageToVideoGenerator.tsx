@@ -36,7 +36,8 @@ export const ImageToVideoGenerator: React.FC<ImageToVideoGeneratorProps> = ({
     clearGenerationError,
   } = useAssetStore();
 
-  const { currentTerritory } = useAppStore();
+  // Note: currentTerritory not available in app store - using fallback
+  const currentTerritory: any = null; // TODO: Replace with proper territory selection
 
   // Form state
   const [selectedAssetId, setSelectedAssetId] = useState(sourceAsset?.id || '');
@@ -50,7 +51,7 @@ export const ImageToVideoGenerator: React.FC<ImageToVideoGeneratorProps> = ({
   const [customPrompt, setCustomPrompt] = useState('');
 
   // Get available image assets
-  const imageAssets = assets.filter(asset => asset.type === 'image');
+  const imageAssets = assets.filter(asset => asset.format === 'image');
   const selectedAsset = assets.find(asset => asset.id === selectedAssetId);
 
   // Platform specifications

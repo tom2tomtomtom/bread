@@ -121,7 +121,7 @@ export const generateWithOpenAI = async (
     } catch (error) {
       console.log('🔧 Backend not available, using mock response');
       const mockResponse = getMockResponse('generate-openai');
-      return mockResponse.data;
+      return mockResponse.data as GeneratedOutput;
     }
   }
 
@@ -143,7 +143,7 @@ export const generateWithOpenAI = async (
 
     if (!response.ok) {
       const result = await handleApiError(response, makeRequest);
-      return result.data;
+      return result.data as GeneratedOutput;
     }
 
     const result: ApiResponse = await response.json();
@@ -153,7 +153,7 @@ export const generateWithOpenAI = async (
     }
 
     console.log('✅ Secure OpenAI API response received');
-    let generatedOutput = result.data;
+    let generatedOutput = result.data as GeneratedOutput;
 
     // Generate images if requested
     if (generateImages && generatedOutput.territories) {
@@ -197,7 +197,7 @@ export const generateWithClaude = async (prompt: string): Promise<GeneratedOutpu
 
     if (!response.ok) {
       const result = await handleApiError(response, makeRequest);
-      return result.data;
+      return result.data as GeneratedOutput;
     }
 
     const result: ApiResponse = await response.json();
@@ -207,7 +207,7 @@ export const generateWithClaude = async (prompt: string): Promise<GeneratedOutpu
     }
 
     console.log('✅ Secure Claude API response received');
-    return result.data;
+    return result.data as GeneratedOutput;
   } catch (error: unknown) {
     console.error('❌ Secure Claude API Error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -236,7 +236,7 @@ const generateImages_API = async (territories: Territory[], brief: string): Prom
 
     if (!response.ok) {
       const result = await handleApiError(response, makeRequest);
-      return result.data || [];
+      return (result.data as string[]) || [];
     }
 
     const result: ApiResponse = await response.json();
@@ -246,7 +246,7 @@ const generateImages_API = async (territories: Territory[], brief: string): Prom
     }
 
     console.log('✅ Secure image generation completed');
-    return result.data || [];
+    return (result.data as string[]) || [];
   } catch (error: any) {
     console.error('❌ Secure image generation error:', error);
     throw error;
@@ -376,7 +376,13 @@ export const generateEnhancedImages_API = async (
   };
 
   try {
-    const response = await retryRequest(makeRequest, 3);
+    const response = await makeRequest();
+    
+    if (!response.ok) {
+      const result = await handleApiError(response, makeRequest);
+      return (result.data as any[]) || [];
+    }
+    
     const result: ApiResponse = await response.json();
 
     if (!result.success) {
@@ -384,7 +390,7 @@ export const generateEnhancedImages_API = async (
     }
 
     console.log('✅ Enhanced image generation completed');
-    return result.data || [];
+    return (result.data as any[]) || [];
   } catch (error: any) {
     console.error('❌ Enhanced image generation error:', error);
     throw error;
@@ -425,7 +431,13 @@ export const generateVideo_API = async (
   };
 
   try {
-    const response = await retryRequest(makeRequest, 3);
+    const response = await makeRequest();
+    
+    if (!response.ok) {
+      const result = await handleApiError(response, makeRequest);
+      return (result.data as any[]) || [];
+    }
+    
     const result: ApiResponse = await response.json();
 
     if (!result.success) {

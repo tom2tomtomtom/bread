@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { EnhancedGeneratedOutput } from '../services/enhancementService';
+import { EnhancedGeneratedOutput } from '../types';
 import { ConfidenceScoring } from './ConfidenceScoring';
 import { pdfExportService, PDFExportOptions } from '../services/pdfExportService';
 import { TerritoryEvolution, PerformancePrediction } from '../types';
@@ -63,21 +63,21 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
       if (result.success) {
         console.log(`✅ PDF exported successfully: ${result.filename}`);
         // Show success toast if available
-        if (window.showToast) {
-          window.showToast(`PDF exported: ${result.filename}`, 'success');
+        if ((window as any).showToast) {
+          (window as any).showToast(`PDF exported: ${result.filename}`, 'success');
         }
       } else {
         console.error('❌ PDF export failed:', result.error);
         // Show error toast if available
-        if (window.showToast) {
-          window.showToast(`PDF export failed: ${result.error}`, 'error');
+        if ((window as any).showToast) {
+          (window as any).showToast(`PDF export failed: ${result.error}`, 'error');
         }
       }
     } catch (error) {
       console.error('❌ PDF export error:', error);
       // Show error toast if available
-      if (window.showToast) {
-        window.showToast('PDF export failed. Please try again.', 'error');
+      if ((window as any).showToast) {
+        (window as any).showToast('PDF export failed. Please try again.', 'error');
       }
     }
   };

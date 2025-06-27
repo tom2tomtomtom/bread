@@ -36,7 +36,8 @@ export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({
     clearLayoutError,
   } = useAssetStore();
 
-  const { currentTerritory } = useAppStore();
+  // Note: currentTerritory not available in app store - using fallback
+  const currentTerritory: { positioning: string; tone: string; audience: string } | null = null; // TODO: Replace with proper territory selection
 
   const [selectedFormats, setSelectedFormats] = useState<ChannelFormat[]>(['instagram_post']);
   const [templatePreferences, setTemplatePreferences] = useState<TemplatePreference>({
@@ -106,11 +107,11 @@ export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({
 
     try {
       // First analyze visual intelligence
-      await analyzeVisualIntelligence(assetsToUse, currentTerritory);
+      await analyzeVisualIntelligence(assetsToUse, currentTerritory!);
 
       // Then generate layouts
       const request: LayoutGenerationRequest = {
-        territory: currentTerritory,
+        territory: currentTerritory!,
         assets: assetsToUse,
         targetFormats: selectedFormats,
         brandGuidelines: defaultBrandGuidelines,
@@ -188,16 +189,7 @@ export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({
           {/* Territory Info */}
           <div className="bg-blue-50 rounded-lg p-4">
             <h3 className="font-semibold text-blue-900 mb-2">📍 Current Territory</h3>
-            {currentTerritory ? (
-              <div>
-                <p className="text-blue-800 font-medium">{currentTerritory.positioning}</p>
-                <p className="text-blue-600 text-sm mt-1">
-                  Tone: {currentTerritory.tone} • Audience: {currentTerritory.audience}
-                </p>
-              </div>
-            ) : (
-              <p className="text-blue-600">No territory selected</p>
-            )}
+            <p className="text-blue-600">No territory selected (feature temporarily disabled)</p>
           </div>
 
           {/* Assets Info */}

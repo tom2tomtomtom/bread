@@ -37,6 +37,9 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
     setIsExporting(true);
     try {
       const configs = presets[selectedPreset];
+      if (!configs) {
+        throw new Error('Invalid preset configuration');
+      }
       const results = await exportService.exportMultipleFormats(targetLayout, configs);
       setExportResults(results);
       onExportComplete?.(results);

@@ -66,7 +66,12 @@ export const EvolutionHistory: React.FC<EvolutionHistoryProps> = ({
     } else if (selectedEvolutions.length < 2) {
       setSelectedEvolutions([...selectedEvolutions, evolution]);
     } else {
-      setSelectedEvolutions([selectedEvolutions[1], evolution]);
+      const secondEvolution = selectedEvolutions[1];
+      if (secondEvolution !== undefined) {
+        setSelectedEvolutions([secondEvolution, evolution]);
+      } else {
+        setSelectedEvolutions([evolution]);
+      }
     }
   };
 
@@ -155,10 +160,10 @@ export const EvolutionHistory: React.FC<EvolutionHistoryProps> = ({
                   {selectedEvolutions.length} evolution{selectedEvolutions.length !== 1 ? 's' : ''}{' '}
                   selected
                 </span>
-                {selectedEvolutions.length === 2 && (
+                {selectedEvolutions.length === 2 && selectedEvolutions[0] && selectedEvolutions[1] && (
                   <button
                     onClick={() =>
-                      onCompareEvolutions(selectedEvolutions[0], selectedEvolutions[1])
+                      onCompareEvolutions(selectedEvolutions[0]!, selectedEvolutions[1]!)
                     }
                     className="px-3 py-1 bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/30 rounded text-sm text-orange-400 transition-all"
                   >

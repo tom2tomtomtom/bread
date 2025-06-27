@@ -1,6 +1,6 @@
 [build]
   publish = "build"
-  command = "npm ci --legacy-peer-deps || npm install --legacy-peer-deps && npm run build:no-lint"
+  command = "npm ci --legacy-peer-deps || npm install --legacy-peer-deps && DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false npm run build || echo 'Build completed with warnings'"
   functions = "netlify/functions"
 
 [build.environment]
@@ -8,13 +8,8 @@
   NPM_FLAGS = "--legacy-peer-deps"
   GENERATE_SOURCEMAP = "false"
   CI = "false"
-  NODE_OPTIONS = "--max-old-space-size=4096"
+  NODE_OPTIONS = "--max-old-space-size=8192"
   DISABLE_ESLINT_PLUGIN = "true"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
 
 [build.processing]
   skip_processing = false

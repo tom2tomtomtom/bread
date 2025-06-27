@@ -184,7 +184,7 @@ export const useConfigStore = create<ConfigState>()(
         });
 
         // Check for minimum prompt lengths
-        if (prompts.system && prompts.system.length < 50) {
+        if (prompts.systemInstructions && prompts.systemInstructions.length < 50) {
           issues.push('System prompt is too short (minimum 50 characters)');
         }
 

@@ -713,7 +713,7 @@ class TemplateService {
           secondaryAudiences: ['Existing customers', 'Industry influencers', 'Media'],
           psychographicProfile: 'Tech-savvy, trend-conscious, willing to try new things',
           behavioralTriggers: ['FOMO', 'Exclusivity', 'Innovation appeal'],
-          communicationStyle: 'exciting',
+          communicationStyle: 'emotional',
           culturalConsiderations: ['Local market readiness', 'Competitive landscape']
         },
         competitivePositioning: {
@@ -899,7 +899,7 @@ class TemplateService {
         }
       },
       channelSpecs: {
-        supportedChannels: ['instagram_post', 'facebook_post', 'linkedin_post', 'twitter_post', 'youtube_thumbnail'],
+        supportedChannels: ['instagram_post', 'facebook_post', 'linkedin_post', 'youtube_thumbnail'],
         channelPriority: [
           {
             channel: 'instagram_post',
@@ -961,7 +961,7 @@ class TemplateService {
             viralPotential: ['Shareable moments', 'Surprise elements', 'Social proof']
           },
           owned: {
-            channels: ['website', 'email', 'app'],
+            channels: ['email_header', 'custom'],
             contentStrategy: ['Product pages', 'Email campaigns', 'In-app notifications'],
             audienceNurturing: ['Educational content', 'Exclusive previews'],
             conversionOptimization: ['Landing pages', 'Trial flows', 'Onboarding']
@@ -1224,7 +1224,7 @@ class TemplateService {
           secondaryAudiences: ['Existing customers', 'Lapsed customers', 'Competitor customers'],
           psychographicProfile: 'Value-driven, deal-motivated, action-oriented',
           behavioralTriggers: ['Limited time', 'Exclusive access', 'Significant savings'],
-          communicationStyle: 'urgent',
+          communicationStyle: 'direct',
           culturalConsiderations: ['Local shopping behaviors', 'Seasonal preferences']
         },
         competitivePositioning: {
@@ -1315,7 +1315,7 @@ class TemplateService {
         }
       },
       channelSpecs: {
-        supportedChannels: ['instagram_post', 'facebook_post', 'email', 'display_ad'],
+        supportedChannels: ['instagram_post', 'facebook_post', 'email_header', 'banner_rectangle'],
         channelPriority: [],
         crossChannelStrategy: {
           consistencyLevel: 'identical',
@@ -1498,7 +1498,7 @@ class TemplateService {
         }
       },
       channelSpecs: {
-        supportedChannels: ['instagram_post', 'youtube_video', 'linkedin_post'],
+        supportedChannels: ['instagram_post', 'youtube_thumbnail', 'linkedin_post'],
         channelPriority: [],
         crossChannelStrategy: {
           consistencyLevel: 'adapted',
@@ -1565,7 +1565,7 @@ class TemplateService {
           secondaryAudiences: ['Lapsed customers', 'High-value prospects', 'Brand advocates'],
           psychographicProfile: 'Loyal, engaged, community-oriented',
           behavioralTriggers: ['Exclusivity', 'Recognition', 'Community belonging'],
-          communicationStyle: 'appreciative',
+          communicationStyle: 'emotional',
           culturalConsiderations: ['Loyalty program preferences', 'Community values']
         },
         competitivePositioning: {
@@ -1596,7 +1596,7 @@ class TemplateService {
         typography: [],
         imageryStyle: {
           photographyStyle: 'lifestyle',
-          colorTreatment: 'warm',
+          colorTreatment: 'enhanced',
           composition: 'centered',
           subjectMatter: ['Community', 'Rewards', 'Exclusive experiences'],
           moodKeywords: ['Warm', 'Exclusive', 'Rewarding']
@@ -1640,7 +1640,7 @@ class TemplateService {
         }
       },
       channelSpecs: {
-        supportedChannels: ['email', 'app_notification', 'instagram_post'],
+        supportedChannels: ['email_header', 'custom', 'instagram_post'],
         channelPriority: [],
         crossChannelStrategy: {
           consistencyLevel: 'customized',

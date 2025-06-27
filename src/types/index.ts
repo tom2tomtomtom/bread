@@ -1028,7 +1028,7 @@ export interface OptionalInput {
 
 export interface ValidationRule {
   type: 'required' | 'minLength' | 'maxLength' | 'pattern' | 'fileSize' | 'dimensions';
-  value: string | number | RegExp;
+  value: string | number | RegExp | boolean;
   message: string;
 }
 

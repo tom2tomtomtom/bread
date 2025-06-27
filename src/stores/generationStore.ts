@@ -122,11 +122,23 @@ export const useGenerationStore = create<GenerationState>()(
           
           set({
             enhancedBriefAnalysis: {
-              // Mock data structure - replace with actual API response
-              insights: [],
-              recommendations: [],
-              confidence: 0.8,
-            } as EnhancedBriefAnalysis,
+              overallScore: 80,
+              categoryScores: {
+                strategicClarity: { score: 80, reasoning: 'Good strategic focus', improvements: [] },
+                audienceDefinition: { score: 75, reasoning: 'Clear audience targeting', improvements: [] },
+                competitiveContext: { score: 70, reasoning: 'Some competitive context', improvements: [] },
+                culturalRelevance: { score: 85, reasoning: 'Culturally appropriate', improvements: [] },
+                executionClarity: { score: 80, reasoning: 'Clear execution path', improvements: [] },
+                practicalConstraints: { score: 75, reasoning: 'Realistic constraints', improvements: [] },
+              },
+              missingElements: [],
+              improvementSuggestions: [],
+              strategicGaps: [],
+              culturalInsights: [],
+              competitiveOpportunities: [],
+              analysisTimestamp: new Date(),
+              confidence: 80,
+            },
             isAnalyzingBrief: false,
           });
         } catch (error) {

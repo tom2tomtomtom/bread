@@ -141,28 +141,7 @@ export const methodNotAllowedResponse = (allowedMethods: string[] = []): Handler
   };
 };
 
-export const rateLimitResponse = (
-  limit: number,
-  resetTime: string
-): HandlerResponse => {
-  return {
-    statusCode: 429,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-RateLimit-Limit': limit.toString(),
-      'X-RateLimit-Reset': resetTime,
-      'Retry-After': '3600', // 1 hour
-      ...CORS_HEADERS,
-    },
-    body: JSON.stringify({
-      success: false,
-      error: 'Rate limit exceeded',
-      limit,
-      resetTime,
-      timestamp: new Date().toISOString(),
-    }),
-  };
-};
+// Removed duplicate rateLimitResponse - using the enhanced version below
 
 export const validationErrorResponse = (
   errors: string[],
