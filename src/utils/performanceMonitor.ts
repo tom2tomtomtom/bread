@@ -252,11 +252,11 @@ class PerformanceMonitor {
             const navEntry = entry as PerformanceNavigationTiming;
             this.addMetric({
               name: 'navigation',
-              value: navEntry.loadEventEnd - navEntry.navigationStart,
+              value: navEntry.loadEventEnd - navEntry.startTime,
               timestamp: Date.now(),
               context: {
-                domContentLoaded: navEntry.domContentLoadedEventEnd - navEntry.navigationStart,
-                loadComplete: navEntry.loadEventEnd - navEntry.navigationStart,
+                domContentLoaded: navEntry.domContentLoadedEventEnd - navEntry.startTime,
+                loadComplete: navEntry.loadEventEnd - navEntry.startTime,
                 type: navEntry.type
               }
             });

@@ -28,5 +28,12 @@
   },
   "include": [
     "src"
+  ],
+  "exclude": [
+    "src/tests.disabled",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
   ]
 }

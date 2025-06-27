@@ -97,25 +97,26 @@ export class KeyboardNavigation {
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
     
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Tab') {
-        if (event.shiftKey) {
+    const handleKeyDown = (event: Event) => {
+      const keyboardEvent = event as KeyboardEvent;
+      if (keyboardEvent.key === 'Tab') {
+        if (keyboardEvent.shiftKey) {
           // Shift + Tab
           if (document.activeElement === firstElement) {
-            event.preventDefault();
+            keyboardEvent.preventDefault();
             lastElement?.focus();
           }
         } else {
           // Tab
           if (document.activeElement === lastElement) {
-            event.preventDefault();
+            keyboardEvent.preventDefault();
             firstElement?.focus();
           }
         }
       }
       
       // Escape key to close
-      if (event.key === 'Escape') {
+      if (keyboardEvent.key === 'Escape') {
         const closeButton = container.querySelector('[data-close]') as HTMLElement;
         closeButton?.click();
       }

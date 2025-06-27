@@ -1,16 +1,7 @@
-import { Territory, Headline } from '../types';
+import { Territory, Headline, EvolutionType } from '../types';
 import { generateWithOpenAI } from './secureApiService';
 
-// Evolution types and interfaces
-export type EvolutionType =
-  | 'TONE_SHIFT'
-  | 'AUDIENCE_PIVOT'
-  | 'COMPETITIVE_RESPONSE'
-  | 'CULTURAL_ADAPTATION'
-  | 'SEASONAL_OPTIMIZATION'
-  | 'PERFORMANCE_ENHANCEMENT'
-  | 'CREATIVE_EXPLORATION'
-  | 'COMPLIANCE_ADJUSTMENT';
+// Evolution types are imported from ../types
 
 export interface TerritoryEvolution {
   id: string;

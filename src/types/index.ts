@@ -649,7 +649,7 @@ export interface LayoutTemplate {
 
 export type CampaignTemplateType = 'launch' | 'promotional' | 'brand_building' | 'retention_loyalty';
 
-export type EvolutionType = 'amplify' | 'pivot' | 'refine' | 'localize' | 'modernize' | 'differentiate';
+// EvolutionType is already defined above at line 290
 
 export interface StrategicFramework {
   primaryObjective: string;
