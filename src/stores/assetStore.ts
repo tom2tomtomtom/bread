@@ -890,9 +890,12 @@ export const useAssetStore = create<AssetState>()(
           }
 
         } catch (error) {
+          console.error('💥 Image generation failed in store:', error);
+          const errorMessage = error instanceof Error ? error.message : 'Image generation failed';
+          console.error('💥 Setting error state:', errorMessage);
           set({
             isGeneratingImage: false,
-            generationError: error instanceof Error ? error.message : 'Image generation failed',
+            generationError: errorMessage,
           });
           throw error;
         }

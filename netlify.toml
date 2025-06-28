@@ -25,6 +25,10 @@
 [build.processing.html]
   pretty_urls = true
 
+# Function timeout settings
+[functions]
+  node_bundler = "esbuild"
+
 # Client-side routing redirects for React Router
 [[redirects]]
   from = "/*"

@@ -357,10 +357,11 @@ export const generateSimpleImage_API = async (
     territory?: any;
   } = {}
 ): Promise<any[]> => {
-  console.log('🎨 Starting simple image generation...');
+  console.log('🎨 Starting simple image generation...', { prompt, options });
 
   const makeRequest = async (): Promise<Response> => {
     const apiUrl = `${getApiBaseUrl()}/generate-images-simple`;
+    console.log('📡 Making request to:', apiUrl);
     return fetch(apiUrl, {
       method: 'POST',
       headers: {
@@ -376,22 +377,40 @@ export const generateSimpleImage_API = async (
   };
 
   try {
-    const response = await makeRequest();
+    console.log('🔄 Sending API request...');
+    
+    // Add timeout to the request
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('Request timeout after 25 seconds')), 25000);
+    });
+    
+    const response = await Promise.race([makeRequest(), timeoutPromise]);
+    console.log('📥 Response received:', response.status, response.statusText);
     
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorText = await response.text();
+      console.error('❌ API Error Response:', errorText);
+      throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
     }
     
     const result: ApiResponse = await response.json();
+    console.log('📊 Parsed result:', result);
 
     if (!result.success) {
+      console.error('❌ API returned error:', result.error);
       throw new Error(result.error || 'Unknown error from simple image API');
     }
 
-    console.log('✅ Simple image generation completed');
+    console.log('✅ Simple image generation completed successfully');
+    console.log('🖼️ Generated image data:', result.data);
     return (result.data as any[]) || [];
   } catch (error: any) {
     console.error('❌ Simple image generation error:', error);
+    console.error('❌ Error details:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
     throw error;
   }
 };

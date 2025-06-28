@@ -924,20 +924,40 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
                 </div>
               )}
 
-              <button
-                onClick={handleGenerateImage}
-                disabled={!imagePrompt.trim() || isGeneratingImage}
-                className="w-full bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-300 hover:to-orange-500 disabled:from-gray-600 disabled:to-gray-700 text-black disabled:text-gray-400 font-semibold px-6 py-3 rounded-xl transition-all duration-300 disabled:cursor-not-allowed"
-              >
-                {isGeneratingImage ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="animate-spin w-5 h-5 border-2 border-black border-t-transparent rounded-full"></div>
-                    Generating Image...
-                  </div>
-                ) : (
-                  '🎨 Generate Image'
-                )}
-              </button>
+              <div className="space-y-3">
+                <button
+                  onClick={async () => {
+                    try {
+                      console.log('🔍 Testing API key...');
+                      const response = await fetch('/.netlify/functions/test-api-key');
+                      const result = await response.json();
+                      console.log('🔑 API Key Test Result:', result);
+                      alert(`API Key Test: ${result.success ? 'SUCCESS' : 'FAILED'}\n${JSON.stringify(result.data || result.error, null, 2)}`);
+                    } catch (error) {
+                      console.error('❌ API key test failed:', error);
+                      alert(`API Key Test Failed: ${error}`);
+                    }
+                  }}
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-lg transition-all duration-300"
+                >
+                  🔍 Test API Key
+                </button>
+                
+                <button
+                  onClick={handleGenerateImage}
+                  disabled={!imagePrompt.trim() || isGeneratingImage}
+                  className="w-full bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-300 hover:to-orange-500 disabled:from-gray-600 disabled:to-gray-700 text-black disabled:text-gray-400 font-semibold px-6 py-3 rounded-xl transition-all duration-300 disabled:cursor-not-allowed"
+                >
+                  {isGeneratingImage ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="animate-spin w-5 h-5 border-2 border-black border-t-transparent rounded-full"></div>
+                      Generating Image...
+                    </div>
+                  ) : (
+                    '🎨 Generate Image'
+                  )}
+                </button>
+              </div>
 
               {generationError && (
                 <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
