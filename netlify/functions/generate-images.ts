@@ -12,7 +12,8 @@ import {
   validationErrorResponse,
 } from './utils/response';
 
-interface ImageRequest {
+// Legacy format for backward compatibility
+interface LegacyImageRequest {
   territories: Array<{
     id: string;
     title: string;
@@ -36,11 +37,71 @@ interface ImageRequest {
       secondary: string[];
       accent: string[];
       neutral: string[];
+      background?: string;
+      text?: string;
     };
     style: string[];
     tone: string;
   };
 }
+
+// New format from asset management workflow
+interface NewImageRequest {
+  prompt: string;
+  territory: {
+    id: string;
+    title: string;
+    positioning: string;
+    tone: string;
+    headlines: Array<{
+      text: string;
+      followUp: string;
+    }>;
+  };
+  brandGuidelines: {
+    colors: {
+      primary: string;
+      secondary: string[];
+      accent: string[];
+      neutral: string[];
+      background: string;
+      text: string;
+    };
+    fonts: {
+      primary: string;
+      secondary: string;
+      fallbacks: string[];
+    };
+    logoUsage: {
+      minSize: number;
+      clearSpace: number;
+      placement: string;
+      variations: string[];
+    };
+    spacing: {
+      grid: number;
+      margins: number;
+      padding: number;
+    };
+    imagery: {
+      style: string[];
+      filters: string[];
+      overlayOpacity: number;
+    };
+    compliance: {
+      requiredElements: string[];
+      prohibitedElements: string[];
+      legalText: string[];
+    };
+  };
+  imageType: 'product' | 'lifestyle' | 'background' | 'hero' | 'icon' | 'pattern';
+  styleConsistency: boolean;
+  culturalContext: 'australian' | 'global' | 'regional';
+  quality?: 'standard' | 'hd' | 'ultra';
+  provider?: 'openai' | 'midjourney' | 'stable-diffusion';
+}
+
+type ImageRequest = LegacyImageRequest | NewImageRequest;
 
 interface ImageResponse {
   success: boolean;
@@ -246,6 +307,39 @@ ${imageType === 'product' ? '- Focus on clean, professional product presentation
 FOCUS: Create a ${territory.tone}, high-quality ${imageType} image that perfectly supports the territory positioning "${positioning}" with ${culturalContext} cultural relevance.`;
 };
 
+// Helper function to detect request format
+const isNewFormat = (request: any): request is NewImageRequest => {
+  return request && 
+         typeof request.prompt === 'string' && 
+         request.territory && 
+         !request.territories && 
+         !request.brief;
+};
+
+// Helper function to convert new format to legacy format for processing
+const convertToLegacyFormat = (newRequest: NewImageRequest): LegacyImageRequest => {
+  return {
+    territories: [{
+      id: newRequest.territory.id,
+      title: newRequest.territory.title,
+      tone: newRequest.territory.tone,
+      positioning: newRequest.territory.positioning,
+      headlines: newRequest.territory.headlines || [{ text: 'Generated Image', followUp: newRequest.prompt }]
+    }],
+    brief: newRequest.prompt,
+    imageType: newRequest.imageType,
+    culturalContext: newRequest.culturalContext,
+    styleConsistency: newRequest.styleConsistency,
+    quality: newRequest.quality,
+    provider: newRequest.provider,
+    brandGuidelines: {
+      colors: newRequest.brandGuidelines.colors,
+      style: newRequest.brandGuidelines.imagery.style,
+      tone: newRequest.territory.tone
+    }
+  };
+};
+
 const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
   const functionName = 'generate-images';
   let authResult: any;
@@ -282,7 +376,16 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
       return errorResponse('Invalid request body', 400);
     }
     
-    const { territories, brief } = requestBody;
+    // Convert new format to legacy format if needed
+    let processedRequest: LegacyImageRequest;
+    if (isNewFormat(requestBody)) {
+      console.log('🔄 Converting new format request to legacy format');
+      processedRequest = convertToLegacyFormat(requestBody);
+    } else {
+      processedRequest = requestBody as LegacyImageRequest;
+    }
+    
+    const { territories, brief } = processedRequest;
 
     // Validate required fields
     const validationErrors: string[] = [];
@@ -346,15 +449,15 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
       const batchPromises = batch.map(async (request) => {
         try {
           const imagePrompt = generateEnhancedImagePrompt(request.headline, request.territory, brief, {
-            imageType: requestBody!.imageType,
-            culturalContext: requestBody!.culturalContext,
-            styleConsistency: requestBody!.styleConsistency,
-            brandGuidelines: requestBody!.brandGuidelines
+            imageType: processedRequest.imageType,
+            culturalContext: processedRequest.culturalContext,
+            styleConsistency: processedRequest.styleConsistency,
+            brandGuidelines: processedRequest.brandGuidelines
           });
           
           // Enhanced generation parameters based on request options
-          const quality = requestBody!.quality || 'standard';
-          const imageType = requestBody!.imageType || 'background';
+          const quality = processedRequest.quality || 'standard';
+          const imageType = processedRequest.imageType || 'background';
 
           // Determine optimal size based on image type
           const sizeMap = {
@@ -372,7 +475,7 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
             n: 1,
             size: (sizeMap[imageType as keyof typeof sizeMap] || "1024x1792") as "1024x1024" | "1792x1024" | "1024x1792",
             quality: quality === 'ultra' ? 'hd' : quality as 'standard' | 'hd',
-            style: requestBody!.styleConsistency ? "natural" : "vivid"
+            style: processedRequest.styleConsistency ? "natural" : "vivid"
           });
 
           const imageUrl = response.data?.[0]?.url;
@@ -420,7 +523,7 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
     const user = authResult?.user;
     logError(functionName, error, user?.id, {
       action: 'image_generation_failed',
-      territoriesCount: requestBody?.territories?.length,
+      territoriesCount: (requestBody as any)?.territories?.length || (requestBody as any)?.territory ? 1 : 0,
       plan: user?.plan
     });
 
