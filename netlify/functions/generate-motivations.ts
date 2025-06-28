@@ -1,10 +1,28 @@
 import { Handler } from '@netlify/functions';
 
-interface MotivationGenerationRequest {
-  brief: string;
+interface ParsedBrief {
+  goal: string;
   targetAudience: string;
-  campaignGoal: string;
+  keyBenefits: string[];
+  brandPersonality: string;
+  productDetails: string;
+  campaignRequirements: string;
+  toneMood: string;
+  callToAction: string;
+  competitiveContext: string;
+  constraints: string;
+}
+
+interface MotivationGenerationRequest {
+  // Legacy fields for backward compatibility
+  brief?: string;
+  targetAudience?: string;
+  campaignGoal?: string;
   templateType?: string;
+  
+  // New comprehensive brief data
+  parsedBrief?: ParsedBrief;
+  briefText?: string;
 }
 
 interface Motivation {
@@ -45,13 +63,17 @@ export const handler: Handler = async (event, context) => {
   try {
     const request: MotivationGenerationRequest = JSON.parse(event.body || '{}');
     
-    if (!request.brief || !request.targetAudience || !request.campaignGoal) {
+    // Check if we have parsed brief or legacy fields
+    const hasParsedBrief = request.parsedBrief && request.parsedBrief.goal && request.parsedBrief.targetAudience;
+    const hasLegacyFields = request.brief && request.targetAudience && request.campaignGoal;
+    
+    if (!hasParsedBrief && !hasLegacyFields) {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({ 
           success: false, 
-          error: 'Missing required fields: brief, targetAudience, campaignGoal' 
+          error: 'Missing required fields. Need either parsedBrief with goal/targetAudience or legacy brief/targetAudience/campaignGoal' 
         }),
       };
     }
@@ -136,19 +158,51 @@ export const handler: Handler = async (event, context) => {
 
   // Real OpenAI API call
   try {
-    const prompt = `Generate 6 psychological motivations for an advertising campaign.
+    // Prepare campaign data from either parsed brief or legacy fields
+    let campaignData = '';
+    
+    if (request.parsedBrief) {
+      const pb = request.parsedBrief;
+      campaignData = `
+CAMPAIGN GOAL: ${pb.goal}
+TARGET AUDIENCE: ${pb.targetAudience}
+PRODUCT/SERVICE: ${pb.productDetails || 'Not specified'}
+KEY BENEFITS: ${pb.keyBenefits.length > 0 ? pb.keyBenefits.join(', ') : 'Not specified'}
+BRAND PERSONALITY: ${pb.brandPersonality || 'Not specified'}
+TONE & MOOD: ${pb.toneMood || 'Not specified'}
+CALL TO ACTION: ${pb.callToAction || 'Not specified'}
+COMPETITIVE CONTEXT: ${pb.competitiveContext || 'Not specified'}
+CAMPAIGN REQUIREMENTS: ${pb.campaignRequirements || 'Not specified'}
+CONSTRAINTS: ${pb.constraints || 'Not specified'}
 
-Brief: ${request.brief}
-Target Audience: ${request.targetAudience}
-Campaign Goal: ${request.campaignGoal}
+RAW BRIEF: ${request.briefText || 'Not provided'}`;
+    } else {
+      // Legacy format
+      campaignData = `
+CAMPAIGN GOAL: ${request.campaignGoal}
+TARGET AUDIENCE: ${request.targetAudience}
+BRIEF: ${request.brief}`;
+    }
+
+    const prompt = `Generate 6 psychological motivations for an advertising campaign based on the following detailed campaign information:
+
+${campaignData}
+
+Analyze all the provided information to create highly targeted motivations. Consider:
+- The specific goal and how to drive action toward it
+- The target audience's psychology, needs, and pain points
+- How the product/service benefits align with audience desires
+- The brand personality and desired tone
+- Any competitive context or market positioning
+- Campaign constraints and requirements
 
 For each motivation, provide:
 1. A compelling title (max 30 characters)
 2. A description of how to use this motivation (max 100 characters)
 3. The psychology type (one of: fear, desire, social_proof, urgency, authority, reciprocity, scarcity, curiosity)
 4. The target emotion this motivation triggers
-5. Reasoning for why this works for this audience
-6. A confidence score (0-100)
+5. Reasoning for why this works for this specific audience and goal
+6. A confidence score (0-100) based on how well it fits the brief
 
 Return the response as a JSON array with this exact structure:
 [
@@ -158,12 +212,12 @@ Return the response as a JSON array with this exact structure:
     "description": "How to use this motivation",
     "psychologyType": "fear|desire|social_proof|urgency|authority|reciprocity|scarcity|curiosity",
     "targetEmotion": "Primary emotion triggered",
-    "reasoning": "Why this works for the target audience",
+    "reasoning": "Why this works for the target audience and campaign goal",
     "confidenceScore": 85
   }
 ]
 
-Make the motivations specific to the brief and audience provided.`;
+Make the motivations highly specific to the campaign details provided.`;
 
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',

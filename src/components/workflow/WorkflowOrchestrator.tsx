@@ -269,10 +269,20 @@ const TemplateSelectionStep: React.FC<{ onContinue: () => void }> = ({ onContinu
 };
 
 const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> = ({ onContinue, onBack }) => {
-  const { setBrief } = useTemplateWorkflowStore();
-  const [briefText, setBriefText] = React.useState('');
-  const [audience, setAudience] = React.useState('');
-  const [goal, setGoal] = React.useState('');
+  const { setParsedBrief, parsedBrief, briefText: storedBriefText } = useTemplateWorkflowStore();
+  const [briefText, setBriefText] = React.useState(storedBriefText || '');
+  const [parsedFields, setParsedFields] = React.useState(parsedBrief || {
+    goal: '',
+    targetAudience: '',
+    keyBenefits: [],
+    brandPersonality: '',
+    productDetails: '',
+    campaignRequirements: '',
+    toneMood: '',
+    callToAction: '',
+    competitiveContext: '',
+    constraints: ''
+  });
   const [isDragOver, setIsDragOver] = React.useState(false);
   const [isProcessing, setIsProcessing] = React.useState(false);
   const [processingStatus, setProcessingStatus] = React.useState<'idle' | 'processing' | 'success' | 'error'>('idle');
@@ -280,7 +290,7 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleContinue = () => {
-    setBrief(briefText, audience, goal);
+    setParsedBrief(briefText, parsedFields);
     onContinue();
   };
 
@@ -333,6 +343,38 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
     }
   };
 
+  const callBriefParsingAPI = async (text: string, fileName?: string) => {
+    console.log('🤖 Calling AI brief parsing API...');
+    try {
+      const response = await fetch('/.netlify/functions/parse-brief', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          briefText: text,
+          fileName: fileName
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('✅ AI parsing successful:', data);
+
+      if (data.success && data.parsedBrief) {
+        return data.parsedBrief;
+      } else {
+        throw new Error(data.error || 'Failed to parse brief');
+      }
+    } catch (error) {
+      console.error('❌ API parsing failed:', error);
+      throw error;
+    }
+  };
+
   const processFile = async (file: File) => {
     console.log('🚀 Starting file processing:', file.name);
     setIsProcessing(true);
@@ -340,115 +382,36 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
     setStatusMessage(`Processing ${file.name}...`);
     
     try {
+      // Step 1: Extract text from file
       const text = await extractTextFromFile(file);
       console.log('📝 Text content preview:', text.substring(0, 200) + '...');
       
-      // Try to intelligently parse the content
-      const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-      console.log('📋 Parsed into', lines.length, 'lines');
-      
-      // Look for common patterns in briefs
-      let extractedGoal = '';
-      let extractedAudience = '';
-      let extractedBrief = text;
-
-      // Enhanced parsing patterns
-      const goalKeywords = ['goal', 'objective', 'purpose', 'aim', 'mission', 'campaign goal', 'business objective', 'marketing goal'];
-      const audienceKeywords = ['audience', 'target', 'demographic', 'customer', 'consumer', 'user', 'segment', 'market'];
-
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].toLowerCase();
-        const nextLine = lines[i + 1] || '';
-        
-        // Look for goal/objective indicators with more patterns
-        if (!extractedGoal) {
-          for (const keyword of goalKeywords) {
-            if (line.includes(keyword)) {
-              // Check if the goal is on the same line after a colon
-              if (line.includes(':')) {
-                const parts = lines[i].split(':');
-                if (parts.length > 1) {
-                  extractedGoal = parts.slice(1).join(':').trim();
-                  break;
-                }
-              }
-              // Check if the goal is on the next line
-              else if (nextLine && nextLine.length > 10) {
-                extractedGoal = nextLine;
-                break;
-              }
-              // Check if it's a formatted line like "Goal: Increase brand awareness"
-              else if (line.includes(keyword) && lines[i].length > keyword.length + 5) {
-                extractedGoal = lines[i].substring(lines[i].toLowerCase().indexOf(keyword) + keyword.length).replace(/[:\-\s]*/, '').trim();
-                break;
-              }
-            }
-          }
-        }
-        
-        // Look for audience/target indicators with more patterns
-        if (!extractedAudience) {
-          for (const keyword of audienceKeywords) {
-            if (line.includes(keyword)) {
-              // Check if the audience is on the same line after a colon
-              if (line.includes(':')) {
-                const parts = lines[i].split(':');
-                if (parts.length > 1) {
-                  extractedAudience = parts.slice(1).join(':').trim();
-                  break;
-                }
-              }
-              // Check if the audience is on the next line
-              else if (nextLine && nextLine.length > 10) {
-                extractedAudience = nextLine;
-                break;
-              }
-              // Check if it's a formatted line like "Target Audience: Young professionals"
-              else if (line.includes(keyword) && lines[i].length > keyword.length + 5) {
-                extractedAudience = lines[i].substring(lines[i].toLowerCase().indexOf(keyword) + keyword.length).replace(/[:\-\s]*/, '').trim();
-                break;
-              }
-            }
-          }
-        }
-      }
-
-      // Clean up extracted fields and validate
-      if (extractedGoal) {
-        extractedGoal = extractedGoal.replace(/^[:\-\s]+/, '').trim();
-        if (extractedGoal.length > 300 || extractedGoal.length < 5) extractedGoal = '';
-      }
-      
-      if (extractedAudience) {
-        extractedAudience = extractedAudience.replace(/^[:\-\s]+/, '').trim();
-        if (extractedAudience.length > 300 || extractedAudience.length < 5) extractedAudience = '';
-      }
-
-      // Update the form fields
-      console.log('📝 Updating form fields with extracted content');
+      // Update the brief text immediately
       setBriefText(text);
-      if (extractedGoal) {
-        console.log('🎯 Setting goal:', extractedGoal);
-        setGoal(extractedGoal);
-      }
-      if (extractedAudience) {
-        console.log('👥 Setting audience:', extractedAudience);
-        setAudience(extractedAudience);
-      }
 
-      // Show success message if parsing was successful
-      if (extractedGoal || extractedAudience) {
-        console.log('✅ Successfully parsed brief:', { 
-          goal: extractedGoal ? 'Found' : 'Not found', 
-          audience: extractedAudience ? 'Found' : 'Not found' 
-        });
-        setProcessingStatus('success');
-        setStatusMessage(`✅ File processed! ${extractedGoal ? 'Goal' : ''}${extractedGoal && extractedAudience ? ' and ' : ''}${extractedAudience ? 'Audience' : ''} automatically detected.`);
-      } else {
-        console.log('⚠️ No goal or audience automatically detected - user can fill manually');
-        setProcessingStatus('success');
-        setStatusMessage(`✅ File content loaded. Please fill goal and audience fields manually.`);
-      }
+      // Step 2: Parse brief using AI API
+      setStatusMessage(`Analyzing brief content with AI...`);
+      const aiParsedBrief = await callBriefParsingAPI(text, file.name);
+      
+      // Update parsed fields
+      console.log('📝 Updating form fields with AI-parsed content');
+      setParsedFields(aiParsedBrief);
+
+      // Count how many fields were successfully parsed
+      const parsedFieldCount = Object.values(aiParsedBrief).filter(value => {
+        if (Array.isArray(value)) return value.length > 0;
+        return value && value.toString().trim().length > 0;
+      }).length;
+
+      console.log('✅ Successfully parsed brief with AI:', { 
+        fieldsExtracted: parsedFieldCount,
+        goal: aiParsedBrief.goal ? 'Found' : 'Not found',
+        audience: aiParsedBrief.targetAudience ? 'Found' : 'Not found',
+        benefits: aiParsedBrief.keyBenefits?.length || 0
+      });
+
+      setProcessingStatus('success');
+      setStatusMessage(`✅ AI analysis complete! Extracted ${parsedFieldCount} structured fields from your brief.`);
 
     } catch (error) {
       console.log('❌ File processing error:', error);
@@ -567,43 +530,153 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
       />
 
       <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6 space-y-6">
+        {/* Brief Text */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Campaign Goal
-          </label>
-          <input
-            type="text"
-            value={goal}
-            onChange={(e) => setGoal(e.target.value)}
-            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
-            placeholder="e.g., Increase brand awareness, Drive sales, Launch new product..."
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Target Audience
-          </label>
-          <input
-            type="text"
-            value={audience}
-            onChange={(e) => setAudience(e.target.value)}
-            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
-            placeholder="e.g., Young professionals aged 25-35, Tech enthusiasts..."
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Campaign Brief
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-medium text-gray-300">
+              Campaign Brief (Raw Text)
+            </label>
+            {briefText.length > 50 && (
+              <button
+                onClick={() => callBriefParsingAPI(briefText).then(setParsedFields).catch(console.error)}
+                disabled={isProcessing}
+                className="text-sm bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/30 text-orange-300 px-3 py-1 rounded-lg transition-all duration-300 disabled:opacity-50"
+              >
+                🤖 AI Parse
+              </button>
+            )}
+          </div>
           <textarea
             value={briefText}
             onChange={(e) => setBriefText(e.target.value)}
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all resize-none"
-            rows={8}
-            placeholder="Describe your product, key benefits, brand personality, and any specific requirements..."
+            rows={6}
+            placeholder="Paste or type your campaign brief here, or drag and drop a file above..."
           />
+        </div>
+
+        {/* Parsed Fields Grid */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Campaign Goal *
+            </label>
+            <input
+              type="text"
+              value={parsedFields.goal}
+              onChange={(e) => setParsedFields({...parsedFields, goal: e.target.value})}
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
+              placeholder="e.g., Increase brand awareness, Drive sales..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Target Audience *
+            </label>
+            <input
+              type="text"
+              value={parsedFields.targetAudience}
+              onChange={(e) => setParsedFields({...parsedFields, targetAudience: e.target.value})}
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
+              placeholder="e.g., Young professionals aged 25-35..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Product/Service Details
+            </label>
+            <input
+              type="text"
+              value={parsedFields.productDetails}
+              onChange={(e) => setParsedFields({...parsedFields, productDetails: e.target.value})}
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
+              placeholder="What are you advertising?"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Brand Personality
+            </label>
+            <input
+              type="text"
+              value={parsedFields.brandPersonality}
+              onChange={(e) => setParsedFields({...parsedFields, brandPersonality: e.target.value})}
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
+              placeholder="e.g., Modern, trustworthy, innovative..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Tone & Mood
+            </label>
+            <input
+              type="text"
+              value={parsedFields.toneMood}
+              onChange={(e) => setParsedFields({...parsedFields, toneMood: e.target.value})}
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
+              placeholder="e.g., Professional, friendly, urgent..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Call to Action
+            </label>
+            <input
+              type="text"
+              value={parsedFields.callToAction}
+              onChange={(e) => setParsedFields({...parsedFields, callToAction: e.target.value})}
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
+              placeholder="e.g., Shop now, Learn more, Sign up..."
+            />
+          </div>
+        </div>
+
+        {/* Key Benefits */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Key Benefits (one per line)
+          </label>
+          <textarea
+            value={parsedFields.keyBenefits.join('\n')}
+            onChange={(e) => setParsedFields({...parsedFields, keyBenefits: e.target.value.split('\n').filter(b => b.trim())})}
+            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all resize-none"
+            rows={3}
+            placeholder="List the main benefits or value propositions..."
+          />
+        </div>
+
+        {/* Additional Fields */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Campaign Requirements
+            </label>
+            <input
+              type="text"
+              value={parsedFields.campaignRequirements}
+              onChange={(e) => setParsedFields({...parsedFields, campaignRequirements: e.target.value})}
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
+              placeholder="Specific requirements or constraints..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Competitive Context
+            </label>
+            <input
+              type="text"
+              value={parsedFields.competitiveContext}
+              onChange={(e) => setParsedFields({...parsedFields, competitiveContext: e.target.value})}
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
+              placeholder="Competitor insights or differentiation..."
+            />
+          </div>
         </div>
 
         <div className="flex justify-between">
@@ -615,7 +688,7 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
           </button>
           <button
             onClick={handleContinue}
-            disabled={!briefText || !audience || !goal}
+            disabled={!briefText || !parsedFields.goal || !parsedFields.targetAudience}
             className="bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-300 hover:to-orange-500 text-black font-semibold px-8 py-3 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Continue to Motivations →

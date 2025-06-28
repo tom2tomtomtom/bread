@@ -1,11 +1,29 @@
 import { Handler } from '@netlify/functions';
 
+interface ParsedBrief {
+  goal: string;
+  targetAudience: string;
+  keyBenefits: string[];
+  brandPersonality: string;
+  productDetails: string;
+  campaignRequirements: string;
+  toneMood: string;
+  callToAction: string;
+  competitiveContext: string;
+  constraints: string;
+}
+
 interface CopyGenerationRequest {
-  brief: string;
+  // Legacy fields for backward compatibility
+  brief?: string;
   selectedMotivations: string[];
   templateType: string;
-  targetAudience: string;
+  targetAudience?: string;
   additionalRequirements?: string;
+  
+  // New comprehensive brief data
+  parsedBrief?: ParsedBrief;
+  briefText?: string;
 }
 
 interface CopyVariation {
@@ -48,13 +66,29 @@ export const handler: Handler = async (event, context) => {
   try {
     const request: CopyGenerationRequest = JSON.parse(event.body || '{}');
     
-    if (!request.brief || !request.selectedMotivations || request.selectedMotivations.length === 0) {
+    // Check if we have required data
+    const hasParsedBrief = request.parsedBrief && request.parsedBrief.goal;
+    const hasLegacyBrief = request.brief;
+    const hasMotivations = request.selectedMotivations && request.selectedMotivations.length > 0;
+    
+    if (!hasMotivations) {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({ 
           success: false, 
-          error: 'Missing required fields: brief, selectedMotivations' 
+          error: 'Missing required field: selectedMotivations' 
+        }),
+      };
+    }
+    
+    if (!hasParsedBrief && !hasLegacyBrief) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ 
+          success: false, 
+          error: 'Missing required brief data. Need either parsedBrief or legacy brief field' 
         }),
       };
     }
@@ -162,22 +196,57 @@ export const handler: Handler = async (event, context) => {
 
   // Real OpenAI API call
   try {
-    const prompt = `Generate 3-4 compelling advertising copy variations based on the following:
+    // Prepare campaign data from either parsed brief or legacy fields
+    let campaignData = '';
+    
+    if (request.parsedBrief) {
+      const pb = request.parsedBrief;
+      campaignData = `
+CAMPAIGN GOAL: ${pb.goal}
+TARGET AUDIENCE: ${pb.targetAudience}
+PRODUCT/SERVICE: ${pb.productDetails || 'Not specified'}
+KEY BENEFITS: ${pb.keyBenefits.length > 0 ? pb.keyBenefits.join(', ') : 'Not specified'}
+BRAND PERSONALITY: ${pb.brandPersonality || 'Not specified'}
+DESIRED TONE & MOOD: ${pb.toneMood || 'Not specified'}
+PREFERRED CALL TO ACTION: ${pb.callToAction || 'Not specified'}
+COMPETITIVE CONTEXT: ${pb.competitiveContext || 'Not specified'}
+CAMPAIGN REQUIREMENTS: ${pb.campaignRequirements || 'Not specified'}
+CONSTRAINTS: ${pb.constraints || 'Not specified'}
 
-Brief: ${request.brief}
-Target Audience: ${request.targetAudience}
-Selected Motivations: ${request.selectedMotivations.join(', ')}
-Template Type: ${request.templateType || 'general'}
+RAW BRIEF: ${request.briefText || 'Not provided'}`;
+    } else {
+      // Legacy format
+      campaignData = `
+BRIEF: ${request.brief}
+TARGET AUDIENCE: ${request.targetAudience || 'Not specified'}`;
+    }
+
+    const prompt = `Generate 3-4 compelling advertising copy variations based on the following detailed campaign information:
+
+${campaignData}
+
+SELECTED MOTIVATIONS: ${request.selectedMotivations.join(', ')}
+TEMPLATE TYPE: ${request.templateType || 'general'}
+
+Analyze all the provided campaign details to create highly targeted copy that:
+- Aligns with the specific campaign goal and drives the desired action
+- Resonates deeply with the target audience's psychology and needs
+- Incorporates the key benefits and product details naturally
+- Matches the desired brand personality and tone
+- Uses the preferred call-to-action or creates appropriate alternatives
+- Leverages the selected psychological motivations effectively
+- Considers competitive context and positioning
+- Adheres to any specified constraints or requirements
 
 For each copy variation, provide:
 1. A compelling headline (max 60 characters)
-2. Body text that expands on the headline (max 150 characters)
+2. Body text that expands on the headline (max 150 characters)  
 3. A strong call-to-action (max 20 characters)
 4. An optional subheadline (max 40 characters)
-5. The tone (urgent, friendly, professional, emotional, playful, authoritative)
-6. A confidence score (0-100)
-7. Reasoning for why this copy works for the audience
-8. Which motivation ID it relates to
+5. The tone that best fits the brief (urgent, friendly, professional, emotional, playful, authoritative)
+6. A confidence score (0-100) based on how well it fits the brief
+7. Reasoning for why this copy works for the specific campaign
+8. Which motivation ID it relates to most strongly
 
 Return the response as a JSON array with this exact structure:
 [
@@ -185,16 +254,16 @@ Return the response as a JSON array with this exact structure:
     "id": "unique-id",
     "headline": "Compelling Headline",
     "bodyText": "Expanded body text that sells the benefit",
-    "callToAction": "Action Text",
+    "callToAction": "Action Text", 
     "subheadline": "Optional subheadline",
     "motivationId": "related-motivation",
     "confidenceScore": 85,
-    "reasoning": "Why this copy works for the target audience",
+    "reasoning": "Why this copy works for this specific campaign and audience",
     "tone": "urgent|friendly|professional|emotional|playful|authoritative"
   }
 ]
 
-Make the copy specific to the brief and motivations provided.`;
+Make the copy highly specific to the campaign details and motivations provided.`;
 
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',

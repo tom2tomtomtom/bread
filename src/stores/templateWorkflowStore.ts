@@ -29,6 +29,19 @@ export interface SelectedTemplate {
   };
 }
 
+export interface ParsedBrief {
+  goal: string;
+  targetAudience: string;
+  keyBenefits: string[];
+  brandPersonality: string;
+  productDetails: string;
+  campaignRequirements: string;
+  toneMood: string;
+  callToAction: string;
+  competitiveContext: string;
+  constraints: string;
+}
+
 interface TemplateWorkflowState {
   // Workflow progress
   currentStep: WorkflowStep;
@@ -37,7 +50,11 @@ interface TemplateWorkflowState {
   // Template selection
   selectedTemplate: SelectedTemplate | null;
   
-  // Brief data
+  // Brief data (comprehensive parsed fields)
+  briefText: string; // Raw brief text
+  parsedBrief: ParsedBrief | null; // AI-parsed structured brief
+  
+  // Legacy fields for backward compatibility
   brief: string;
   targetAudience: string;
   campaignGoal: string;
@@ -50,6 +67,7 @@ interface TemplateWorkflowState {
   markStepCompleted: (step: WorkflowStep) => void;
   selectTemplate: (template: SelectedTemplate) => void;
   setBrief: (brief: string, targetAudience: string, campaignGoal: string) => void;
+  setParsedBrief: (briefText: string, parsedBrief: ParsedBrief) => void;
   validateStep: (step: WorkflowStep) => boolean;
   canProceedToStep: (step: WorkflowStep) => boolean;
   resetWorkflow: () => void;
@@ -79,6 +97,8 @@ export const useTemplateWorkflowStore = create<TemplateWorkflowState>()(
       currentStep: 'template-selection',
       completedSteps: [],
       selectedTemplate: null,
+      briefText: '',
+      parsedBrief: null,
       brief: '',
       targetAudience: '',
       campaignGoal: '',
@@ -103,9 +123,22 @@ export const useTemplateWorkflowStore = create<TemplateWorkflowState>()(
         get().markStepCompleted('template-selection');
       },
 
-      // Set brief data
+      // Set brief data (legacy method)
       setBrief: (brief: string, targetAudience: string, campaignGoal: string) => {
         set({ brief, targetAudience, campaignGoal });
+        get().markStepCompleted('brief-input');
+      },
+
+      // Set parsed brief data (new comprehensive method)
+      setParsedBrief: (briefText: string, parsedBrief: ParsedBrief) => {
+        set({ 
+          briefText, 
+          parsedBrief,
+          // Update legacy fields for backward compatibility
+          brief: briefText,
+          targetAudience: parsedBrief.targetAudience,
+          campaignGoal: parsedBrief.goal
+        });
         get().markStepCompleted('brief-input');
       },
 
@@ -117,6 +150,10 @@ export const useTemplateWorkflowStore = create<TemplateWorkflowState>()(
           case 'template-selection':
             return !!state.selectedTemplate;
           case 'brief-input':
+            // Check if we have parsed brief or legacy fields
+            if (state.parsedBrief) {
+              return !!(state.briefText && state.parsedBrief.goal && state.parsedBrief.targetAudience);
+            }
             return !!(state.brief && state.targetAudience && state.campaignGoal);
           case 'motivation-generation':
             // Check if motivations are generated and selected (would integrate with motivationStore)
@@ -165,6 +202,8 @@ export const useTemplateWorkflowStore = create<TemplateWorkflowState>()(
           currentStep: 'template-selection',
           completedSteps: [],
           selectedTemplate: null,
+          briefText: '',
+          parsedBrief: null,
           brief: '',
           targetAudience: '',
           campaignGoal: '',
@@ -221,6 +260,8 @@ export const useTemplateWorkflowStore = create<TemplateWorkflowState>()(
         currentStep: state.currentStep,
         completedSteps: state.completedSteps,
         selectedTemplate: state.selectedTemplate,
+        briefText: state.briefText,
+        parsedBrief: state.parsedBrief,
         brief: state.brief,
         targetAudience: state.targetAudience,
         campaignGoal: state.campaignGoal,
