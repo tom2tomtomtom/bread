@@ -44,14 +44,14 @@ export class PDFExportService {
         includeConfidenceScores = true,
         includeCompliance = true,
         format = 'a4',
-        orientation = 'portrait'
+        orientation = 'portrait',
       } = options;
 
       // Create PDF document
       const pdf = new jsPDF({
         orientation,
         unit: 'mm',
-        format
+        format,
       });
 
       // Set document properties
@@ -75,7 +75,7 @@ export class PDFExportService {
       for (const territory of generatedOutput.territories) {
         yPosition = await this.addTerritory(pdf, territory, yPosition, {
           includeImages,
-          includeConfidenceScores
+          includeConfidenceScores,
         });
 
         // Add new page if needed
@@ -104,14 +104,13 @@ export class PDFExportService {
       return {
         success: true,
         filename,
-        size: pdf.internal.pages.length
+        size: pdf.internal.pages.length,
       };
-
     } catch (error) {
       console.error('PDF Export Error:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
       };
     }
   }
@@ -129,7 +128,7 @@ export class PDFExportService {
         scale: 2,
         useCORS: true,
         allowTaint: false,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
       });
 
       // Calculate PDF dimensions
@@ -163,14 +162,13 @@ export class PDFExportService {
       return {
         success: true,
         filename,
-        size: pdf.internal.pages.length
+        size: pdf.internal.pages.length,
       };
-
     } catch (error) {
       console.error('Element to PDF Export Error:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to export element to PDF'
+        error: error instanceof Error ? error.message : 'Failed to export element to PDF',
       };
     }
   }
@@ -180,15 +178,15 @@ export class PDFExportService {
     pdf.setFontSize(24);
     pdf.setFont('helvetica', 'bold');
     pdf.text('AIDEAS', 20, 20);
-    
+
     pdf.setFontSize(16);
     pdf.setFont('helvetica', 'normal');
     pdf.text('Creative Territories Report', 20, 30);
-    
+
     // Add timestamp
     pdf.setFontSize(10);
     pdf.text(`Generated: ${new Date().toLocaleString()}`, 20, 40);
-    
+
     // Add separator line
     pdf.setLineWidth(0.5);
     pdf.line(20, 45, 190, 45);
@@ -198,9 +196,10 @@ export class PDFExportService {
     pdf.setFontSize(14);
     pdf.setFont('helvetica', 'bold');
     pdf.text('Overall Confidence Score', 20, 55);
-    
+
     // Color code confidence score
-    const color = confidence >= 80 ? [34, 197, 94] : confidence >= 60 ? [245, 158, 11] : [239, 68, 68];
+    const color =
+      confidence >= 80 ? [34, 197, 94] : confidence >= 60 ? [245, 158, 11] : [239, 68, 68];
     pdf.setTextColor(color[0], color[1], color[2]);
     pdf.text(`${confidence}%`, 120, 55);
     pdf.setTextColor(0, 0, 0); // Reset to black
@@ -223,7 +222,7 @@ export class PDFExportService {
     // Territory details
     pdf.setFontSize(11);
     pdf.setFont('helvetica', 'normal');
-    
+
     // Positioning
     pdf.text('Positioning:', 20, currentY);
     const positioningLines = pdf.splitTextToSize(territory.positioning, 150);
@@ -239,17 +238,19 @@ export class PDFExportService {
     // Confidence scores if enabled
     if (options.includeConfidenceScores && territory.confidence) {
       const avgConfidence = Math.round(
-        (territory.confidence.marketFit + 
-         territory.confidence.complianceConfidence + 
-         territory.confidence.audienceResonance) / 3
+        (territory.confidence.marketFit +
+          territory.confidence.complianceConfidence +
+          territory.confidence.audienceResonance) /
+          3
       );
-      
+
       pdf.text('Confidence:', 20, currentY);
-      const color = avgConfidence >= 80 ? [34, 197, 94] : avgConfidence >= 60 ? [245, 158, 11] : [239, 68, 68];
+      const color =
+        avgConfidence >= 80 ? [34, 197, 94] : avgConfidence >= 60 ? [245, 158, 11] : [239, 68, 68];
       pdf.setTextColor(color[0], color[1], color[2]);
       pdf.text(`${avgConfidence}%`, 60, currentY);
       pdf.setTextColor(0, 0, 0);
-      
+
       pdf.text(`Risk Level: ${territory.confidence.riskLevel}`, 90, currentY);
       currentY += 8;
     }
@@ -263,20 +264,20 @@ export class PDFExportService {
     territory.headlines.forEach((headline: any, index: number) => {
       pdf.text(`${index + 1}. "${headline.text}"`, 25, currentY);
       currentY += 6;
-      
+
       if (headline.followUp) {
         const followUpLines = pdf.splitTextToSize(headline.followUp, 140);
         pdf.text(followUpLines, 30, currentY);
         currentY += followUpLines.length * 4 + 2;
       }
-      
+
       if (options.includeConfidenceScores && headline.confidence) {
         pdf.setFontSize(9);
         pdf.text(`Confidence: ${headline.confidence}%`, 30, currentY);
         currentY += 5;
         pdf.setFontSize(11);
       }
-      
+
       currentY += 3;
     });
 
@@ -288,29 +289,29 @@ export class PDFExportService {
     pdf.setFontSize(16);
     pdf.setFont('helvetica', 'bold');
     pdf.text('Compliance Summary', 20, yPosition);
-    
+
     pdf.setFontSize(11);
     pdf.setFont('helvetica', 'normal');
-    
+
     let currentY = yPosition + 10;
-    
+
     if (compliance.output) {
       pdf.text('Output:', 20, currentY);
       const outputLines = pdf.splitTextToSize(compliance.output, 150);
       pdf.text(outputLines, 20, currentY + 5);
       currentY += outputLines.length * 5 + 10;
     }
-    
+
     if (compliance.powerBy && compliance.powerBy.length > 0) {
       pdf.text('Powered by:', 20, currentY);
       pdf.text(compliance.powerBy.join(', '), 20, currentY + 5);
       currentY += 15;
     }
-    
+
     if (compliance.notes && compliance.notes.length > 0) {
       pdf.text('Notes:', 20, currentY);
       currentY += 8;
-      
+
       compliance.notes.forEach((note: string) => {
         const noteLines = pdf.splitTextToSize(`• ${note}`, 160);
         pdf.text(noteLines, 25, currentY);

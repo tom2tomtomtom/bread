@@ -1,6 +1,6 @@
 /**
  * 🎨 Text-to-Image Generator Component
- * 
+ *
  * Advanced AI-powered image generation with territory-driven prompts,
  * brand consistency, and cultural context adaptation.
  */
@@ -25,13 +25,8 @@ export const TextToImageGenerator: React.FC<TextToImageGeneratorProps> = ({
   onImageGenerated,
   onClose,
 }) => {
-  const {
-    generateImage,
-    enhancePrompt,
-    isGeneratingImage,
-    generationError,
-    clearGenerationError,
-  } = useAssetStore();
+  const { generateImage, enhancePrompt, isGeneratingImage, generationError, clearGenerationError } =
+    useAssetStore();
 
   // Note: currentTerritory not available in app store - using fallback
   const currentTerritory: any = null; // TODO: Replace with proper territory selection
@@ -131,7 +126,6 @@ export const TextToImageGenerator: React.FC<TextToImageGeneratorProps> = ({
 
       const queueId = await generateImage(request);
       onImageGenerated?.(queueId);
-
     } catch (error) {
       console.error('Image generation failed:', error);
     }
@@ -155,16 +149,16 @@ export const TextToImageGenerator: React.FC<TextToImageGeneratorProps> = ({
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">
-          🎨 AI Image Generation
-        </h2>
+        <h2 className="text-2xl font-bold text-gray-900">🎨 AI Image Generation</h2>
         {onClose && (
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         )}
@@ -183,20 +177,16 @@ export const TextToImageGenerator: React.FC<TextToImageGeneratorProps> = ({
 
       {/* Prompt Input */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Image Description
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Image Description</label>
         <textarea
           value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
+          onChange={e => setPrompt(e.target.value)}
           placeholder="Describe the image you want to generate..."
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           rows={3}
         />
         <div className="flex justify-between items-center mt-2">
-          <span className="text-xs text-gray-500">
-            {prompt.length}/500 characters
-          </span>
+          <span className="text-xs text-gray-500">{prompt.length}/500 characters</span>
           <button
             onClick={handleEnhancePrompt}
             disabled={!prompt.trim() || !currentTerritory || isEnhancing}
@@ -218,12 +208,10 @@ export const TextToImageGenerator: React.FC<TextToImageGeneratorProps> = ({
       {/* Generation Options */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Image Type
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Image Type</label>
           <select
             value={imageType}
-            onChange={(e) => setImageType(e.target.value as ImageType)}
+            onChange={e => setImageType(e.target.value as ImageType)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="background">Background</option>
@@ -236,12 +224,10 @@ export const TextToImageGenerator: React.FC<TextToImageGeneratorProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Cultural Context
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Cultural Context</label>
           <select
             value={culturalContext}
-            onChange={(e) => setCulturalContext(e.target.value as CulturalContext)}
+            onChange={e => setCulturalContext(e.target.value as CulturalContext)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="australian">Australian</option>
@@ -251,12 +237,10 @@ export const TextToImageGenerator: React.FC<TextToImageGeneratorProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Quality
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Quality</label>
           <select
             value={quality}
-            onChange={(e) => setQuality(e.target.value as 'standard' | 'hd' | 'ultra')}
+            onChange={e => setQuality(e.target.value as 'standard' | 'hd' | 'ultra')}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="standard">Standard</option>
@@ -266,12 +250,10 @@ export const TextToImageGenerator: React.FC<TextToImageGeneratorProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            AI Provider
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">AI Provider</label>
           <select
             value={provider}
-            onChange={(e) => setProvider(e.target.value as AIProvider)}
+            onChange={e => setProvider(e.target.value as AIProvider)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="openai">DALL-E 3</option>
@@ -287,12 +269,10 @@ export const TextToImageGenerator: React.FC<TextToImageGeneratorProps> = ({
           <input
             type="checkbox"
             checked={styleConsistency}
-            onChange={(e) => setStyleConsistency(e.target.checked)}
+            onChange={e => setStyleConsistency(e.target.checked)}
             className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           />
-          <span className="ml-2 text-sm text-gray-700">
-            Maintain brand style consistency
-          </span>
+          <span className="ml-2 text-sm text-gray-700">Maintain brand style consistency</span>
         </label>
       </div>
 
@@ -320,9 +300,25 @@ export const TextToImageGenerator: React.FC<TextToImageGeneratorProps> = ({
         >
           {isGeneratingImage ? (
             <>
-              <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <svg
+                className="animate-spin -ml-1 mr-3 h-4 w-4 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
               Generating...
             </>

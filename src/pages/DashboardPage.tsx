@@ -33,9 +33,7 @@ export const DashboardPage: React.FC = () => {
           <h1 className="text-4xl font-bold text-white mb-4">
             Welcome back, {user?.name || 'Creator'}! 👋
           </h1>
-          <p className="text-gray-400 text-lg">
-            Ready to create your next breakthrough campaign?
-          </p>
+          <p className="text-gray-400 text-lg">Ready to create your next breakthrough campaign?</p>
         </div>
 
         {/* Quick Actions */}
@@ -111,12 +109,12 @@ export const DashboardPage: React.FC = () => {
             <div className="text-3xl font-bold text-orange-400 mb-2">0</div>
             <p className="text-gray-400">Projects Created</p>
           </div>
-          
+
           <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6 text-center">
             <div className="text-3xl font-bold text-purple-400 mb-2">0</div>
             <p className="text-gray-400">Images Generated</p>
           </div>
-          
+
           <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6 text-center">
             <div className="text-3xl font-bold text-blue-400 mb-2">0</div>
             <p className="text-gray-400">Videos Created</p>

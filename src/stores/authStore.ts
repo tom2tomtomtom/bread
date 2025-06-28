@@ -1,7 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { APP_CONFIG } from '../config/app';
-import { handleError, EnhancedError, getErrorMessage, shouldRetry, getRetryDelay } from '../utils/errorHandler';
+import {
+  handleError,
+  EnhancedError,
+  getErrorMessage,
+  shouldRetry,
+  getRetryDelay,
+} from '../utils/errorHandler';
 
 // Types for authentication
 export interface User {
@@ -157,7 +163,10 @@ export const useAuthStore = create<AuthState>()(
           // Fetch usage stats after successful login
           get().getUsageStats();
         } catch (error: any) {
-          const enhancedError = handleError(error, { action: 'login', credentials: { email: credentials.email } });
+          const enhancedError = handleError(error, {
+            action: 'login',
+            credentials: { email: credentials.email },
+          });
           set({
             isLoading: false,
             error: getErrorMessage(enhancedError),
@@ -333,7 +342,7 @@ export const useAuthStore = create<AuthState>()(
       setEnhancedError: (error: EnhancedError | null) => {
         set({
           enhancedError: error,
-          error: error ? getErrorMessage(error) : null
+          error: error ? getErrorMessage(error) : null,
         });
       },
 

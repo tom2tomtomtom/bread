@@ -1,6 +1,6 @@
 /**
  * 🎬 Multimedia Generation Workflow
- * 
+ *
  * Complete workflow component that demonstrates the full multimedia
  * generation pipeline from territory selection to final asset creation.
  */
@@ -12,11 +12,7 @@ import { TextToImageGenerator } from './TextToImageGenerator';
 import { ImageToVideoGenerator } from './ImageToVideoGenerator';
 import { GenerationQueue } from './GenerationQueue';
 import { MediaPreview } from './MediaPreview';
-import {
-  GenerationQueue as QueueItem,
-  GeneratedAsset,
-  UploadedAsset,
-} from '../../types';
+import { GenerationQueue as QueueItem, GeneratedAsset, UploadedAsset } from '../../types';
 
 interface MultimediaWorkflowProps {
   onComplete?: (assets: GeneratedAsset[]) => void;
@@ -24,16 +20,9 @@ interface MultimediaWorkflowProps {
 
 type WorkflowStep = 'select' | 'image' | 'video' | 'queue' | 'preview' | 'complete';
 
-export const MultimediaWorkflow: React.FC<MultimediaWorkflowProps> = ({
-  onComplete,
-}) => {
-  const {
-    generationQueue,
-    generatedAssets,
-    assets,
-    clearGenerationQueue,
-    getGenerationStatus,
-  } = useAssetStore();
+export const MultimediaWorkflow: React.FC<MultimediaWorkflowProps> = ({ onComplete }) => {
+  const { generationQueue, generatedAssets, assets, clearGenerationQueue, getGenerationStatus } =
+    useAssetStore();
 
   // Note: currentTerritory not available in app store - using fallback
   const currentTerritory: any = null; // TODO: Replace with proper territory selection
@@ -45,17 +34,17 @@ export const MultimediaWorkflow: React.FC<MultimediaWorkflowProps> = ({
 
   // Monitor queue for completed items
   useEffect(() => {
-    const completedItems = generationQueue.filter(item => 
-      item.status === 'complete' && item.result
+    const completedItems = generationQueue.filter(
+      item => item.status === 'complete' && item.result
     );
-    
+
     const newAssets = completedItems
       .map(item => item.result!)
       .filter(asset => !completedAssets.find(existing => existing.id === asset.id));
-    
+
     if (newAssets.length > 0) {
       setCompletedAssets(prev => [...prev, ...newAssets]);
-      
+
       // Auto-advance to preview if we have new assets
       if (currentStep === 'queue' && newAssets.length > 0 && newAssets[0]) {
         setPreviewAsset(newAssets[0]);
@@ -95,11 +84,11 @@ export const MultimediaWorkflow: React.FC<MultimediaWorkflowProps> = ({
     // In a real implementation, this would save the generated asset
     // to the main asset collection
     console.log('💾 Saving asset to collection:', asset.id);
-    
+
     // Move to next asset or complete workflow
     const currentIndex = completedAssets.findIndex(a => a.id === asset.id);
     const nextAsset = completedAssets[currentIndex + 1];
-    
+
     if (nextAsset) {
       setPreviewAsset(nextAsset);
     } else {
@@ -136,9 +125,7 @@ export const MultimediaWorkflow: React.FC<MultimediaWorkflowProps> = ({
     return (
       <div className="bg-white rounded-lg shadow-lg p-8 text-center">
         <div className="text-4xl mb-4">🎯</div>
-        <h2 className="text-xl font-bold text-gray-900 mb-2">
-          No Territory Selected
-        </h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-2">No Territory Selected</h2>
         <p className="text-gray-600 mb-4">
           Please select a territory to begin multimedia generation.
         </p>
@@ -157,9 +144,7 @@ export const MultimediaWorkflow: React.FC<MultimediaWorkflowProps> = ({
       {/* Progress Header */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-gray-900">
-            🎬 Multimedia Generation Workflow
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900">🎬 Multimedia Generation Workflow</h1>
           <button
             onClick={handleReset}
             className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 transition-colors"
@@ -197,9 +182,12 @@ export const MultimediaWorkflow: React.FC<MultimediaWorkflowProps> = ({
               className={`flex flex-col items-center ${
                 currentStep === step.key
                   ? 'text-blue-600'
-                  : index < ['select', 'image', 'video', 'queue', 'preview', 'complete'].indexOf(currentStep)
-                  ? 'text-green-600'
-                  : 'text-gray-400'
+                  : index <
+                      ['select', 'image', 'video', 'queue', 'preview', 'complete'].indexOf(
+                        currentStep
+                      )
+                    ? 'text-green-600'
+                    : 'text-gray-400'
               }`}
             >
               <div className="text-lg mb-1">{step.icon}</div>
@@ -234,9 +222,7 @@ export const MultimediaWorkflow: React.FC<MultimediaWorkflowProps> = ({
               >
                 <div className="text-center">
                   <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">🎨</div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    Generate Images
-                  </h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Generate Images</h3>
                   <p className="text-gray-600 text-sm">
                     Create AI-powered images with territory-driven prompts and brand consistency
                   </p>
@@ -259,9 +245,7 @@ export const MultimediaWorkflow: React.FC<MultimediaWorkflowProps> = ({
               >
                 <div className="text-center">
                   <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">🎬</div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    Generate Videos
-                  </h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Generate Videos</h3>
                   <p className="text-gray-600 text-sm">
                     Transform images into engaging videos with professional animations
                   </p>
@@ -296,14 +280,14 @@ export const MultimediaWorkflow: React.FC<MultimediaWorkflowProps> = ({
               maxItems={20}
               showCompleted={true}
             />
-            
+
             {completedAssets.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                   ✅ Completed Assets ({completedAssets.length})
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {completedAssets.map((asset) => (
+                  {completedAssets.map(asset => (
                     <button
                       key={asset.id}
                       onClick={() => {
@@ -313,9 +297,7 @@ export const MultimediaWorkflow: React.FC<MultimediaWorkflowProps> = ({
                       className="p-3 border border-gray-200 rounded-lg hover:border-blue-500 transition-colors"
                     >
                       <div className="text-center">
-                        <div className="text-2xl mb-2">
-                          {asset.type === 'image' ? '🎨' : '🎬'}
-                        </div>
+                        <div className="text-2xl mb-2">{asset.type === 'image' ? '🎨' : '🎬'}</div>
                         <div className="text-xs text-gray-600 truncate">
                           {asset.type} • {asset.quality}
                         </div>
@@ -342,14 +324,12 @@ export const MultimediaWorkflow: React.FC<MultimediaWorkflowProps> = ({
         {currentStep === 'complete' && (
           <div className="bg-white rounded-lg shadow-lg p-8 text-center">
             <div className="text-6xl mb-4">🎉</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Workflow Complete!
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Workflow Complete!</h2>
             <p className="text-gray-600 mb-6">
-              Successfully generated {completedAssets.length} multimedia assets
-              for the "{currentTerritory.title}" territory.
+              Successfully generated {completedAssets.length} multimedia assets for the "
+              {currentTerritory.title}" territory.
             </p>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="p-4 bg-blue-50 rounded-lg">
                 <div className="text-2xl mb-2">🎨</div>
@@ -369,7 +349,10 @@ export const MultimediaWorkflow: React.FC<MultimediaWorkflowProps> = ({
                 <div className="text-2xl mb-2">⚡</div>
                 <div className="font-medium">Total Time</div>
                 <div className="text-sm text-gray-600">
-                  {Math.round(completedAssets.reduce((sum, asset) => sum + asset.generationTime, 0) / 1000)}s
+                  {Math.round(
+                    completedAssets.reduce((sum, asset) => sum + asset.generationTime, 0) / 1000
+                  )}
+                  s
                 </div>
               </div>
             </div>

@@ -5,7 +5,6 @@ import { DashboardPage, BriefPage, GeneratePage, ResultsPage } from '../pages';
 import { LandingPage } from '../pages/LandingPage';
 
 export const ProtectedRoutes: React.FC = () => {
-
   return (
     <Routes>
       {/* Legacy routes - keep for backward compatibility */}
@@ -43,10 +42,7 @@ export const ProtectedRoutes: React.FC = () => {
       />
 
       {/* All other routes redirect to main integrated experience */}
-      <Route
-        path="*"
-        element={<LandingPage />}
-      />
+      <Route path="*" element={<LandingPage />} />
     </Routes>
   );
 };

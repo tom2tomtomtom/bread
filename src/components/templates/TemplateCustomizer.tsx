@@ -1,6 +1,6 @@
 /**
  * 🎨 Template Customizer Component
- * 
+ *
  * Brand adaptation and template-specific configuration tools for campaign templates.
  * Provides intuitive interface for customizing templates while maintaining brand compliance.
  */
@@ -78,16 +78,14 @@ export const TemplateCustomizer: React.FC<TemplateCustomizerProps> = ({
   };
 
   const handleChannelToggle = (channel: ChannelFormat) => {
-    setSelectedChannels(prev => 
-      prev.includes(channel) 
-        ? prev.filter(c => c !== channel)
-        : [...prev, channel]
+    setSelectedChannels(prev =>
+      prev.includes(channel) ? prev.filter(c => c !== channel) : [...prev, channel]
     );
   };
 
   const handleGeneratePreview = async () => {
     if (selectedChannels.length === 0) return;
-    
+
     setIsGeneratingPreview(true);
     try {
       await generateTemplatePreview(selectedChannels);
@@ -128,7 +126,12 @@ export const TemplateCustomizer: React.FC<TemplateCustomizerProps> = ({
               className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
           )}
@@ -137,14 +140,12 @@ export const TemplateCustomizer: React.FC<TemplateCustomizerProps> = ({
             <p className="text-gray-600 mt-1">{template.name}</p>
           </div>
         </div>
-        
+
         {/* Progress Indicator */}
         <div className="flex items-center space-x-3">
-          <div className="text-sm text-gray-600">
-            {Math.round(completionPercentage)}% Complete
-          </div>
+          <div className="text-sm text-gray-600">{Math.round(completionPercentage)}% Complete</div>
           <div className="w-24 h-2 bg-gray-200 rounded-full">
-            <div 
+            <div
               className="h-2 bg-blue-600 rounded-full transition-all duration-300"
               style={{ width: `${completionPercentage}%` }}
             />
@@ -160,7 +161,7 @@ export const TemplateCustomizer: React.FC<TemplateCustomizerProps> = ({
             { id: 'brand', label: 'Brand Adaptation', icon: '🎨' },
             { id: 'channels', label: 'Channels', icon: '📱' },
             { id: 'preview', label: 'Preview', icon: '👁️' },
-          ].map((tab) => (
+          ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
@@ -226,9 +227,7 @@ export const TemplateCustomizer: React.FC<TemplateCustomizerProps> = ({
                   ⚠️ {validationResults.filter(r => !r.isValid).length} validation errors
                 </span>
               ) : (
-                <span className="text-green-600">
-                  ✅ All validations passed
-                </span>
+                <span className="text-green-600">✅ All validations passed</span>
               )}
             </div>
           )}
@@ -290,7 +289,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Required Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {template.templateConfiguration.requiredInputs.map((input) => (
+          {template.templateConfiguration.requiredInputs.map(input => (
             <div key={input.field}>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 {input.field.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
@@ -299,7 +298,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
               <input
                 type={input.type === 'number' ? 'number' : 'text'}
                 value={getCustomizationValue(input.field)}
-                onChange={(e) => onInputChange(input.field, e.target.value)}
+                onChange={e => onInputChange(input.field, e.target.value)}
                 placeholder={input.examples?.[0] || input.description}
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                   getValidationError(input.field) ? 'border-red-300' : 'border-gray-300'
@@ -318,7 +317,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
         <div>
           <h3 className="text-lg font-medium text-gray-900 mb-4">Optional Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {template.templateConfiguration.optionalInputs.map((input) => (
+            {template.templateConfiguration.optionalInputs.map(input => (
               <div key={input.field}>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   {input.field.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
@@ -326,7 +325,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                 <input
                   type={input.type === 'number' ? 'number' : 'text'}
                   value={getCustomizationValue(input.field) || input.defaultValue}
-                  onChange={(e) => onInputChange(input.field, e.target.value)}
+                  onChange={e => onInputChange(input.field, e.target.value)}
                   placeholder={input.description}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
@@ -363,21 +362,22 @@ const BrandAdaptationTab: React.FC<BrandAdaptationTabProps> = ({
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Brand Customization</h3>
         <div className="space-y-6">
-          {template.brandAdaptation.customizationOptions.map((option) => (
+          {template.brandAdaptation.customizationOptions.map(option => (
             <div key={option.name}>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {option.name}
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{option.name}</label>
               <p className="text-gray-500 text-sm mb-3">{option.description}</p>
 
               {option.type === 'color' && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {option.options.map((choice) => (
+                  {option.options.map(choice => (
                     <button
                       key={String(choice.value)}
-                      onClick={() => onInputChange(option.name.toLowerCase().replace(' ', '_'), choice.value)}
+                      onClick={() =>
+                        onInputChange(option.name.toLowerCase().replace(' ', '_'), choice.value)
+                      }
                       className={`p-3 border rounded-lg text-left hover:shadow-md transition-all ${
-                        getCustomizationValue(option.name.toLowerCase().replace(' ', '_')) === choice.value
+                        getCustomizationValue(option.name.toLowerCase().replace(' ', '_')) ===
+                        choice.value
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-200'
                       }`}
@@ -398,11 +398,13 @@ const BrandAdaptationTab: React.FC<BrandAdaptationTabProps> = ({
               {option.type === 'typography' && (
                 <select
                   value={getCustomizationValue(option.name.toLowerCase().replace(' ', '_'))}
-                  onChange={(e) => onInputChange(option.name.toLowerCase().replace(' ', '_'), e.target.value)}
+                  onChange={e =>
+                    onInputChange(option.name.toLowerCase().replace(' ', '_'), e.target.value)
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">Select {option.name}</option>
-                  {option.options.map((choice) => (
+                  {option.options.map(choice => (
                     <option key={String(choice.value)} value={String(choice.value)}>
                       {choice.label}
                     </option>
@@ -422,10 +424,15 @@ const BrandAdaptationTab: React.FC<BrandAdaptationTabProps> = ({
           {template.brandAdaptation.brandConsistency.map((rule, index) => (
             <div key={index} className="p-4 bg-gray-50 rounded-lg">
               <div className="flex items-start space-x-3">
-                <div className={`mt-1 w-3 h-3 rounded-full ${
-                  rule.enforcement === 'strict' ? 'bg-red-500' :
-                  rule.enforcement === 'flexible' ? 'bg-yellow-500' : 'bg-green-500'
-                }`} />
+                <div
+                  className={`mt-1 w-3 h-3 rounded-full ${
+                    rule.enforcement === 'strict'
+                      ? 'bg-red-500'
+                      : rule.enforcement === 'flexible'
+                        ? 'bg-yellow-500'
+                        : 'bg-green-500'
+                  }`}
+                />
                 <div>
                   <h4 className="font-medium text-gray-900">{rule.rule}</h4>
                   <p className="text-gray-600 text-sm mt-1">
@@ -479,11 +486,12 @@ const ChannelsTab: React.FC<ChannelsTabProps> = ({
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Select Channels</h3>
         <p className="text-gray-600 mb-6">
-          Choose the channels where you want to deploy this campaign. Each channel will be optimized according to the template's specifications.
+          Choose the channels where you want to deploy this campaign. Each channel will be optimized
+          according to the template's specifications.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {template.channelSpecs.supportedChannels.map((channel) => {
+          {template.channelSpecs.supportedChannels.map(channel => {
             const isSelected = selectedChannels.includes(channel);
             const priority = template.channelSpecs.channelPriority.find(p => p.channel === channel);
 
@@ -492,25 +500,29 @@ const ChannelsTab: React.FC<ChannelsTabProps> = ({
                 key={channel}
                 onClick={() => onChannelToggle(channel)}
                 className={`p-4 border rounded-lg text-left hover:shadow-md transition-all ${
-                  isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
+                  isSelected
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="text-2xl">{getChannelIcon(channel)}</div>
                   {priority && (
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      priority.priority === 'primary' ? 'bg-green-100 text-green-800' :
-                      priority.priority === 'secondary' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        priority.priority === 'primary'
+                          ? 'bg-green-100 text-green-800'
+                          : priority.priority === 'secondary'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
                       {priority.priority}
                     </span>
                   )}
                 </div>
                 <h4 className="font-medium text-gray-900 mb-1">{getChannelName(channel)}</h4>
-                {priority && (
-                  <p className="text-gray-600 text-sm">{priority.reasoning}</p>
-                )}
+                {priority && <p className="text-gray-600 text-sm">{priority.reasoning}</p>}
                 <div className="mt-2 flex items-center justify-between text-sm">
                   <span className="text-gray-500">Expected Impact:</span>
                   <span className="font-medium text-gray-700">
@@ -529,15 +541,20 @@ const ChannelsTab: React.FC<ChannelsTabProps> = ({
           <div className="p-4 bg-blue-50 rounded-lg">
             <h4 className="font-medium text-blue-900 mb-2">Cross-Channel Coordination</h4>
             <p className="text-blue-800 text-sm mb-3">
-              Consistency Level: <span className="font-medium">{template.channelSpecs.crossChannelStrategy.consistencyLevel}</span>
+              Consistency Level:{' '}
+              <span className="font-medium">
+                {template.channelSpecs.crossChannelStrategy.consistencyLevel}
+              </span>
             </p>
             <div className="space-y-2">
-              {template.channelSpecs.crossChannelStrategy.messagingAlignment.map((alignment, index) => (
-                <div key={index} className="flex items-center text-sm text-blue-700">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-2" />
-                  {alignment}
-                </div>
-              ))}
+              {template.channelSpecs.crossChannelStrategy.messagingAlignment.map(
+                (alignment, index) => (
+                  <div key={index} className="flex items-center text-sm text-blue-700">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-2" />
+                    {alignment}
+                  </div>
+                )
+              )}
             </div>
           </div>
         </div>
@@ -586,7 +603,8 @@ const PreviewTab: React.FC<PreviewTabProps> = ({
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
         <h3 className="text-gray-600 text-lg font-medium mb-2">Generating Preview...</h3>
         <p className="text-gray-500">
-          Creating optimized assets for {selectedChannels.length} channel{selectedChannels.length !== 1 ? 's' : ''}
+          Creating optimized assets for {selectedChannels.length} channel
+          {selectedChannels.length !== 1 ? 's' : ''}
         </p>
       </div>
     );
@@ -597,7 +615,7 @@ const PreviewTab: React.FC<PreviewTabProps> = ({
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Preview Assets</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {previewAssets.map((asset) => (
+          {previewAssets.map(asset => (
             <div key={asset.id} className="border border-gray-200 rounded-lg overflow-hidden">
               <div className="aspect-square bg-gray-100 flex items-center justify-center">
                 {asset.type === 'image' ? (
@@ -605,8 +623,9 @@ const PreviewTab: React.FC<PreviewTabProps> = ({
                     src={asset.url}
                     alt={`Preview for ${asset.channel}`}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk3YTNiNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIFByZXZpZXc8L3RleHQ+PC9zdmc+';
+                    onError={e => {
+                      (e.target as HTMLImageElement).src =
+                        'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk3YTNiNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIFByZXZpZXc8L3RleHQ+PC9zdmc+';
                     }}
                   />
                 ) : (
@@ -616,13 +635,19 @@ const PreviewTab: React.FC<PreviewTabProps> = ({
               <div className="p-4">
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-medium text-gray-900">
-                    {asset.channel.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                    {asset.channel
+                      .replace('_', ' ')
+                      .replace(/\b\w/g, (l: string) => l.toUpperCase())}
                   </h4>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    asset.status === 'ready' ? 'bg-green-100 text-green-800' :
-                    asset.status === 'generating' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      asset.status === 'ready'
+                        ? 'bg-green-100 text-green-800'
+                        : asset.status === 'generating'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-red-100 text-red-800'
+                    }`}
+                  >
                     {asset.status}
                   </span>
                 </div>

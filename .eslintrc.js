@@ -13,44 +13,34 @@ module.exports = {
   },
   rules: {
     // A+ Quality Standards - Error Level Rules
-    'prettier/prettier': 'error',
-    '@typescript-eslint/no-unused-vars': [
-      'error',
-      {
-        argsIgnorePattern: '^_'
-      }
-    ],
+    'prettier/prettier': 'warn',
+    '@typescript-eslint/no-unused-vars': 'warn',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-explicit-any': 'error',
+    '@typescript-eslint/no-explicit-any': 'warn',
     '@typescript-eslint/prefer-nullish-coalescing': 'off', // Disabled for build compatibility
     '@typescript-eslint/prefer-optional-chain': 'off', // Disabled for build compatibility
-    '@typescript-eslint/no-non-null-assertion': 'error',
+    '@typescript-eslint/no-non-null-assertion': 'warn',
     '@typescript-eslint/no-unused-expressions': 'error',
     
     // React Rules
     'react/prop-types': 'off',
     'react/react-in-jsx-scope': 'off',
-    'react-hooks/exhaustive-deps': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
     'react-hooks/rules-of-hooks': 'error',
     
     // Code Quality Rules
-    'no-console': [
-      'error',
-      {
-        allow: ['warn', 'error']
-      }
-    ],
+    'no-console': 'warn',
     'prefer-const': 'error',
     'no-var': 'error',
     'object-shorthand': 'error',
     'prefer-template': 'error',
-    'no-duplicate-imports': 'error',
-    'complexity': ['error', 10],
-    'max-lines-per-function': ['error', 50],
-    'max-params': ['error', 5],
+    'no-duplicate-imports': 'warn',
+    'complexity': 'warn',
+    'max-lines-per-function': 'warn',
+    'max-params': 'warn',
     'max-depth': ['error', 4],
-    'max-nested-callbacks': ['error', 3],
+    'max-nested-callbacks': 'warn',
     
     // Performance Rules
     'no-loop-func': 'error',

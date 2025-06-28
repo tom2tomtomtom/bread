@@ -44,12 +44,22 @@ const AssetLibraryComponent: React.FC<AssetLibraryProps> = ({
   const filteredAndSortedAssets = useMemo(() => {
     console.log('🔍 AssetLibrary Debug:', {
       totalAssets: assets.length,
-      assets: assets.map(a => ({ id: a.id, filename: a.filename, type: a.type, format: a.format, tags: a.tags })),
-      activeFilters: filters
+      assets: assets.map(a => ({
+        id: a.id,
+        filename: a.filename,
+        type: a.type,
+        format: a.format,
+        tags: a.tags,
+      })),
+      activeFilters: filters,
     });
-    
+
     const filtered = applyFilters();
-    console.log('📋 Filtered assets:', filtered.length, filtered.map(a => ({ id: a.id, filename: a.filename })));
+    console.log(
+      '📋 Filtered assets:',
+      filtered.length,
+      filtered.map(a => ({ id: a.id, filename: a.filename }))
+    );
 
     // Apply sorting
     filtered.sort((a, b) => {
@@ -83,17 +93,23 @@ const AssetLibraryComponent: React.FC<AssetLibraryProps> = ({
 
   const usageStats = getAssetUsageStats();
 
-  const handleAssetClick = useCallback((asset: UploadedAsset) => {
-    if (selectionMode) {
-      toggleAssetSelection(asset.id);
-    } else {
-      onAssetSelect?.(asset);
-    }
-  }, [selectionMode, toggleAssetSelection, onAssetSelect]);
+  const handleAssetClick = useCallback(
+    (asset: UploadedAsset) => {
+      if (selectionMode) {
+        toggleAssetSelection(asset.id);
+      } else {
+        onAssetSelect?.(asset);
+      }
+    },
+    [selectionMode, toggleAssetSelection, onAssetSelect]
+  );
 
-  const handleAssetDoubleClick = useCallback((asset: UploadedAsset) => {
-    onAssetPreview?.(asset);
-  }, [onAssetPreview]);
+  const handleAssetDoubleClick = useCallback(
+    (asset: UploadedAsset) => {
+      onAssetPreview?.(asset);
+    },
+    [onAssetPreview]
+  );
 
   const handleDeleteSelected = async () => {
     if (selectedAssets.length === 0) return;

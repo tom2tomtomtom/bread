@@ -11,7 +11,7 @@ export const GeneratePage: React.FC = () => {
   const { brief, showOutput, generatedOutput } = useGenerationStore();
 
   const handleAdminToggle = () => setShowAdmin(!showAdmin);
-  
+
   const handleBackToBrief = () => {
     navigate('/brief');
   };
@@ -56,17 +56,23 @@ export const GeneratePage: React.FC = () => {
         <div className="mb-8">
           <div className="flex items-center justify-center space-x-4 mb-4">
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold">✓</div>
+              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold">
+                ✓
+              </div>
               <span className="ml-2 text-green-400 font-medium">Brief</span>
             </div>
             <div className="w-16 h-1 bg-green-500 rounded"></div>
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-semibold">2</div>
+              <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-semibold">
+                2
+              </div>
               <span className="ml-2 text-orange-400 font-medium">Generate</span>
             </div>
             <div className="w-16 h-1 bg-gray-600 rounded"></div>
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-gray-400 font-semibold">3</div>
+              <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-gray-400 font-semibold">
+                3
+              </div>
               <span className="ml-2 text-gray-400">Results</span>
             </div>
           </div>

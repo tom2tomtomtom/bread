@@ -30,7 +30,7 @@ interface GenerationOrchestratorProps {
  */
 export const GenerationOrchestrator: React.FC<GenerationOrchestratorProps> = ({
   children,
-  onShowLogin
+  onShowLogin,
 }) => {
   const { isAuthenticated } = useAuthStore();
 
@@ -48,18 +48,11 @@ export const GenerationOrchestrator: React.FC<GenerationOrchestratorProps> = ({
     updateRealTimeAnalysis,
   } = useGenerationStore();
 
-  const {
-    prompts,
-    generateImages,
-  } = useConfigStore();
+  const { prompts, generateImages } = useConfigStore();
 
-  const {
-    starredItems,
-  } = useStarredStore();
+  const { starredItems } = useStarredStore();
 
-  const {
-    showToastMessage,
-  } = useUIStore();
+  const { showToastMessage } = useUIStore();
 
   // Real-time brief analysis
   const handleBriefChange = (newBrief: string) => {
@@ -132,7 +125,8 @@ Please provide a structured response with territories, headlines, and compliance
       console.log('✅ Generation completed successfully');
     } catch (error: unknown) {
       console.error('❌ Generation failed:', error);
-      const errorMessage = error instanceof Error ? error.message : APP_CONFIG.errors.generation.apiError;
+      const errorMessage =
+        error instanceof Error ? error.message : APP_CONFIG.errors.generation.apiError;
       setError(errorMessage);
       showToastMessage(errorMessage, 'error');
     } finally {
@@ -185,7 +179,7 @@ Please provide a structured response with territories, headlines, and compliance
     brief,
     isGenerating,
     generatedOutput,
-    
+
     // Handlers
     handleGenerate,
     handleBriefChange,
@@ -198,7 +192,7 @@ Please provide a structured response with territories, headlines, and compliance
   return (
     <>
       {/* Pass generation handlers to children */}
-      {React.Children.map(children, (child) => {
+      {React.Children.map(children, child => {
         if (React.isValidElement(child)) {
           return React.cloneElement(child, {
             ...generationContextValue,

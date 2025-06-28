@@ -2,7 +2,7 @@ import React, { Suspense, lazy } from 'react';
 
 /**
  * Lazy-loaded components for code splitting and performance optimization
- * 
+ *
  * Benefits:
  * - Reduces initial bundle size
  * - Faster initial page load
@@ -21,25 +21,25 @@ const LoadingSpinner: React.FC<{ message?: string }> = ({ message = 'Loading...'
 );
 
 // Lazy-loaded components
-export const LazyAssetManager = lazy(() => 
+export const LazyAssetManager = lazy(() =>
   import('../assets/AssetManager').then(module => ({ default: module.AssetManager }))
 );
 
-export const LazyConfigurationManager = lazy(() => 
-  import('../configuration/ConfigurationManager').then(module => ({ default: module.ConfigurationManager }))
+export const LazyConfigurationManager = lazy(() =>
+  import('../configuration/ConfigurationManager').then(module => ({
+    default: module.ConfigurationManager,
+  }))
 );
 
-export const LazyTerritoryOutput = lazy(() => 
+export const LazyTerritoryOutput = lazy(() =>
   import('../territory/TerritoryOutput').then(module => ({ default: module.TerritoryOutput }))
 );
 
-export const LazyConfidenceScoring = lazy(() => 
+export const LazyConfidenceScoring = lazy(() =>
   import('../ConfidenceScoring').then(module => ({ default: module.ConfidenceScoring }))
 );
 
-export const LazyTestEnhancedSystem = lazy(() => 
-  import('../../test-enhanced-system')
-);
+export const LazyTestEnhancedSystem = lazy(() => import('../../test-enhanced-system'));
 
 // HOC for wrapping components with Suspense
 export function withSuspense<P extends object>(
@@ -107,21 +107,24 @@ export function usePreloadComponents() {
     preloadTerritoryOutput();
   }, []);
 
-  const preloadOnHover = React.useCallback((componentName: string) => {
-    switch (componentName) {
-      case 'assets':
-        preloadAssetManager();
-        break;
-      case 'configuration':
-        preloadConfigurationManager();
-        break;
-      case 'territory':
-        preloadTerritoryOutput();
-        break;
-      default:
-        preloadAll();
-    }
-  }, [preloadAll]);
+  const preloadOnHover = React.useCallback(
+    (componentName: string) => {
+      switch (componentName) {
+        case 'assets':
+          preloadAssetManager();
+          break;
+        case 'configuration':
+          preloadConfigurationManager();
+          break;
+        case 'territory':
+          preloadTerritoryOutput();
+          break;
+        default:
+          preloadAll();
+      }
+    },
+    [preloadAll]
+  );
 
   return { preloadAll, preloadOnHover };
 }

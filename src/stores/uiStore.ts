@@ -5,13 +5,13 @@ import { APP_CONFIG } from '../config/app';
 
 /**
  * UIStore - Focused store for UI state management
- * 
+ *
  * Responsibilities:
  * - Modal and panel visibility
  * - Toast notifications
  * - Loading states
  * - UI preferences
- * 
+ *
  * Benefits:
  * - Centralized UI state management
  * - Easy to test UI interactions
@@ -92,10 +92,10 @@ export const useUIStore = create<UIState>()(
 
       // Toast actions
       showToastMessage: (message: string, type: ToastType) => {
-        set({ 
-          showToast: true, 
-          toastMessage: message, 
-          toastType: type 
+        set({
+          showToast: true,
+          toastMessage: message,
+          toastType: type,
         });
 
         // Auto-hide toast after configured duration
@@ -104,15 +104,16 @@ export const useUIStore = create<UIState>()(
         }, APP_CONFIG.ui.toastDuration);
       },
 
-      hideToast: () => set({ 
-        showToast: false, 
-        toastMessage: '', 
-        toastType: 'success' 
-      }),
+      hideToast: () =>
+        set({
+          showToast: false,
+          toastMessage: '',
+          toastType: 'success',
+        }),
 
       // Loading state actions
       setIsLoadingTemplates: (isLoadingTemplates: boolean) => set({ isLoadingTemplates }),
-      setIsGeneratingRecommendations: (isGeneratingRecommendations: boolean) => 
+      setIsGeneratingRecommendations: (isGeneratingRecommendations: boolean) =>
         set({ isGeneratingRecommendations }),
 
       // UI preference actions
@@ -121,31 +122,33 @@ export const useUIStore = create<UIState>()(
       setCompactMode: (compactMode: boolean) => set({ compactMode }),
 
       // Utility actions
-      closeAllPanels: () => set({
-        showAdmin: false,
-        showAssets: false,
-        showEvolutionPanel: false,
-        showTemplateSelector: false,
-      }),
+      closeAllPanels: () =>
+        set({
+          showAdmin: false,
+          showAssets: false,
+          showEvolutionPanel: false,
+          showTemplateSelector: false,
+        }),
 
-      resetUI: () => set({
-        showAdmin: false,
-        showAssets: false,
-        showEvolutionPanel: false,
-        showTemplateSelector: false,
-        showToast: false,
-        toastMessage: '',
-        toastType: 'success',
-        isLoadingTemplates: false,
-        isGeneratingRecommendations: false,
-        theme: 'auto',
-        sidebarCollapsed: false,
-        compactMode: false,
-      }),
+      resetUI: () =>
+        set({
+          showAdmin: false,
+          showAssets: false,
+          showEvolutionPanel: false,
+          showTemplateSelector: false,
+          showToast: false,
+          toastMessage: '',
+          toastType: 'success',
+          isLoadingTemplates: false,
+          isGeneratingRecommendations: false,
+          theme: 'auto',
+          sidebarCollapsed: false,
+          compactMode: false,
+        }),
     }),
     {
       name: `${APP_CONFIG.storage.keys.appState}-ui`,
-      partialize: (state) => ({
+      partialize: state => ({
         // Persist only user preferences
         theme: state.theme,
         sidebarCollapsed: state.sidebarCollapsed,

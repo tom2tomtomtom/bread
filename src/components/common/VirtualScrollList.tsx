@@ -11,13 +11,13 @@ interface VirtualScrollListProps<T> {
 
 /**
  * VirtualScrollList - High-performance virtual scrolling component
- * 
+ *
  * Benefits:
  * - Only renders visible items + overscan buffer
  * - Handles thousands of items without performance issues
  * - Smooth scrolling with proper positioning
  * - Memory efficient for large datasets
- * 
+ *
  * Use cases:
  * - Large territory lists
  * - Extensive headline collections
@@ -68,13 +68,16 @@ export function VirtualScrollList<T>({
   }, []);
 
   // Scroll to specific item
-  const scrollToItem = useCallback((index: number) => {
-    if (scrollElementRef.current) {
-      const targetScrollTop = index * itemHeight;
-      scrollElementRef.current.scrollTop = targetScrollTop;
-      setScrollTop(targetScrollTop);
-    }
-  }, [itemHeight]);
+  const scrollToItem = useCallback(
+    (index: number) => {
+      if (scrollElementRef.current) {
+        const targetScrollTop = index * itemHeight;
+        scrollElementRef.current.scrollTop = targetScrollTop;
+        setScrollTop(targetScrollTop);
+      }
+    },
+    [itemHeight]
+  );
 
   // Scroll to top
   const scrollToTop = useCallback(() => {
@@ -138,7 +141,9 @@ export function VirtualScrollList<T>({
         <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs p-2 rounded">
           <div>Total: {items.length}</div>
           <div>Visible: {visibleItems.length}</div>
-          <div>Range: {visibleRange.startIndex}-{visibleRange.endIndex}</div>
+          <div>
+            Range: {visibleRange.startIndex}-{visibleRange.endIndex}
+          </div>
           <div>Scroll: {Math.round(scrollTop)}px</div>
         </div>
       )}

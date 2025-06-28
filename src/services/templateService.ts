@@ -1,6 +1,6 @@
 /**
  * 🎯 Campaign Template Service
- * 
+ *
  * Strategic campaign template system that provides four proven frameworks
  * for different marketing objectives with AI-powered recommendations.
  */
@@ -87,7 +87,7 @@ class TemplateService {
     console.log('🤖 Analyzing brief for template recommendations...');
 
     const cacheKey = this.generateCacheKey(brief, briefAnalysis);
-    
+
     // Check cache first
     if (this.templateCache.has(cacheKey)) {
       console.log('📋 Returning cached template recommendations');
@@ -97,10 +97,10 @@ class TemplateService {
     try {
       // Analyze brief context for template matching
       const briefContext = this.extractBriefContext(brief, briefAnalysis);
-      
+
       // Score each template against the brief
       const recommendations: TemplateRecommendation[] = [];
-      
+
       for (const template of this.templates.values()) {
         const recommendation = await this.scoreTemplateAlignment(
           template,
@@ -119,10 +119,9 @@ class TemplateService {
 
       console.log(`✅ Generated ${recommendations.length} template recommendations`);
       return recommendations;
-
     } catch (error) {
       console.error('Error generating template recommendations:', error);
-      
+
       // Return fallback recommendations
       return this.getFallbackRecommendations();
     }
@@ -137,12 +136,14 @@ class TemplateService {
   ): ValidationResult[] {
     const template = this.getTemplate(templateId);
     if (!template) {
-      return [{
-        field: 'template',
-        isValid: false,
-        message: 'Template not found',
-        severity: 'error'
-      }];
+      return [
+        {
+          field: 'template',
+          isValid: false,
+          message: 'Template not found',
+          severity: 'error',
+        },
+      ];
     }
 
     const results: ValidationResult[] = [];
@@ -150,13 +151,13 @@ class TemplateService {
     // Validate required inputs
     for (const requiredInput of template.templateConfiguration.requiredInputs) {
       const customization = customizations.find(c => c.field === requiredInput.field);
-      
+
       if (!customization || !customization.value) {
         results.push({
           field: requiredInput.field,
           isValid: false,
           message: `${requiredInput.field} is required`,
-          severity: 'error'
+          severity: 'error',
         });
         continue;
       }
@@ -169,7 +170,7 @@ class TemplateService {
             field: requiredInput.field,
             isValid: false,
             message: validationResult.message,
-            severity: 'error'
+            severity: 'error',
           });
         }
       }
@@ -203,21 +204,18 @@ class TemplateService {
       // Generate previews for each requested channel
       for (const channel of channels) {
         if (template.channelSpecs.supportedChannels.includes(channel)) {
-          const previewAsset = await this.generateChannelPreview(
-            template,
-            customizations,
-            channel
-          );
+          const previewAsset = await this.generateChannelPreview(template, customizations, channel);
           previewAssets.push(previewAsset);
         }
       }
 
       console.log(`✅ Generated ${previewAssets.length} preview assets`);
       return previewAssets;
-
     } catch (error) {
       console.error('Error generating preview assets:', error);
-      throw new Error(`Failed to generate preview assets: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to generate preview assets: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -258,27 +256,32 @@ class TemplateService {
     try {
       // Analyze performance data and feedback
       const optimizationPrompt = this.buildOptimizationPrompt(template, performanceData, feedback);
-      
+
       // Get AI recommendations for optimization
-      const aiResponse = await generateWithOpenAI(optimizationPrompt, false, JSON.stringify(performanceData));
-      
+      const aiResponse = await generateWithOpenAI(
+        optimizationPrompt,
+        false,
+        JSON.stringify(performanceData)
+      );
+
       // Apply optimizations (in a real implementation, this would parse AI response)
       const optimizedTemplate = this.applyOptimizations(template, performanceData, feedback);
-      
+
       // Update template in storage
       this.templates.set(templateId, optimizedTemplate);
-      
+
       console.log('✅ Template optimization complete');
       return optimizedTemplate;
-
     } catch (error) {
       console.error('Error optimizing template:', error);
-      throw new Error(`Failed to optimize template: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to optimize template: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
   // Private helper methods will be added in the next chunk...
-  
+
   private generateCacheKey(brief: string, briefAnalysis: EnhancedBriefAnalysis): string {
     return `${brief.slice(0, 50)}_${briefAnalysis.overallScore}_${briefAnalysis.analysisTimestamp.getTime()}`;
   }
@@ -339,7 +342,8 @@ class TemplateService {
     };
 
     // Calculate confidence score
-    const confidenceScore = Object.values(briefAlignment).reduce((sum, score) => sum + score, 0) / 7;
+    const confidenceScore =
+      Object.values(briefAlignment).reduce((sum, score) => sum + score, 0) / 7;
 
     // Generate reasoning
     const reasoning = this.generateRecommendationReasoning(template, briefAlignment);
@@ -371,11 +375,20 @@ class TemplateService {
     // Adjust based on template type and brief context
     if (briefContext.brief.toLowerCase().includes('launch') && template.type === 'launch') {
       score += 20;
-    } else if (briefContext.brief.toLowerCase().includes('sale') && template.type === 'promotional') {
+    } else if (
+      briefContext.brief.toLowerCase().includes('sale') &&
+      template.type === 'promotional'
+    ) {
       score += 20;
-    } else if (briefContext.brief.toLowerCase().includes('brand') && template.type === 'brand_building') {
+    } else if (
+      briefContext.brief.toLowerCase().includes('brand') &&
+      template.type === 'brand_building'
+    ) {
       score += 20;
-    } else if (briefContext.brief.toLowerCase().includes('loyalty') && template.type === 'retention_loyalty') {
+    } else if (
+      briefContext.brief.toLowerCase().includes('loyalty') &&
+      template.type === 'retention_loyalty'
+    ) {
       score += 20;
     }
 
@@ -387,7 +400,10 @@ class TemplateService {
     const templateObjective = template.strategicFramework.primaryObjective.toLowerCase();
     const briefText = briefContext.brief.toLowerCase();
 
-    if (briefText.includes(templateObjective) || templateObjective.includes('awareness') && briefText.includes('awareness')) {
+    if (
+      briefText.includes(templateObjective) ||
+      (templateObjective.includes('awareness') && briefText.includes('awareness'))
+    ) {
       return 90;
     }
     return 65;
@@ -418,7 +434,10 @@ class TemplateService {
     return 70; // Simplified for now
   }
 
-  private generateRecommendationReasoning(template: CampaignTemplate, alignment: BriefAlignmentScore): string[] {
+  private generateRecommendationReasoning(
+    template: CampaignTemplate,
+    alignment: BriefAlignmentScore
+  ): string[] {
     const reasoning: string[] = [];
 
     if (alignment.overall > 80) {
@@ -480,7 +499,10 @@ class TemplateService {
     };
   }
 
-  private generateCustomizationSuggestions(template: CampaignTemplate, briefContext: any): CustomizationSuggestion[] {
+  private generateCustomizationSuggestions(
+    template: CampaignTemplate,
+    briefContext: any
+  ): CustomizationSuggestion[] {
     const suggestions: CustomizationSuggestion[] = [];
 
     // Generate suggestions based on template and brief
@@ -538,24 +560,27 @@ class TemplateService {
       case 'required':
         return {
           isValid: value !== null && value !== undefined && value !== '',
-          message: rule.message || 'This field is required'
+          message: rule.message || 'This field is required',
         };
       case 'minLength':
         return {
           isValid: typeof value === 'string' && value.length >= rule.value,
-          message: rule.message || `Minimum length is ${rule.value} characters`
+          message: rule.message || `Minimum length is ${rule.value} characters`,
         };
       case 'maxLength':
         return {
           isValid: typeof value === 'string' && value.length <= rule.value,
-          message: rule.message || `Maximum length is ${rule.value} characters`
+          message: rule.message || `Maximum length is ${rule.value} characters`,
         };
       default:
         return { isValid: true, message: '' };
     }
   }
 
-  private validateBrandCompliance(template: CampaignTemplate, customizations: TemplateCustomization[]): ValidationResult[] {
+  private validateBrandCompliance(
+    template: CampaignTemplate,
+    customizations: TemplateCustomization[]
+  ): ValidationResult[] {
     const results: ValidationResult[] = [];
 
     // Check brand compliance requirements
@@ -568,7 +593,7 @@ class TemplateService {
             field: 'brand_compliance',
             isValid: false,
             message: compliance.message,
-            severity: 'error'
+            severity: 'error',
           });
         }
       }
@@ -577,11 +602,14 @@ class TemplateService {
     return results;
   }
 
-  private checkBrandCompliance(requirement: any, customizations: TemplateCustomization[]): { isValid: boolean; message: string } {
+  private checkBrandCompliance(
+    requirement: any,
+    customizations: TemplateCustomization[]
+  ): { isValid: boolean; message: string } {
     // Simplified brand compliance check
     return {
       isValid: true,
-      message: ''
+      message: '',
     };
   }
 
@@ -603,7 +631,7 @@ class TemplateService {
         customizations,
         qualityScore: 85,
         brandCompliance: 90,
-      }
+      },
     };
   }
 
@@ -627,7 +655,7 @@ class TemplateService {
       'Improve call-to-action placement',
       'Enhance visual hierarchy',
       'Optimize for mobile viewing',
-      'Strengthen brand integration'
+      'Strengthen brand integration',
     ];
   }
 
@@ -648,7 +676,11 @@ class TemplateService {
     };
   }
 
-  private buildOptimizationPrompt(template: CampaignTemplate, performanceData: any, feedback: string[]): string {
+  private buildOptimizationPrompt(
+    template: CampaignTemplate,
+    performanceData: any,
+    feedback: string[]
+  ): string {
     return `
       Analyze the performance data and feedback for the ${template.name} campaign template.
 
@@ -666,7 +698,11 @@ class TemplateService {
     `;
   }
 
-  private applyOptimizations(template: CampaignTemplate, performanceData: any, feedback: string[]): CampaignTemplate {
+  private applyOptimizations(
+    template: CampaignTemplate,
+    performanceData: any,
+    feedback: string[]
+  ): CampaignTemplate {
     // Create optimized version of template
     const optimizedTemplate = { ...template };
 
@@ -698,7 +734,8 @@ class TemplateService {
     return {
       id: 'launch_template_v1',
       name: 'Launch Campaign Template',
-      description: 'Strategic framework for new product announcements, market entry, and feature launches',
+      description:
+        'Strategic framework for new product announcements, market entry, and feature launches',
       type: 'launch',
       strategicFramework: {
         primaryObjective: 'Generate awareness and trial for new offering',
@@ -706,7 +743,7 @@ class TemplateService {
           'Introduce the innovation',
           'Highlight key benefits',
           'Create urgency for early adoption',
-          'Drive trial or purchase'
+          'Drive trial or purchase',
         ],
         audienceStrategy: {
           primaryAudience: 'Early adopters and innovation enthusiasts',
@@ -714,27 +751,27 @@ class TemplateService {
           psychographicProfile: 'Tech-savvy, trend-conscious, willing to try new things',
           behavioralTriggers: ['FOMO', 'Exclusivity', 'Innovation appeal'],
           communicationStyle: 'emotional',
-          culturalConsiderations: ['Local market readiness', 'Competitive landscape']
+          culturalConsiderations: ['Local market readiness', 'Competitive landscape'],
         },
         competitivePositioning: {
           marketPosition: 'challenger',
           differentiationPoints: ['First-to-market', 'Unique features', 'Superior performance'],
           competitiveAdvantages: ['Innovation', 'Technology', 'User experience'],
           valueProposition: 'Revolutionary solution that changes the game',
-          brandPersonality: ['Innovative', 'Bold', 'Forward-thinking']
+          brandPersonality: ['Innovative', 'Bold', 'Forward-thinking'],
         },
         emotionalTerritory: {
           primaryEmotion: 'excitement',
           emotionalJourney: ['Curiosity', 'Interest', 'Excitement', 'Desire', 'Action'],
           tonalAttributes: ['Dynamic', 'Confident', 'Inspiring'],
-          brandVoice: 'innovative'
+          brandVoice: 'innovative',
         },
         keyPerformanceIndicators: [
           'Brand awareness lift',
           'Trial rate',
           'Media coverage',
           'Social engagement',
-          'Early sales velocity'
+          'Early sales velocity',
         ],
         successMetrics: [
           {
@@ -742,16 +779,16 @@ class TemplateService {
             target: 25,
             unit: 'percentage',
             timeframe: '3 months',
-            priority: 'primary'
+            priority: 'primary',
           },
           {
             name: 'Trial Rate',
             target: 15,
             unit: 'percentage',
             timeframe: '1 month',
-            priority: 'primary'
-          }
-        ]
+            priority: 'primary',
+          },
+        ],
       },
       visualGuidelines: {
         colorPalette: [
@@ -760,15 +797,15 @@ class TemplateService {
             hex: '#0066FF',
             usage: 'primary',
             emotionalAssociation: 'Trust and innovation',
-            applicationRules: ['Headlines', 'CTAs', 'Key elements']
+            applicationRules: ['Headlines', 'CTAs', 'Key elements'],
           },
           {
             name: 'Energy Orange',
             hex: '#FF6600',
             usage: 'accent',
             emotionalAssociation: 'Excitement and energy',
-            applicationRules: ['Highlights', 'New badges', 'Action elements']
-          }
+            applicationRules: ['Highlights', 'New badges', 'Action elements'],
+          },
         ],
         typography: [
           {
@@ -777,23 +814,23 @@ class TemplateService {
             usage: 'headline',
             weight: 'bold',
             size: '2.5rem',
-            lineHeight: '1.2'
-          }
+            lineHeight: '1.2',
+          },
         ],
         imageryStyle: {
           photographyStyle: 'conceptual',
           colorTreatment: 'enhanced',
           composition: 'dynamic',
           subjectMatter: ['Technology', 'Innovation', 'Future-focused'],
-          moodKeywords: ['Cutting-edge', 'Revolutionary', 'Game-changing']
+          moodKeywords: ['Cutting-edge', 'Revolutionary', 'Game-changing'],
         },
         layoutPrinciples: [
           {
             name: 'Hero Focus',
             description: 'Prominent product/feature showcase',
             applicationRules: ['Large hero image', 'Clear product focus', 'Minimal distractions'],
-            examples: ['Product hero shots', 'Feature demonstrations']
-          }
+            examples: ['Product hero shots', 'Feature demonstrations'],
+          },
         ],
         brandElements: [
           {
@@ -801,15 +838,15 @@ class TemplateService {
             name: 'New Badge',
             usage: 'Highlight newness',
             placement: ['Top right', 'Near headlines'],
-            sizing: ['Small accent', 'Medium emphasis']
-          }
+            sizing: ['Small accent', 'Medium emphasis'],
+          },
         ],
         visualHierarchy: {
           primaryFocus: 'Product/feature announcement',
           secondaryElements: ['Key benefits', 'Call to action'],
           supportingElements: ['Social proof', 'Additional features'],
-          informationFlow: ['Attention', 'Interest', 'Desire', 'Action']
-        }
+          informationFlow: ['Attention', 'Interest', 'Desire', 'Action'],
+        },
       },
       contentStructure: {
         messagingFramework: {
@@ -817,59 +854,71 @@ class TemplateService {
           supportingMessages: [
             'Revolutionary technology that changes everything',
             'Be among the first to experience the difference',
-            'Limited time early access available'
+            'Limited time early access available',
           ],
-          proofPoints: ['Technical specifications', 'Beta user testimonials', 'Expert endorsements'],
+          proofPoints: [
+            'Technical specifications',
+            'Beta user testimonials',
+            'Expert endorsements',
+          ],
           messagingHierarchy: [
             {
               level: 'primary',
               message: 'Product announcement',
               weight: 40,
-              placement: ['Headlines', 'Hero sections']
+              placement: ['Headlines', 'Hero sections'],
             },
             {
               level: 'secondary',
               message: 'Key benefits',
               weight: 35,
-              placement: ['Subheadings', 'Feature callouts']
+              placement: ['Subheadings', 'Feature callouts'],
             },
             {
               level: 'tertiary',
               message: 'Call to action',
               weight: 25,
-              placement: ['Buttons', 'Footer']
-            }
+              placement: ['Buttons', 'Footer'],
+            },
           ],
-          tonalGuidelines: ['Confident but not arrogant', 'Exciting but credible', 'Innovative but accessible']
+          tonalGuidelines: [
+            'Confident but not arrogant',
+            'Exciting but credible',
+            'Innovative but accessible',
+          ],
         },
         contentPillars: [
           {
             name: 'Innovation Story',
             description: 'The breakthrough behind the product',
-            keyMessages: ['Revolutionary technology', 'Months/years in development', 'Industry first'],
+            keyMessages: [
+              'Revolutionary technology',
+              'Months/years in development',
+              'Industry first',
+            ],
             contentTypes: ['Behind-the-scenes', 'Developer interviews', 'Technical demos'],
             channelRelevance: [
               {
                 channel: 'instagram_post',
                 relevanceScore: 85,
-                adaptationNotes: ['Visual storytelling', 'Short-form content']
-              }
-            ]
-          }
+                adaptationNotes: ['Visual storytelling', 'Short-form content'],
+              },
+            ],
+          },
         ],
         narrativeFlow: {
-          openingHook: 'The moment you\'ve been waiting for is here',
+          openingHook: "The moment you've been waiting for is here",
           problemStatement: 'Traditional solutions fall short of modern needs',
           solutionPresentation: 'Introducing our revolutionary approach',
           benefitReinforcement: 'Experience the difference firsthand',
-          actionDirection: 'Be among the first - get early access now'
+          actionDirection: 'Be among the first - get early access now',
         },
         callToAction: {
           primaryCTA: 'Get Early Access',
           secondaryCTAs: ['Learn More', 'Watch Demo', 'Join Waitlist'],
           urgencyLevel: 'high',
           placementStrategy: ['Above fold', 'After benefits', 'Multiple touchpoints'],
-          visualTreatment: 'High contrast button with urgency indicators'
+          visualTreatment: 'High contrast button with urgency indicators',
         },
         contentAdaptation: {
           channelSpecificRules: [
@@ -877,37 +926,42 @@ class TemplateService {
               channel: 'instagram_post',
               adaptationRules: ['Square format', 'Visual-first', 'Minimal text'],
               restrictions: ['No long copy', 'Avoid small text'],
-              opportunities: ['Stories integration', 'Carousel format', 'Video content']
-            }
+              opportunities: ['Stories integration', 'Carousel format', 'Video content'],
+            },
           ],
           lengthVariations: [
             {
               format: 'short',
               wordCount: 25,
               keyElements: ['Product name', 'Key benefit', 'CTA'],
-              usage: ['Social media', 'Display ads']
-            }
+              usage: ['Social media', 'Display ads'],
+            },
           ],
           formatOptimizations: [
             {
               format: 'instagram_post',
               optimizations: ['High-quality visuals', 'Branded elements', 'Clear CTA'],
               bestPractices: ['Use brand colors', 'Include product shots', 'Add urgency'],
-              avoidances: ['Cluttered design', 'Too much text', 'Generic imagery']
-            }
-          ]
-        }
+              avoidances: ['Cluttered design', 'Too much text', 'Generic imagery'],
+            },
+          ],
+        },
       },
       channelSpecs: {
-        supportedChannels: ['instagram_post', 'facebook_post', 'linkedin_post', 'youtube_thumbnail'],
+        supportedChannels: [
+          'instagram_post',
+          'facebook_post',
+          'linkedin_post',
+          'youtube_thumbnail',
+        ],
         channelPriority: [
           {
             channel: 'instagram_post',
             priority: 'primary',
             reasoning: 'High visual impact for product showcase',
             expectedImpact: 85,
-            resourceAllocation: 30
-          }
+            resourceAllocation: 30,
+          },
         ],
         crossChannelStrategy: {
           consistencyLevel: 'adapted',
@@ -919,19 +973,23 @@ class TemplateService {
                 channel: 'instagram_post',
                 timing: 'launch',
                 delay: 0,
-                reasoning: 'Primary announcement channel'
-              }
+                reasoning: 'Primary announcement channel',
+              },
             ],
             frequencyRules: [
               {
                 channel: 'instagram_post',
                 frequency: 'Daily for first week',
                 optimalTiming: ['9 AM', '1 PM', '7 PM'],
-                restrictions: ['No more than 3 posts per day']
-              }
+                restrictions: ['No more than 3 posts per day'],
+              },
             ],
-            seasonalConsiderations: ['Product launch timing', 'Market readiness', 'Competitive calendar']
-          }
+            seasonalConsiderations: [
+              'Product launch timing',
+              'Market readiness',
+              'Competitive calendar',
+            ],
+          },
         },
         platformOptimizations: [],
         distributionStrategy: {
@@ -939,7 +997,7 @@ class TemplateService {
             channels: ['instagram_post', 'linkedin_post'],
             contentTypes: ['Product reveals', 'Behind-the-scenes', 'User testimonials'],
             engagementTactics: ['Countdown posts', 'Sneak peeks', 'Live demos'],
-            communityBuilding: ['Early adopter groups', 'Beta user communities']
+            communityBuilding: ['Early adopter groups', 'Beta user communities'],
           },
           paid: {
             channels: ['facebook_post', 'instagram_post'],
@@ -948,25 +1006,29 @@ class TemplateService {
                 channel: 'instagram_post',
                 percentage: 40,
                 reasoning: 'High engagement and visual impact',
-                expectedROI: 2.5
-              }
+                expectedROI: 2.5,
+              },
             ],
-            targetingStrategy: ['Lookalike audiences', 'Interest targeting', 'Competitor audiences'],
-            bidStrategy: 'Maximize reach during launch window'
+            targetingStrategy: [
+              'Lookalike audiences',
+              'Interest targeting',
+              'Competitor audiences',
+            ],
+            bidStrategy: 'Maximize reach during launch window',
           },
           earned: {
             prTargets: ['Tech journalists', 'Industry analysts', 'Thought leaders'],
             influencerStrategy: ['Early access programs', 'Product seeding', 'Co-creation'],
             communityEngagement: ['User-generated content', 'Reviews and testimonials'],
-            viralPotential: ['Shareable moments', 'Surprise elements', 'Social proof']
+            viralPotential: ['Shareable moments', 'Surprise elements', 'Social proof'],
           },
           owned: {
             channels: ['email_header', 'custom'],
             contentStrategy: ['Product pages', 'Email campaigns', 'In-app notifications'],
             audienceNurturing: ['Educational content', 'Exclusive previews'],
-            conversionOptimization: ['Landing pages', 'Trial flows', 'Onboarding']
-          }
-        }
+            conversionOptimization: ['Landing pages', 'Trial flows', 'Onboarding'],
+          },
+        },
       },
       performanceKPIs: {
         kpis: [
@@ -978,8 +1040,8 @@ class TemplateService {
             unit: 'percentage',
             timeframe: '3 months',
             priority: 'primary',
-            trackingMethod: 'Brand tracking surveys'
-          }
+            trackingMethod: 'Brand tracking surveys',
+          },
         ],
         benchmarks: [
           {
@@ -988,8 +1050,8 @@ class TemplateService {
             category: 20,
             historical: 18,
             aspirational: 30,
-            source: 'Industry reports'
-          }
+            source: 'Industry reports',
+          },
         ],
         trackingSetup: {
           platforms: [
@@ -997,8 +1059,8 @@ class TemplateService {
               name: 'Google Analytics',
               metrics: ['Traffic', 'Conversions', 'Engagement'],
               integrationRequired: true,
-              setupInstructions: ['Install tracking code', 'Set up goals', 'Configure events']
-            }
+              setupInstructions: ['Install tracking code', 'Set up goals', 'Configure events'],
+            },
           ],
           customEvents: [
             {
@@ -1010,19 +1072,19 @@ class TemplateService {
                   name: 'product_id',
                   type: 'string',
                   required: true,
-                  description: 'Unique product identifier'
-                }
-              ]
-            }
+                  description: 'Unique product identifier',
+                },
+              ],
+            },
           ],
           attributionModel: 'First-click attribution for awareness, last-click for conversion',
-          reportingFrequency: 'Daily during launch, weekly thereafter'
+          reportingFrequency: 'Daily during launch, weekly thereafter',
         },
         reportingSchedule: {
           frequency: 'weekly',
           stakeholders: ['Marketing team', 'Product team', 'Leadership'],
           format: 'dashboard',
-          automationLevel: 'semi-automated'
+          automationLevel: 'semi-automated',
         },
         optimizationTriggers: [
           {
@@ -1030,9 +1092,9 @@ class TemplateService {
             threshold: 10,
             action: 'Increase media spend and adjust messaging',
             priority: 'high',
-            automationPossible: false
-          }
-        ]
+            automationPossible: false,
+          },
+        ],
       },
       templateConfiguration: {
         customizationLevel: 'high',
@@ -1045,16 +1107,16 @@ class TemplateService {
               {
                 type: 'required',
                 value: true,
-                message: 'Product name is required'
+                message: 'Product name is required',
               },
               {
                 type: 'maxLength',
                 value: 50,
-                message: 'Product name must be 50 characters or less'
-              }
+                message: 'Product name must be 50 characters or less',
+              },
             ],
-            examples: ['iPhone 15', 'Premium Subscription', 'AI Assistant']
-          }
+            examples: ['iPhone 15', 'Premium Subscription', 'AI Assistant'],
+          },
         ],
         optionalInputs: [
           {
@@ -1062,16 +1124,16 @@ class TemplateService {
             type: 'text',
             description: 'Official launch date',
             defaultValue: 'Coming Soon',
-            impact: 'Adds urgency and specificity to messaging'
-          }
+            impact: 'Adds urgency and specificity to messaging',
+          },
         ],
         brandingRequirements: [
           {
             element: 'logo',
             importance: 'critical',
             guidelines: ['Must be prominently displayed', 'Use approved logo variants'],
-            flexibility: 20
-          }
+            flexibility: 20,
+          },
         ],
         technicalSpecs: [
           {
@@ -1081,12 +1143,12 @@ class TemplateService {
                 channel: 'instagram_post',
                 specification: 'Square format',
                 value: '1080x1080',
-                tolerance: '±50px'
-              }
+                tolerance: '±50px',
+              },
             ],
-            recommendations: ['Use high-resolution images', 'Optimize for mobile viewing']
-          }
-        ]
+            recommendations: ['Use high-resolution images', 'Optimize for mobile viewing'],
+          },
+        ],
       },
       brandAdaptation: {
         adaptationPoints: [
@@ -1095,16 +1157,20 @@ class TemplateService {
             description: 'Adapt template colors to brand palette',
             adaptationLevel: 'moderate',
             brandImpact: 'high',
-            guidelines: ['Use primary brand colors', 'Maintain contrast ratios', 'Consider accessibility']
-          }
+            guidelines: [
+              'Use primary brand colors',
+              'Maintain contrast ratios',
+              'Consider accessibility',
+            ],
+          },
         ],
         brandConsistency: [
           {
             rule: 'Logo must be visible and unobstructed',
             enforcement: 'strict',
             exceptions: ['Artistic treatments with approval'],
-            validation: 'Automated logo detection'
-          }
+            validation: 'Automated logo detection',
+          },
         ],
         customizationOptions: [
           {
@@ -1116,11 +1182,11 @@ class TemplateService {
                 value: '#0066FF',
                 label: 'Innovation Blue',
                 preview: 'blue-theme-preview.jpg',
-                brandAlignment: 85
-              }
+                brandAlignment: 85,
+              },
             ],
-            impact: 'Changes overall visual tone and brand alignment'
-          }
+            impact: 'Changes overall visual tone and brand alignment',
+          },
         ],
         qualityChecks: [
           {
@@ -1132,12 +1198,12 @@ class TemplateService {
                 aspect: 'Logo visibility',
                 measurement: 'Logo detection and size',
                 target: 100,
-                weight: 30
-              }
+                weight: 30,
+              },
             ],
-            threshold: 80
-          }
-        ]
+            threshold: 80,
+          },
+        ],
       },
       examples: [
         {
@@ -1158,10 +1224,10 @@ class TemplateService {
                   name: 'Engagement Rate',
                   value: 4.2,
                   unit: 'percentage',
-                  benchmark: 3.1
-                }
-              ]
-            }
+                  benchmark: 3.1,
+                },
+              ],
+            },
           ],
           performance: {
             overallScore: 87,
@@ -1171,14 +1237,17 @@ class TemplateService {
                 target: 25,
                 actual: 32,
                 variance: 7,
-                status: 'exceeded'
-              }
+                status: 'exceeded',
+              },
             ],
             insights: ['Visual storytelling drove high engagement', 'Early access created urgency'],
-            recommendations: ['Extend campaign duration', 'Increase video content']
+            recommendations: ['Extend campaign duration', 'Increase video content'],
           },
-          learnings: ['Product demos performed better than static images', 'Countdown timers increased urgency']
-        }
+          learnings: [
+            'Product demos performed better than static images',
+            'Countdown timers increased urgency',
+          ],
+        },
       ],
       metadata: {
         version: '1.0.0',
@@ -1197,10 +1266,10 @@ class TemplateService {
             market: 'Australia',
             relevanceScore: 90,
             adaptationNotes: ['Consider local launch timing', 'Adapt to Australian English'],
-            localConsiderations: ['ACCC compliance', 'Local media landscape']
-          }
-        ]
-      }
+            localConsiderations: ['ACCC compliance', 'Local media landscape'],
+          },
+        ],
+      },
     };
   }
 
@@ -1209,7 +1278,8 @@ class TemplateService {
     return {
       id: 'promotional_template_v1',
       name: 'Promotional Campaign Template',
-      description: 'Strategic framework for sales events, seasonal promotions, and limited-time offers',
+      description:
+        'Strategic framework for sales events, seasonal promotions, and limited-time offers',
       type: 'promotional',
       strategicFramework: {
         primaryObjective: 'Drive immediate sales and conversions',
@@ -1217,7 +1287,7 @@ class TemplateService {
           'Highlight the offer/discount',
           'Create urgency and scarcity',
           'Emphasize value and savings',
-          'Drive immediate action'
+          'Drive immediate action',
         ],
         audienceStrategy: {
           primaryAudience: 'Price-conscious consumers and deal seekers',
@@ -1225,27 +1295,27 @@ class TemplateService {
           psychographicProfile: 'Value-driven, deal-motivated, action-oriented',
           behavioralTriggers: ['Limited time', 'Exclusive access', 'Significant savings'],
           communicationStyle: 'direct',
-          culturalConsiderations: ['Local shopping behaviors', 'Seasonal preferences']
+          culturalConsiderations: ['Local shopping behaviors', 'Seasonal preferences'],
         },
         competitivePositioning: {
           marketPosition: 'challenger',
           differentiationPoints: ['Better value', 'Exclusive offers', 'Limited availability'],
           competitiveAdvantages: ['Price', 'Quality', 'Service'],
           valueProposition: 'Unbeatable value for limited time only',
-          brandPersonality: ['Accessible', 'Value-focused', 'Customer-centric']
+          brandPersonality: ['Accessible', 'Value-focused', 'Customer-centric'],
         },
         emotionalTerritory: {
           primaryEmotion: 'urgency',
           emotionalJourney: ['Attention', 'Interest', 'Urgency', 'Decision', 'Action'],
           tonalAttributes: ['Urgent', 'Exciting', 'Compelling'],
-          brandVoice: 'accessible'
+          brandVoice: 'accessible',
         },
         keyPerformanceIndicators: [
           'Sales conversion rate',
           'Revenue lift',
           'Customer acquisition',
           'Average order value',
-          'Campaign ROI'
+          'Campaign ROI',
         ],
         successMetrics: [
           {
@@ -1253,9 +1323,9 @@ class TemplateService {
             target: 8,
             unit: 'percentage',
             timeframe: 'Campaign duration',
-            priority: 'primary'
-          }
-        ]
+            priority: 'primary',
+          },
+        ],
       },
       // Simplified other properties for brevity
       visualGuidelines: {
@@ -1265,8 +1335,8 @@ class TemplateService {
             hex: '#FF0000',
             usage: 'primary',
             emotionalAssociation: 'Urgency and action',
-            applicationRules: ['Sale badges', 'CTAs', 'Discount highlights']
-          }
+            applicationRules: ['Sale badges', 'CTAs', 'Discount highlights'],
+          },
         ],
         typography: [],
         imageryStyle: {
@@ -1274,7 +1344,7 @@ class TemplateService {
           colorTreatment: 'enhanced',
           composition: 'centered',
           subjectMatter: ['Products', 'Savings', 'Value'],
-          moodKeywords: ['Exciting', 'Valuable', 'Limited-time']
+          moodKeywords: ['Exciting', 'Valuable', 'Limited-time'],
         },
         layoutPrinciples: [],
         brandElements: [],
@@ -1282,37 +1352,37 @@ class TemplateService {
           primaryFocus: 'Discount/offer',
           secondaryElements: ['Product', 'Urgency indicators'],
           supportingElements: ['Terms', 'Additional offers'],
-          informationFlow: ['Offer', 'Value', 'Urgency', 'Action']
-        }
+          informationFlow: ['Offer', 'Value', 'Urgency', 'Action'],
+        },
       },
       contentStructure: {
         messagingFramework: {
           primaryMessage: 'Limited Time: Save [X]% on [Product/Category]',
-          supportingMessages: ['Biggest sale of the year', 'While supplies last', 'Don\'t miss out'],
+          supportingMessages: ['Biggest sale of the year', 'While supplies last', "Don't miss out"],
           proofPoints: ['Previous customer savings', 'Limited inventory', 'Time remaining'],
           messagingHierarchy: [],
-          tonalGuidelines: ['Urgent but not pushy', 'Exciting but credible', 'Clear and direct']
+          tonalGuidelines: ['Urgent but not pushy', 'Exciting but credible', 'Clear and direct'],
         },
         contentPillars: [],
         narrativeFlow: {
           openingHook: 'Flash Sale Alert: Your favorites are on sale',
-          problemStatement: 'Prices like this don\'t last long',
+          problemStatement: "Prices like this don't last long",
           solutionPresentation: 'Save big on everything you love',
           benefitReinforcement: 'More savings, same quality you trust',
-          actionDirection: 'Shop now before it\'s too late'
+          actionDirection: "Shop now before it's too late",
         },
         callToAction: {
           primaryCTA: 'Shop Sale Now',
           secondaryCTAs: ['View All Deals', 'Save to Wishlist'],
           urgencyLevel: 'critical',
           placementStrategy: ['Multiple locations', 'Sticky elements', 'Exit intent'],
-          visualTreatment: 'High contrast with countdown timers'
+          visualTreatment: 'High contrast with countdown timers',
         },
         contentAdaptation: {
           channelSpecificRules: [],
           lengthVariations: [],
-          formatOptimizations: []
-        }
+          formatOptimizations: [],
+        },
       },
       channelSpecs: {
         supportedChannels: ['instagram_post', 'facebook_post', 'email_header', 'banner_rectangle'],
@@ -1324,8 +1394,8 @@ class TemplateService {
           timingCoordination: {
             launchSequence: [],
             frequencyRules: [],
-            seasonalConsiderations: []
-          }
+            seasonalConsiderations: [],
+          },
         },
         platformOptimizations: [],
         distributionStrategy: {
@@ -1333,27 +1403,27 @@ class TemplateService {
             channels: [],
             contentTypes: [],
             engagementTactics: [],
-            communityBuilding: []
+            communityBuilding: [],
           },
           paid: {
             channels: [],
             budgetAllocation: [],
             targetingStrategy: [],
-            bidStrategy: ''
+            bidStrategy: '',
           },
           earned: {
             prTargets: [],
             influencerStrategy: [],
             communityEngagement: [],
-            viralPotential: []
+            viralPotential: [],
           },
           owned: {
             channels: [],
             contentStrategy: [],
             audienceNurturing: [],
-            conversionOptimization: []
-          }
-        }
+            conversionOptimization: [],
+          },
+        },
       },
       performanceKPIs: {
         kpis: [],
@@ -1362,28 +1432,28 @@ class TemplateService {
           platforms: [],
           customEvents: [],
           attributionModel: '',
-          reportingFrequency: ''
+          reportingFrequency: '',
         },
         reportingSchedule: {
           frequency: 'daily',
           stakeholders: [],
           format: 'dashboard',
-          automationLevel: 'fully-automated'
+          automationLevel: 'fully-automated',
         },
-        optimizationTriggers: []
+        optimizationTriggers: [],
       },
       templateConfiguration: {
         customizationLevel: 'medium',
         requiredInputs: [],
         optionalInputs: [],
         brandingRequirements: [],
-        technicalSpecs: []
+        technicalSpecs: [],
       },
       brandAdaptation: {
         adaptationPoints: [],
         brandConsistency: [],
         customizationOptions: [],
-        qualityChecks: []
+        qualityChecks: [],
       },
       examples: [],
       metadata: {
@@ -1398,8 +1468,8 @@ class TemplateService {
         complexity: 'beginner',
         estimatedSetupTime: 30,
         supportedLanguages: ['en'],
-        marketRelevance: []
-      }
+        marketRelevance: [],
+      },
     };
   }
 
@@ -1408,7 +1478,8 @@ class TemplateService {
     return {
       id: 'brand_building_template_v1',
       name: 'Brand Building Campaign Template',
-      description: 'Strategic framework for awareness, emotional connection, and brand differentiation',
+      description:
+        'Strategic framework for awareness, emotional connection, and brand differentiation',
       type: 'brand_building',
       strategicFramework: {
         primaryObjective: 'Build brand awareness and emotional connection',
@@ -1416,7 +1487,7 @@ class TemplateService {
           'Establish brand values and purpose',
           'Create emotional resonance',
           'Differentiate from competitors',
-          'Build long-term relationship'
+          'Build long-term relationship',
         ],
         audienceStrategy: {
           primaryAudience: 'Brand-conscious consumers and aspirational segments',
@@ -1424,29 +1495,29 @@ class TemplateService {
           psychographicProfile: 'Values-driven, quality-focused, brand-loyal',
           behavioralTriggers: ['Authenticity', 'Social impact', 'Quality assurance'],
           communicationStyle: 'aspirational',
-          culturalConsiderations: ['Local values', 'Cultural sensitivities']
+          culturalConsiderations: ['Local values', 'Cultural sensitivities'],
         },
         competitivePositioning: {
           marketPosition: 'leader',
           differentiationPoints: ['Brand heritage', 'Values alignment', 'Quality commitment'],
           competitiveAdvantages: ['Brand trust', 'Emotional connection', 'Premium positioning'],
           valueProposition: 'More than a product - a lifestyle and values alignment',
-          brandPersonality: ['Authentic', 'Premium', 'Trustworthy']
+          brandPersonality: ['Authentic', 'Premium', 'Trustworthy'],
         },
         emotionalTerritory: {
           primaryEmotion: 'aspiration',
           emotionalJourney: ['Awareness', 'Interest', 'Consideration', 'Affinity', 'Advocacy'],
           tonalAttributes: ['Inspiring', 'Authentic', 'Premium'],
-          brandVoice: 'premium'
+          brandVoice: 'premium',
         },
         keyPerformanceIndicators: [
           'Brand awareness',
           'Brand sentiment',
           'Share of voice',
           'Brand consideration',
-          'Customer lifetime value'
+          'Customer lifetime value',
         ],
-        successMetrics: []
+        successMetrics: [],
       },
       // Simplified properties
       visualGuidelines: {
@@ -1457,7 +1528,7 @@ class TemplateService {
           colorTreatment: 'natural',
           composition: 'rule-of-thirds',
           subjectMatter: ['Lifestyle', 'Values', 'Aspirations'],
-          moodKeywords: ['Premium', 'Authentic', 'Inspiring']
+          moodKeywords: ['Premium', 'Authentic', 'Inspiring'],
         },
         layoutPrinciples: [],
         brandElements: [],
@@ -1465,8 +1536,8 @@ class TemplateService {
           primaryFocus: 'Brand story and values',
           secondaryElements: ['Lifestyle imagery', 'Brand elements'],
           supportingElements: ['Product integration', 'Social proof'],
-          informationFlow: ['Values', 'Story', 'Connection', 'Engagement']
-        }
+          informationFlow: ['Values', 'Story', 'Connection', 'Engagement'],
+        },
       },
       contentStructure: {
         messagingFramework: {
@@ -1474,7 +1545,7 @@ class TemplateService {
           supportingMessages: [],
           proofPoints: [],
           messagingHierarchy: [],
-          tonalGuidelines: []
+          tonalGuidelines: [],
         },
         contentPillars: [],
         narrativeFlow: {
@@ -1482,20 +1553,20 @@ class TemplateService {
           problemStatement: 'In a world of choices, values matter',
           solutionPresentation: 'We believe in [brand values]',
           benefitReinforcement: 'Join a community that shares your values',
-          actionDirection: 'Discover your story with us'
+          actionDirection: 'Discover your story with us',
         },
         callToAction: {
           primaryCTA: 'Learn Our Story',
           secondaryCTAs: [],
           urgencyLevel: 'low',
           placementStrategy: [],
-          visualTreatment: ''
+          visualTreatment: '',
         },
         contentAdaptation: {
           channelSpecificRules: [],
           lengthVariations: [],
-          formatOptimizations: []
-        }
+          formatOptimizations: [],
+        },
       },
       channelSpecs: {
         supportedChannels: ['instagram_post', 'youtube_thumbnail', 'linkedin_post'],
@@ -1507,26 +1578,57 @@ class TemplateService {
           timingCoordination: {
             launchSequence: [],
             frequencyRules: [],
-            seasonalConsiderations: []
-          }
+            seasonalConsiderations: [],
+          },
         },
         platformOptimizations: [],
         distributionStrategy: {
           organic: { channels: [], contentTypes: [], engagementTactics: [], communityBuilding: [] },
           paid: { channels: [], budgetAllocation: [], targetingStrategy: [], bidStrategy: '' },
-          earned: { prTargets: [], influencerStrategy: [], communityEngagement: [], viralPotential: [] },
-          owned: { channels: [], contentStrategy: [], audienceNurturing: [], conversionOptimization: [] }
-        }
+          earned: {
+            prTargets: [],
+            influencerStrategy: [],
+            communityEngagement: [],
+            viralPotential: [],
+          },
+          owned: {
+            channels: [],
+            contentStrategy: [],
+            audienceNurturing: [],
+            conversionOptimization: [],
+          },
+        },
       },
       performanceKPIs: {
         kpis: [],
         benchmarks: [],
-        trackingSetup: { platforms: [], customEvents: [], attributionModel: '', reportingFrequency: '' },
-        reportingSchedule: { frequency: 'monthly', stakeholders: [], format: 'report', automationLevel: 'semi-automated' },
-        optimizationTriggers: []
+        trackingSetup: {
+          platforms: [],
+          customEvents: [],
+          attributionModel: '',
+          reportingFrequency: '',
+        },
+        reportingSchedule: {
+          frequency: 'monthly',
+          stakeholders: [],
+          format: 'report',
+          automationLevel: 'semi-automated',
+        },
+        optimizationTriggers: [],
       },
-      templateConfiguration: { customizationLevel: 'high', requiredInputs: [], optionalInputs: [], brandingRequirements: [], technicalSpecs: [] },
-      brandAdaptation: { adaptationPoints: [], brandConsistency: [], customizationOptions: [], qualityChecks: [] },
+      templateConfiguration: {
+        customizationLevel: 'high',
+        requiredInputs: [],
+        optionalInputs: [],
+        brandingRequirements: [],
+        technicalSpecs: [],
+      },
+      brandAdaptation: {
+        adaptationPoints: [],
+        brandConsistency: [],
+        customizationOptions: [],
+        qualityChecks: [],
+      },
       examples: [],
       metadata: {
         version: '1.0.0',
@@ -1540,8 +1642,8 @@ class TemplateService {
         complexity: 'advanced',
         estimatedSetupTime: 60,
         supportedLanguages: ['en'],
-        marketRelevance: []
-      }
+        marketRelevance: [],
+      },
     };
   }
 
@@ -1558,7 +1660,7 @@ class TemplateService {
           'Acknowledge customer value',
           'Highlight exclusive benefits',
           'Strengthen community connection',
-          'Encourage continued engagement'
+          'Encourage continued engagement',
         ],
         audienceStrategy: {
           primaryAudience: 'Existing customers and members',
@@ -1566,29 +1668,29 @@ class TemplateService {
           psychographicProfile: 'Loyal, engaged, community-oriented',
           behavioralTriggers: ['Exclusivity', 'Recognition', 'Community belonging'],
           communicationStyle: 'emotional',
-          culturalConsiderations: ['Loyalty program preferences', 'Community values']
+          culturalConsiderations: ['Loyalty program preferences', 'Community values'],
         },
         competitivePositioning: {
           marketPosition: 'leader',
           differentiationPoints: ['Customer care', 'Exclusive access', 'Community value'],
           competitiveAdvantages: ['Loyalty program', 'Customer service', 'Brand community'],
           valueProposition: 'Your loyalty deserves exclusive rewards and recognition',
-          brandPersonality: ['Caring', 'Exclusive', 'Community-focused']
+          brandPersonality: ['Caring', 'Exclusive', 'Community-focused'],
         },
         emotionalTerritory: {
           primaryEmotion: 'belonging',
           emotionalJourney: ['Recognition', 'Appreciation', 'Exclusivity', 'Pride', 'Advocacy'],
           tonalAttributes: ['Warm', 'Appreciative', 'Exclusive'],
-          brandVoice: 'friendly'
+          brandVoice: 'friendly',
         },
         keyPerformanceIndicators: [
           'Customer retention rate',
           'Lifetime value',
           'Engagement frequency',
           'Referral rate',
-          'Loyalty program participation'
+          'Loyalty program participation',
         ],
-        successMetrics: []
+        successMetrics: [],
       },
       // Simplified properties
       visualGuidelines: {
@@ -1599,7 +1701,7 @@ class TemplateService {
           colorTreatment: 'enhanced',
           composition: 'centered',
           subjectMatter: ['Community', 'Rewards', 'Exclusive experiences'],
-          moodKeywords: ['Warm', 'Exclusive', 'Rewarding']
+          moodKeywords: ['Warm', 'Exclusive', 'Rewarding'],
         },
         layoutPrinciples: [],
         brandElements: [],
@@ -1607,8 +1709,8 @@ class TemplateService {
           primaryFocus: 'Customer appreciation and rewards',
           secondaryElements: ['Exclusive benefits', 'Community elements'],
           supportingElements: ['Program details', 'Success stories'],
-          informationFlow: ['Recognition', 'Benefits', 'Community', 'Action']
-        }
+          informationFlow: ['Recognition', 'Benefits', 'Community', 'Action'],
+        },
       },
       contentStructure: {
         messagingFramework: {
@@ -1616,7 +1718,7 @@ class TemplateService {
           supportingMessages: [],
           proofPoints: [],
           messagingHierarchy: [],
-          tonalGuidelines: []
+          tonalGuidelines: [],
         },
         contentPillars: [],
         narrativeFlow: {
@@ -1624,20 +1726,20 @@ class TemplateService {
           problemStatement: 'Great customers deserve great rewards',
           solutionPresentation: 'Exclusive benefits just for you',
           benefitReinforcement: 'The more you engage, the more you earn',
-          actionDirection: 'Discover your exclusive member benefits'
+          actionDirection: 'Discover your exclusive member benefits',
         },
         callToAction: {
           primaryCTA: 'View My Rewards',
           secondaryCTAs: [],
           urgencyLevel: 'low',
           placementStrategy: [],
-          visualTreatment: ''
+          visualTreatment: '',
         },
         contentAdaptation: {
           channelSpecificRules: [],
           lengthVariations: [],
-          formatOptimizations: []
-        }
+          formatOptimizations: [],
+        },
       },
       channelSpecs: {
         supportedChannels: ['email_header', 'custom', 'instagram_post'],
@@ -1649,26 +1751,57 @@ class TemplateService {
           timingCoordination: {
             launchSequence: [],
             frequencyRules: [],
-            seasonalConsiderations: []
-          }
+            seasonalConsiderations: [],
+          },
         },
         platformOptimizations: [],
         distributionStrategy: {
           organic: { channels: [], contentTypes: [], engagementTactics: [], communityBuilding: [] },
           paid: { channels: [], budgetAllocation: [], targetingStrategy: [], bidStrategy: '' },
-          earned: { prTargets: [], influencerStrategy: [], communityEngagement: [], viralPotential: [] },
-          owned: { channels: [], contentStrategy: [], audienceNurturing: [], conversionOptimization: [] }
-        }
+          earned: {
+            prTargets: [],
+            influencerStrategy: [],
+            communityEngagement: [],
+            viralPotential: [],
+          },
+          owned: {
+            channels: [],
+            contentStrategy: [],
+            audienceNurturing: [],
+            conversionOptimization: [],
+          },
+        },
       },
       performanceKPIs: {
         kpis: [],
         benchmarks: [],
-        trackingSetup: { platforms: [], customEvents: [], attributionModel: '', reportingFrequency: '' },
-        reportingSchedule: { frequency: 'monthly', stakeholders: [], format: 'dashboard', automationLevel: 'fully-automated' },
-        optimizationTriggers: []
+        trackingSetup: {
+          platforms: [],
+          customEvents: [],
+          attributionModel: '',
+          reportingFrequency: '',
+        },
+        reportingSchedule: {
+          frequency: 'monthly',
+          stakeholders: [],
+          format: 'dashboard',
+          automationLevel: 'fully-automated',
+        },
+        optimizationTriggers: [],
       },
-      templateConfiguration: { customizationLevel: 'medium', requiredInputs: [], optionalInputs: [], brandingRequirements: [], technicalSpecs: [] },
-      brandAdaptation: { adaptationPoints: [], brandConsistency: [], customizationOptions: [], qualityChecks: [] },
+      templateConfiguration: {
+        customizationLevel: 'medium',
+        requiredInputs: [],
+        optionalInputs: [],
+        brandingRequirements: [],
+        technicalSpecs: [],
+      },
+      brandAdaptation: {
+        adaptationPoints: [],
+        brandConsistency: [],
+        customizationOptions: [],
+        qualityChecks: [],
+      },
       examples: [],
       metadata: {
         version: '1.0.0',
@@ -1682,8 +1815,8 @@ class TemplateService {
         complexity: 'intermediate',
         estimatedSetupTime: 40,
         supportedLanguages: ['en'],
-        marketRelevance: []
-      }
+        marketRelevance: [],
+      },
     };
   }
 }

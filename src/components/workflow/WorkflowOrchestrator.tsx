@@ -19,7 +19,7 @@ const STEP_LABELS: Record<WorkflowStep, string> = {
   'copy-generation': 'Generate Copy',
   'asset-selection': 'Select Assets',
   'template-population': 'Populate Template',
-  'export': 'Export & Download',
+  export: 'Export & Download',
 };
 
 const STEP_ICONS: Record<WorkflowStep, string> = {
@@ -29,20 +29,12 @@ const STEP_ICONS: Record<WorkflowStep, string> = {
   'copy-generation': '✍️',
   'asset-selection': '🖼️',
   'template-population': '🎨',
-  'export': '📤',
+  export: '📤',
 };
 
-export const WorkflowOrchestrator: React.FC<WorkflowOrchestratorProps> = ({
-  onComplete,
-}) => {
-  const {
-    currentStep,
-    completedSteps,
-    nextStep,
-    previousStep,
-    goToStep,
-    canProceedToStep,
-  } = useTemplateWorkflowStore();
+export const WorkflowOrchestrator: React.FC<WorkflowOrchestratorProps> = ({ onComplete }) => {
+  const { currentStep, completedSteps, nextStep, previousStep, goToStep, canProceedToStep } =
+    useTemplateWorkflowStore();
 
   const handleStepClick = (step: WorkflowStep) => {
     if (canProceedToStep(step)) {
@@ -61,51 +53,19 @@ export const WorkflowOrchestrator: React.FC<WorkflowOrchestratorProps> = ({
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 'template-selection':
-        return (
-          <TemplateSelectionStep 
-            onContinue={handleContinue}
-          />
-        );
+        return <TemplateSelectionStep onContinue={handleContinue} />;
       case 'brief-input':
-        return (
-          <BriefInputStep 
-            onContinue={handleContinue}
-            onBack={handleBack}
-          />
-        );
+        return <BriefInputStep onContinue={handleContinue} onBack={handleBack} />;
       case 'motivation-generation':
-        return (
-          <MotivationGenerator 
-            onContinue={handleContinue}
-          />
-        );
+        return <MotivationGenerator onContinue={handleContinue} />;
       case 'copy-generation':
-        return (
-          <CopyGenerator 
-            onContinue={handleContinue}
-          />
-        );
+        return <CopyGenerator onContinue={handleContinue} />;
       case 'asset-selection':
-        return (
-          <AssetSelectionStep 
-            onContinue={handleContinue}
-            onBack={handleBack}
-          />
-        );
+        return <AssetSelectionStep onContinue={handleContinue} onBack={handleBack} />;
       case 'template-population':
-        return (
-          <TemplatePopulationStep 
-            onContinue={handleContinue}
-            onBack={handleBack}
-          />
-        );
+        return <TemplatePopulationStep onContinue={handleContinue} onBack={handleBack} />;
       case 'export':
-        return (
-          <ExportStep 
-            onComplete={onComplete}
-            onBack={handleBack}
-          />
-        );
+        return <ExportStep onComplete={onComplete} onBack={handleBack} />;
       default:
         return <div>Unknown step</div>;
     }
@@ -114,7 +74,7 @@ export const WorkflowOrchestrator: React.FC<WorkflowOrchestratorProps> = ({
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Progress Bar */}
-      <WorkflowProgressBar 
+      <WorkflowProgressBar
         currentStep={currentStep}
         completedSteps={completedSteps}
         onStepClick={handleStepClick}
@@ -122,9 +82,7 @@ export const WorkflowOrchestrator: React.FC<WorkflowOrchestratorProps> = ({
       />
 
       {/* Step Content */}
-      <div className="container mx-auto">
-        {renderCurrentStep()}
-      </div>
+      <div className="container mx-auto">{renderCurrentStep()}</div>
     </div>
   );
 };
@@ -149,7 +107,7 @@ const WorkflowProgressBar: React.FC<WorkflowProgressBarProps> = ({
     'copy-generation',
     'asset-selection',
     'template-population',
-    'export'
+    'export',
   ];
 
   const getStepStatus = (step: WorkflowStep) => {
@@ -181,7 +139,7 @@ const WorkflowProgressBar: React.FC<WorkflowProgressBarProps> = ({
           {steps.map((step, index) => {
             const status = getStepStatus(step);
             const isClickable = status === 'available' || status === 'completed';
-            
+
             return (
               <div key={step} className="flex items-center">
                 {/* Step Circle */}
@@ -195,7 +153,12 @@ const WorkflowProgressBar: React.FC<WorkflowProgressBarProps> = ({
                 >
                   {status === 'completed' ? (
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   ) : (
                     <span className="text-lg">{STEP_ICONS[step]}</span>
@@ -204,21 +167,29 @@ const WorkflowProgressBar: React.FC<WorkflowProgressBarProps> = ({
 
                 {/* Step Label */}
                 <div className="ml-3 hidden md:block">
-                  <div className={`text-sm font-medium ${
-                    status === 'current' ? 'text-orange-400' : 
-                    status === 'completed' ? 'text-green-400' : 
-                    status === 'available' ? 'text-white' : 'text-gray-500'
-                  }`}>
+                  <div
+                    className={`text-sm font-medium ${
+                      status === 'current'
+                        ? 'text-orange-400'
+                        : status === 'completed'
+                          ? 'text-green-400'
+                          : status === 'available'
+                            ? 'text-white'
+                            : 'text-gray-500'
+                    }`}
+                  >
                     {STEP_LABELS[step]}
                   </div>
                 </div>
 
                 {/* Connector Line */}
                 {index < steps.length - 1 && (
-                  <div className={`
+                  <div
+                    className={`
                     flex-1 h-1 mx-4 rounded-full transition-all duration-300
                     ${completedSteps.includes(step) ? 'bg-green-500' : 'bg-gray-600'}
-                  `} />
+                  `}
+                  />
                 )}
               </div>
             );
@@ -247,7 +218,7 @@ const TemplateSelectionStep: React.FC<{ onContinue: () => void }> = ({ onContinu
         optionalAssets: template.channelSpecs?.optionalAssets || [],
       },
     };
-    
+
     selectTemplate(selectedTemplate);
     onContinue();
   };
@@ -256,36 +227,43 @@ const TemplateSelectionStep: React.FC<{ onContinue: () => void }> = ({ onContinu
     <div className="max-w-6xl mx-auto p-8">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-white mb-4">🎯 Select Your Template</h1>
-        <p className="text-gray-400 text-lg">Choose the ad format that best fits your campaign goals</p>
+        <p className="text-gray-400 text-lg">
+          Choose the ad format that best fits your campaign goals
+        </p>
       </div>
-      
+
       <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6">
-        <TemplateSelector 
-          onTemplateSelected={handleTemplateSelected}
-        />
+        <TemplateSelector onTemplateSelected={handleTemplateSelected} />
       </div>
     </div>
   );
 };
 
-const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> = ({ onContinue, onBack }) => {
+const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> = ({
+  onContinue,
+  onBack,
+}) => {
   const { setParsedBrief, parsedBrief, briefText: storedBriefText } = useTemplateWorkflowStore();
   const [briefText, setBriefText] = React.useState(storedBriefText || '');
-  const [parsedFields, setParsedFields] = React.useState(parsedBrief || {
-    goal: '',
-    targetAudience: '',
-    keyBenefits: [],
-    brandPersonality: '',
-    productDetails: '',
-    campaignRequirements: '',
-    toneMood: '',
-    callToAction: '',
-    competitiveContext: '',
-    constraints: ''
-  });
+  const [parsedFields, setParsedFields] = React.useState(
+    parsedBrief || {
+      goal: '',
+      targetAudience: '',
+      keyBenefits: [],
+      brandPersonality: '',
+      productDetails: '',
+      campaignRequirements: '',
+      toneMood: '',
+      callToAction: '',
+      competitiveContext: '',
+      constraints: '',
+    }
+  );
   const [isDragOver, setIsDragOver] = React.useState(false);
   const [isProcessing, setIsProcessing] = React.useState(false);
-  const [processingStatus, setProcessingStatus] = React.useState<'idle' | 'processing' | 'success' | 'error'>('idle');
+  const [processingStatus, setProcessingStatus] = React.useState<
+    'idle' | 'processing' | 'success' | 'error'
+  >('idle');
   const [statusMessage, setStatusMessage] = React.useState('');
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -295,10 +273,10 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
   };
 
   const extractTextFromFile = async (file: File): Promise<string> => {
-    console.log('🔍 Extracting text from file:', { 
-      name: file.name, 
-      type: file.type, 
-      size: file.size 
+    console.log('🔍 Extracting text from file:', {
+      name: file.name,
+      type: file.type,
+      size: file.size,
     });
 
     const fileType = file.type;
@@ -353,7 +331,7 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
         },
         body: JSON.stringify({
           briefText: text,
-          fileName: fileName
+          fileName,
         }),
       });
 
@@ -380,19 +358,19 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
     setIsProcessing(true);
     setProcessingStatus('processing');
     setStatusMessage(`Processing ${file.name}...`);
-    
+
     try {
       // Step 1: Extract text from file
       const text = await extractTextFromFile(file);
-      console.log('📝 Text content preview:', text.substring(0, 200) + '...');
-      
+      console.log('📝 Text content preview:', `${text.substring(0, 200)}...`);
+
       // Update the brief text immediately
       setBriefText(text);
 
       // Step 2: Parse brief using AI API
       setStatusMessage(`Analyzing brief content with AI...`);
       const aiParsedBrief = await callBriefParsingAPI(text, file.name);
-      
+
       // Update parsed fields
       console.log('📝 Updating form fields with AI-parsed content');
       setParsedFields(aiParsedBrief);
@@ -403,21 +381,26 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
         return value && value.toString().trim().length > 0;
       }).length;
 
-      console.log('✅ Successfully parsed brief with AI:', { 
+      console.log('✅ Successfully parsed brief with AI:', {
         fieldsExtracted: parsedFieldCount,
         goal: aiParsedBrief.goal ? 'Found' : 'Not found',
         audience: aiParsedBrief.targetAudience ? 'Found' : 'Not found',
-        benefits: aiParsedBrief.keyBenefits?.length || 0
+        benefits: aiParsedBrief.keyBenefits?.length || 0,
       });
 
       setProcessingStatus('success');
-      setStatusMessage(`✅ AI analysis complete! Extracted ${parsedFieldCount} structured fields from your brief.`);
-
+      setStatusMessage(
+        `✅ AI analysis complete! Extracted ${parsedFieldCount} structured fields from your brief.`
+      );
     } catch (error) {
       console.log('❌ File processing error:', error);
-      setBriefText(`Error reading file "${file.name}". Please copy and paste the content manually.`);
+      setBriefText(
+        `Error reading file "${file.name}". Please copy and paste the content manually.`
+      );
       setProcessingStatus('error');
-      setStatusMessage(`❌ Error processing ${file.name}. Please try again or paste content manually.`);
+      setStatusMessage(
+        `❌ Error processing ${file.name}. Please try again or paste content manually.`
+      );
     } finally {
       setIsProcessing(false);
       // Clear status message after 5 seconds
@@ -432,9 +415,13 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
     console.log('📂 File dropped!');
     e.preventDefault();
     setIsDragOver(false);
-    
+
     const files = Array.from(e.dataTransfer.files);
-    console.log('📁 Files detected:', files.length, files.map(f => f.name));
+    console.log(
+      '📁 Files detected:',
+      files.length,
+      files.map(f => f.name)
+    );
     if (files.length > 0) {
       processFile(files[0]); // Process the first file
     } else {
@@ -471,16 +458,21 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
     <div className="max-w-4xl mx-auto p-8">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-white mb-4">📝 Input Your Brief</h1>
-        <p className="text-gray-400 text-lg">Provide details about your campaign or drag & drop a file</p>
+        <p className="text-gray-400 text-lg">
+          Provide details about your campaign or drag & drop a file
+        </p>
       </div>
 
       {/* Drag & Drop Zone */}
-      <div 
+      <div
         className={`mb-6 p-6 border-2 border-dashed rounded-xl transition-all duration-300 cursor-pointer ${
-          processingStatus === 'success' ? 'border-green-400 bg-green-400/10' :
-          processingStatus === 'error' ? 'border-red-400 bg-red-400/10' :
-          isDragOver ? 'border-orange-400 bg-orange-400/10' : 
-          'border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10'
+          processingStatus === 'success'
+            ? 'border-green-400 bg-green-400/10'
+            : processingStatus === 'error'
+              ? 'border-red-400 bg-red-400/10'
+              : isDragOver
+                ? 'border-orange-400 bg-orange-400/10'
+                : 'border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10'
         }`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
@@ -509,9 +501,7 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
           ) : (
             <>
               <div className="text-4xl mb-4">📄</div>
-              <p className="text-white font-medium mb-2">
-                Drag & drop your brief file here
-              </p>
+              <p className="text-white font-medium mb-2">Drag & drop your brief file here</p>
               <p className="text-gray-400 text-sm">
                 Supports .txt, .pdf, .doc, .docx files or click to browse
               </p>
@@ -538,7 +528,9 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
             </label>
             {briefText.length > 50 && (
               <button
-                onClick={() => callBriefParsingAPI(briefText).then(setParsedFields).catch(console.error)}
+                onClick={() =>
+                  callBriefParsingAPI(briefText).then(setParsedFields).catch(console.error)
+                }
                 disabled={isProcessing}
                 className="text-sm bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/30 text-orange-300 px-3 py-1 rounded-lg transition-all duration-300 disabled:opacity-50"
               >
@@ -548,7 +540,7 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
           </div>
           <textarea
             value={briefText}
-            onChange={(e) => setBriefText(e.target.value)}
+            onChange={e => setBriefText(e.target.value)}
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all resize-none"
             rows={6}
             placeholder="Paste or type your campaign brief here, or drag and drop a file above..."
@@ -558,13 +550,11 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
         {/* Parsed Fields Grid */}
         <div className="grid md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Campaign Goal *
-            </label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Campaign Goal *</label>
             <input
               type="text"
               value={parsedFields.goal}
-              onChange={(e) => setParsedFields({...parsedFields, goal: e.target.value})}
+              onChange={e => setParsedFields({ ...parsedFields, goal: e.target.value })}
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
               placeholder="e.g., Increase brand awareness, Drive sales..."
             />
@@ -577,7 +567,7 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
             <input
               type="text"
               value={parsedFields.targetAudience}
-              onChange={(e) => setParsedFields({...parsedFields, targetAudience: e.target.value})}
+              onChange={e => setParsedFields({ ...parsedFields, targetAudience: e.target.value })}
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
               placeholder="e.g., Young professionals aged 25-35..."
             />
@@ -590,7 +580,7 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
             <input
               type="text"
               value={parsedFields.productDetails}
-              onChange={(e) => setParsedFields({...parsedFields, productDetails: e.target.value})}
+              onChange={e => setParsedFields({ ...parsedFields, productDetails: e.target.value })}
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
               placeholder="What are you advertising?"
             />
@@ -603,33 +593,29 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
             <input
               type="text"
               value={parsedFields.brandPersonality}
-              onChange={(e) => setParsedFields({...parsedFields, brandPersonality: e.target.value})}
+              onChange={e => setParsedFields({ ...parsedFields, brandPersonality: e.target.value })}
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
               placeholder="e.g., Modern, trustworthy, innovative..."
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Tone & Mood
-            </label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Tone & Mood</label>
             <input
               type="text"
               value={parsedFields.toneMood}
-              onChange={(e) => setParsedFields({...parsedFields, toneMood: e.target.value})}
+              onChange={e => setParsedFields({ ...parsedFields, toneMood: e.target.value })}
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
               placeholder="e.g., Professional, friendly, urgent..."
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Call to Action
-            </label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Call to Action</label>
             <input
               type="text"
               value={parsedFields.callToAction}
-              onChange={(e) => setParsedFields({...parsedFields, callToAction: e.target.value})}
+              onChange={e => setParsedFields({ ...parsedFields, callToAction: e.target.value })}
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
               placeholder="e.g., Shop now, Learn more, Sign up..."
             />
@@ -643,7 +629,12 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
           </label>
           <textarea
             value={parsedFields.keyBenefits.join('\n')}
-            onChange={(e) => setParsedFields({...parsedFields, keyBenefits: e.target.value.split('\n').filter(b => b.trim())})}
+            onChange={e =>
+              setParsedFields({
+                ...parsedFields,
+                keyBenefits: e.target.value.split('\n').filter(b => b.trim()),
+              })
+            }
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all resize-none"
             rows={3}
             placeholder="List the main benefits or value propositions..."
@@ -659,7 +650,9 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
             <input
               type="text"
               value={parsedFields.campaignRequirements}
-              onChange={(e) => setParsedFields({...parsedFields, campaignRequirements: e.target.value})}
+              onChange={e =>
+                setParsedFields({ ...parsedFields, campaignRequirements: e.target.value })
+              }
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
               placeholder="Specific requirements or constraints..."
             />
@@ -672,7 +665,9 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
             <input
               type="text"
               value={parsedFields.competitiveContext}
-              onChange={(e) => setParsedFields({...parsedFields, competitiveContext: e.target.value})}
+              onChange={e =>
+                setParsedFields({ ...parsedFields, competitiveContext: e.target.value })
+              }
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
               placeholder="Competitor insights or differentiation..."
             />
@@ -699,16 +694,31 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
   );
 };
 
-const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void }> = ({ onContinue, onBack }) => {
-  const { selectedAssets, uploadAssets, generateImage, generateVideo, isGeneratingImage, isGeneratingVideo, generationError, uploadProgress, isUploading } = useAssetStore();
+const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void }> = ({
+  onContinue,
+  onBack,
+}) => {
+  const {
+    selectedAssets,
+    uploadAssets,
+    generateImage,
+    generateVideo,
+    isGeneratingImage,
+    isGeneratingVideo,
+    generationError,
+    uploadProgress,
+    isUploading,
+  } = useAssetStore();
   const { markStepCompleted, parsedBrief, briefText } = useTemplateWorkflowStore();
-  const [activeTab, setActiveTab] = React.useState<'browse' | 'generate-images' | 'generate-videos' | 'upload'>('browse');
+  const [activeTab, setActiveTab] = React.useState<
+    'browse' | 'generate-images' | 'generate-videos' | 'upload'
+  >('browse');
   const [imagePrompt, setImagePrompt] = React.useState('');
   const [videoSettings, setVideoSettings] = React.useState({
     sourceImageUrl: '',
     animationType: 'subtle_float' as const,
     duration: 3,
-    platformOptimization: 'instagram' as const
+    platformOptimization: 'instagram' as const,
   });
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = React.useState(false);
@@ -727,9 +737,9 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
     if (!imagePrompt.trim()) return;
 
     // Use parsed brief data to enhance the prompt
-    const enhancedPrompt = parsedBrief ? 
-      `${imagePrompt}. Brand personality: ${parsedBrief.brandPersonality}. Tone: ${parsedBrief.toneMood}. Product: ${parsedBrief.productDetails}` :
-      imagePrompt;
+    const enhancedPrompt = parsedBrief
+      ? `${imagePrompt}. Brand personality: ${parsedBrief.brandPersonality}. Tone: ${parsedBrief.toneMood}. Product: ${parsedBrief.productDetails}`
+      : imagePrompt;
 
     try {
       // Create a mock territory for image generation
@@ -738,7 +748,7 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
         title: parsedBrief?.goal || 'Campaign Territory',
         positioning: parsedBrief?.productDetails || 'Product positioning',
         tone: parsedBrief?.toneMood || 'professional',
-        headlines: []
+        headlines: [],
       };
 
       const defaultBrandGuidelines = {
@@ -748,34 +758,34 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
           accent: ['#007BFF', '#28A745'],
           neutral: ['#6C757D', '#E9ECEF'],
           background: '#FFFFFF',
-          text: '#212529'
+          text: '#212529',
         },
         fonts: {
           primary: 'Inter',
           secondary: 'Space Grotesk',
-          fallbacks: ['Arial', 'sans-serif']
+          fallbacks: ['Arial', 'sans-serif'],
         },
         logoUsage: {
           minSize: 32,
           clearSpace: 16,
           placement: 'top-left' as const,
-          variations: ['primary', 'monochrome', 'reversed']
+          variations: ['primary', 'monochrome', 'reversed'],
         },
         spacing: {
           grid: 8,
           margins: 24,
-          padding: 16
+          padding: 16,
         },
         imagery: {
           style: parsedBrief?.brandPersonality ? [parsedBrief.brandPersonality] : ['modern'],
           filters: ['vibrant', 'high-contrast'],
-          overlayOpacity: 0.3
+          overlayOpacity: 0.3,
         },
         compliance: {
           requiredElements: ['logo', 'tagline'],
           prohibitedElements: ['competitor-references'],
-          legalText: ['Terms apply', 'See website for details']
-        }
+          legalText: ['Terms apply', 'See website for details'],
+        },
       };
 
       await generateImage({
@@ -785,7 +795,7 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
         imageType: 'hero',
         culturalContext: 'global',
         quality: 'hd',
-        styleConsistency: true
+        styleConsistency: true,
       });
       setImagePrompt('');
     } catch (error) {
@@ -804,7 +814,7 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
         duration: videoSettings.duration,
         outputFormat: 'mp4',
         platformOptimization: videoSettings.platformOptimization,
-        quality: 'hd'
+        quality: 'hd',
       });
     } catch (error) {
       console.error('Video generation failed:', error);
@@ -845,14 +855,16 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
     { id: 'browse', label: 'Browse Library', icon: '📚' },
     { id: 'generate-images', label: 'Generate Images', icon: '🎨' },
     { id: 'generate-videos', label: 'Generate Videos', icon: '🎬' },
-    { id: 'upload', label: 'Upload Assets', icon: '📤' }
+    { id: 'upload', label: 'Upload Assets', icon: '📤' },
   ];
 
   return (
     <div className="max-w-6xl mx-auto p-8">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-white mb-4">🖼️ Select & Create Assets</h1>
-        <p className="text-gray-400 text-lg">Browse existing assets, generate new ones, or upload your own</p>
+        <p className="text-gray-400 text-lg">
+          Browse existing assets, generate new ones, or upload your own
+        </p>
         {selectedAssets.length > 0 && (
           <div className="mt-4 text-orange-400">
             {selectedAssets.length} asset{selectedAssets.length !== 1 ? 's' : ''} selected
@@ -863,7 +875,7 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
       {/* Tab Navigation */}
       <div className="flex justify-center mb-8">
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-1 inline-flex">
-          {tabs.map((tab) => (
+          {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
@@ -896,7 +908,9 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
           <div className="space-y-6">
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-white mb-2">🎨 AI Image Generation</h3>
-              <p className="text-gray-400">Create custom images using AI based on your campaign brief</p>
+              <p className="text-gray-400">
+                Create custom images using AI based on your campaign brief
+              </p>
             </div>
 
             <div className="max-w-2xl mx-auto space-y-4">
@@ -906,7 +920,7 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
                 </label>
                 <textarea
                   value={imagePrompt}
-                  onChange={(e) => setImagePrompt(e.target.value)}
+                  onChange={e => setImagePrompt(e.target.value)}
                   className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all resize-none"
                   rows={4}
                   placeholder="Describe the image you want to generate... (e.g., Professional product photo of a smartphone on a clean white background with soft lighting)"
@@ -915,9 +929,13 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
 
               {parsedBrief && (
                 <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-                  <h4 className="text-blue-300 font-medium mb-2">✨ Auto-Enhanced with Campaign Data:</h4>
+                  <h4 className="text-blue-300 font-medium mb-2">
+                    ✨ Auto-Enhanced with Campaign Data:
+                  </h4>
                   <ul className="text-sm text-blue-200 space-y-1">
-                    {parsedBrief.brandPersonality && <li>• Brand: {parsedBrief.brandPersonality}</li>}
+                    {parsedBrief.brandPersonality && (
+                      <li>• Brand: {parsedBrief.brandPersonality}</li>
+                    )}
                     {parsedBrief.toneMood && <li>• Tone: {parsedBrief.toneMood}</li>}
                     {parsedBrief.productDetails && <li>• Product: {parsedBrief.productDetails}</li>}
                   </ul>
@@ -925,24 +943,53 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
               )}
 
               <div className="space-y-3">
-                <button
-                  onClick={async () => {
-                    try {
-                      console.log('🔍 Testing API key...');
-                      const response = await fetch('/.netlify/functions/test-api-key');
-                      const result = await response.json();
-                      console.log('🔑 API Key Test Result:', result);
-                      alert(`API Key Test: ${result.success ? 'SUCCESS' : 'FAILED'}\n${JSON.stringify(result.data || result.error, null, 2)}`);
-                    } catch (error) {
-                      console.error('❌ API key test failed:', error);
-                      alert(`API Key Test Failed: ${error}`);
-                    }
-                  }}
-                  className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-lg transition-all duration-300"
-                >
-                  🔍 Test API Key
-                </button>
-                
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={async () => {
+                      try {
+                        console.log('🔍 Testing API key...');
+                        const response = await fetch('/.netlify/functions/test-api-key');
+                        const result = await response.json();
+                        console.log('🔑 API Key Test Result:', result);
+                        alert(
+                          `API Key Test: ${result.success ? 'SUCCESS' : 'FAILED'}\n${JSON.stringify(result.data || result.error, null, 2)}`
+                        );
+                      } catch (error) {
+                        console.error('❌ API key test failed:', error);
+                        alert(`API Key Test Failed: ${error}`);
+                      }
+                    }}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-medium px-3 py-2 rounded-lg transition-all duration-300 text-sm"
+                  >
+                    🔍 Test API
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      try {
+                        console.log('🍎 Testing simple prompt...');
+                        const { generateSimpleImage_API } = await import(
+                          '../../services/secureApiService'
+                        );
+                        const result = await generateSimpleImage_API('red apple', {
+                          imageType: 'product',
+                          quality: 'standard',
+                        });
+                        console.log('🍎 Simple test result:', result);
+                        alert(
+                          `Simple Test: ${result.length > 0 ? 'SUCCESS' : 'FAILED'}\nGenerated: ${result.length} image(s)`
+                        );
+                      } catch (error) {
+                        console.error('❌ Simple test failed:', error);
+                        alert(`Simple Test Failed: ${error}`);
+                      }
+                    }}
+                    className="bg-green-500 hover:bg-green-600 text-white font-medium px-3 py-2 rounded-lg transition-all duration-300 text-sm"
+                  >
+                    🍎 Quick Test
+                  </button>
+                </div>
+
                 <button
                   onClick={handleGenerateImage}
                   disabled={!imagePrompt.trim() || isGeneratingImage}
@@ -983,7 +1030,9 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
                 <input
                   type="url"
                   value={videoSettings.sourceImageUrl}
-                  onChange={(e) => setVideoSettings({...videoSettings, sourceImageUrl: e.target.value})}
+                  onChange={e =>
+                    setVideoSettings({ ...videoSettings, sourceImageUrl: e.target.value })
+                  }
                   className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
                   placeholder="Paste image URL to animate..."
                 />
@@ -996,7 +1045,9 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
                   </label>
                   <select
                     value={videoSettings.animationType}
-                    onChange={(e) => setVideoSettings({...videoSettings, animationType: e.target.value as any})}
+                    onChange={e =>
+                      setVideoSettings({ ...videoSettings, animationType: e.target.value as any })
+                    }
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
                   >
                     <option value="subtle_float">Subtle Float</option>
@@ -1017,7 +1068,9 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
                     min="1"
                     max="10"
                     value={videoSettings.duration}
-                    onChange={(e) => setVideoSettings({...videoSettings, duration: parseInt(e.target.value)})}
+                    onChange={e =>
+                      setVideoSettings({ ...videoSettings, duration: parseInt(e.target.value) })
+                    }
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
                   />
                 </div>
@@ -1029,7 +1082,12 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
                 </label>
                 <select
                   value={videoSettings.platformOptimization}
-                  onChange={(e) => setVideoSettings({...videoSettings, platformOptimization: e.target.value as any})}
+                  onChange={e =>
+                    setVideoSettings({
+                      ...videoSettings,
+                      platformOptimization: e.target.value as any,
+                    })
+                  }
                   className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
                 >
                   <option value="instagram">Instagram</option>
@@ -1069,14 +1127,16 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
           <div className="space-y-6">
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-white mb-2">📤 Upload Assets</h3>
-              <p className="text-gray-400">Add your own images, videos, and other assets to the library</p>
+              <p className="text-gray-400">
+                Add your own images, videos, and other assets to the library
+              </p>
             </div>
 
             {/* Drag & Drop Zone */}
-            <div 
+            <div
               className={`max-w-2xl mx-auto p-8 border-2 border-dashed rounded-xl transition-all duration-300 cursor-pointer ${
-                isDragOver 
-                  ? 'border-orange-400 bg-orange-400/10' 
+                isDragOver
+                  ? 'border-orange-400 bg-orange-400/10'
                   : 'border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10'
               }`}
               onDrop={handleDrop}
@@ -1093,9 +1153,7 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
                 ) : (
                   <>
                     <div className="text-4xl mb-4">📁</div>
-                    <p className="text-white font-medium mb-2">
-                      Drag & drop your assets here
-                    </p>
+                    <p className="text-white font-medium mb-2">Drag & drop your assets here</p>
                     <p className="text-gray-400 text-sm">
                       Supports images, videos, audio files (max 50MB each)
                     </p>
@@ -1110,17 +1168,20 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
             {/* Upload Progress */}
             {uploadProgress.length > 0 && (
               <div className="max-w-2xl mx-auto space-y-2">
-                {uploadProgress.map((progress) => (
+                {uploadProgress.map(progress => (
                   <div key={progress.id} className="bg-white/5 rounded-lg p-3">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-white text-sm">{progress.filename}</span>
                       <span className="text-gray-400 text-xs">{progress.status}</span>
                     </div>
                     <div className="w-full bg-gray-700 rounded-full h-2">
-                      <div 
+                      <div
                         className={`h-2 rounded-full transition-all duration-300 ${
-                          progress.status === 'complete' ? 'bg-green-500' :
-                          progress.status === 'error' ? 'bg-red-500' : 'bg-orange-500'
+                          progress.status === 'complete'
+                            ? 'bg-green-500'
+                            : progress.status === 'error'
+                              ? 'bg-red-500'
+                              : 'bg-orange-500'
                         }`}
                         style={{ width: `${progress.progress}%` }}
                       ></div>
@@ -1164,7 +1225,10 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
   );
 };
 
-const TemplatePopulationStep: React.FC<{ onContinue: () => void; onBack: () => void }> = ({ onContinue, onBack }) => {
+const TemplatePopulationStep: React.FC<{ onContinue: () => void; onBack: () => void }> = ({
+  onContinue,
+  onBack,
+}) => {
   const { selectedCopy } = useCopyStore();
   const { selectedAssets } = useAssetStore();
   const { selectedTemplate, markStepCompleted } = useTemplateWorkflowStore();
@@ -1183,8 +1247,10 @@ const TemplatePopulationStep: React.FC<{ onContinue: () => void; onBack: () => v
     <div className="max-w-6xl mx-auto p-8">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-white mb-4">🎨 Populate Template</h1>
-        <p className="text-gray-400 text-lg">Customize your selected template with copy and assets</p>
-        
+        <p className="text-gray-400 text-lg">
+          Customize your selected template with copy and assets
+        </p>
+
         {/* Show current selections */}
         <div className="mt-6 grid md:grid-cols-3 gap-4 text-sm">
           <div className="bg-white/5 rounded-lg p-3">
@@ -1207,7 +1273,7 @@ const TemplatePopulationStep: React.FC<{ onContinue: () => void; onBack: () => v
           </div>
         </div>
       </div>
-      
+
       <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6 mb-8">
         <TemplateCustomizer
           onCustomizationComplete={handleCustomizationComplete}
@@ -1219,11 +1285,17 @@ const TemplatePopulationStep: React.FC<{ onContinue: () => void; onBack: () => v
   );
 };
 
-const ExportStep: React.FC<{ onComplete?: () => void; onBack: () => void }> = ({ onComplete, onBack }) => {
+const ExportStep: React.FC<{ onComplete?: () => void; onBack: () => void }> = ({
+  onComplete,
+  onBack,
+}) => {
   const { selectedCopy } = useCopyStore();
   const { selectedAssets } = useAssetStore();
   const { selectedTemplate, markStepCompleted } = useTemplateWorkflowStore();
-  const [toastMessage, setToastMessage] = React.useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [toastMessage, setToastMessage] = React.useState<{
+    message: string;
+    type: 'success' | 'error' | 'info';
+  } | null>(null);
 
   // Create a mock generated output for the export manager
   const mockGeneratedOutput = React.useMemo(() => {
@@ -1241,16 +1313,16 @@ const ExportStep: React.FC<{ onComplete?: () => void; onBack: () => void }> = ({
               text: selectedCopy.headline,
               followUp: selectedCopy.bodyText,
               reasoning: 'Generated from workflow copy selection',
-              confidence: 90
-            }
+              confidence: 90,
+            },
           ],
           confidence: {
             marketFit: 85,
             complianceConfidence: 90,
             audienceResonance: 88,
-            riskLevel: 'LOW' as const
-          }
-        }
+            riskLevel: 'LOW' as const,
+          },
+        },
       ],
       overallConfidence: 87.7, // Average of the confidence scores
       compliance: {
@@ -1259,14 +1331,14 @@ const ExportStep: React.FC<{ onComplete?: () => void; onBack: () => void }> = ({
         recommendations: ['Campaign meets all compliance requirements'],
         powerBy: ['workflow-integration'],
         output: 'All compliance checks passed',
-        notes: ['Generated from workflow integration']
+        notes: ['Generated from workflow integration'],
       },
       metadata: {
         generatedAt: new Date(),
         model: 'workflow-integration',
-        requestId: 'workflow-' + Date.now(),
-        processingTime: 2500
-      }
+        requestId: `workflow-${Date.now()}`,
+        processingTime: 2500,
+      },
     };
   }, [selectedCopy, selectedTemplate]);
 
@@ -1302,7 +1374,7 @@ const ExportStep: React.FC<{ onComplete?: () => void; onBack: () => void }> = ({
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-white mb-4">📤 Export & Download</h1>
         <p className="text-gray-400 text-lg">Your advertisement is ready for download</p>
-        
+
         {/* Campaign Summary */}
         <div className="mt-6 grid md:grid-cols-3 gap-4 text-sm">
           <div className="bg-white/5 rounded-lg p-4">
@@ -1328,23 +1400,24 @@ const ExportStep: React.FC<{ onComplete?: () => void; onBack: () => void }> = ({
           </div>
         </div>
       </div>
-      
+
       {/* Toast Message */}
       {toastMessage && (
-        <div className={`mb-6 p-4 rounded-xl ${
-          toastMessage.type === 'success' ? 'bg-green-500/20 border border-green-500/30 text-green-300' :
-          toastMessage.type === 'error' ? 'bg-red-500/20 border border-red-500/30 text-red-300' :
-          'bg-blue-500/20 border border-blue-500/30 text-blue-300'
-        }`}>
+        <div
+          className={`mb-6 p-4 rounded-xl ${
+            toastMessage.type === 'success'
+              ? 'bg-green-500/20 border border-green-500/30 text-green-300'
+              : toastMessage.type === 'error'
+                ? 'bg-red-500/20 border border-red-500/30 text-red-300'
+                : 'bg-blue-500/20 border border-blue-500/30 text-blue-300'
+          }`}
+        >
           {toastMessage.message}
         </div>
       )}
-      
+
       <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6 mb-8">
-        <ExportManager
-          generatedOutput={mockGeneratedOutput}
-          onShowToast={handleToast}
-        />
+        <ExportManager generatedOutput={mockGeneratedOutput} onShowToast={handleToast} />
       </div>
 
       <div className="flex justify-between">

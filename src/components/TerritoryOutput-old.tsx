@@ -55,7 +55,7 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
         includeConfidenceScores: true,
         includeCompliance: true,
         format: 'a4',
-        orientation: 'portrait'
+        orientation: 'portrait',
       };
 
       const result = await pdfExportService.exportTerritoriesToPDF(generatedOutput, options);

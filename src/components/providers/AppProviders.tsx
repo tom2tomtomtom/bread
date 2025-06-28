@@ -36,9 +36,7 @@ export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
         <AuthenticationProvider>
           <ConfigurationProvider>
             <UIStateManager>
-              <GenerationOrchestrator>
-                {children}
-              </GenerationOrchestrator>
+              <GenerationOrchestrator>{children}</GenerationOrchestrator>
             </UIStateManager>
           </ConfigurationProvider>
         </AuthenticationProvider>

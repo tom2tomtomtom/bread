@@ -1,6 +1,6 @@
 /**
  * 🎨 Layout Generation Service
- * 
+ *
  * AI-powered layout generation engine that creates professional ad layouts
  * by intelligently combining uploaded assets with creative territories.
  */
@@ -36,25 +36,37 @@ export const CHANNEL_SPECIFICATIONS: Record<ChannelFormat, ChannelSpecs> = {
   linkedin_banner: { width: 1584, height: 396, dpi: 72, colorSpace: 'RGB', fileFormat: 'JPG' },
   tiktok_video: { width: 1080, height: 1920, dpi: 72, colorSpace: 'RGB', fileFormat: 'MP4' },
   youtube_thumbnail: { width: 1280, height: 720, dpi: 72, colorSpace: 'RGB', fileFormat: 'JPG' },
-  
+
   // Print
   print_a4: { width: 2480, height: 3508, dpi: 300, colorSpace: 'CMYK', fileFormat: 'PDF' },
   print_a3: { width: 3508, height: 4961, dpi: 300, colorSpace: 'CMYK', fileFormat: 'PDF' },
-  billboard_landscape: { width: 14400, height: 4800, dpi: 150, colorSpace: 'CMYK', fileFormat: 'PDF' },
-  billboard_portrait: { width: 4800, height: 14400, dpi: 150, colorSpace: 'CMYK', fileFormat: 'PDF' },
-  
+  billboard_landscape: {
+    width: 14400,
+    height: 4800,
+    dpi: 150,
+    colorSpace: 'CMYK',
+    fileFormat: 'PDF',
+  },
+  billboard_portrait: {
+    width: 4800,
+    height: 14400,
+    dpi: 150,
+    colorSpace: 'CMYK',
+    fileFormat: 'PDF',
+  },
+
   // Digital Advertising
   banner_leaderboard: { width: 728, height: 90, dpi: 72, colorSpace: 'RGB', fileFormat: 'JPG' },
   banner_rectangle: { width: 300, height: 250, dpi: 72, colorSpace: 'RGB', fileFormat: 'JPG' },
   banner_skyscraper: { width: 160, height: 600, dpi: 72, colorSpace: 'RGB', fileFormat: 'JPG' },
   email_header: { width: 600, height: 200, dpi: 72, colorSpace: 'RGB', fileFormat: 'JPG' },
   email_signature: { width: 320, height: 120, dpi: 72, colorSpace: 'RGB', fileFormat: 'PNG' },
-  
+
   // Retail & In-store
   pos_display: { width: 1080, height: 1920, dpi: 150, colorSpace: 'RGB', fileFormat: 'PDF' },
   shelf_talker: { width: 600, height: 400, dpi: 150, colorSpace: 'RGB', fileFormat: 'PDF' },
   window_cling: { width: 1200, height: 1600, dpi: 150, colorSpace: 'RGB', fileFormat: 'PDF' },
-  
+
   // Custom
   custom: { width: 1080, height: 1080, dpi: 72, colorSpace: 'RGB', fileFormat: 'JPG' },
 };
@@ -78,7 +90,7 @@ const LAYOUT_GENERATION_PROMPTS = {
     
     Generate 3 distinct layout variations with detailed placement coordinates and reasoning.
   `,
-  
+
   BRAND_COMPLIANCE_CHECK: `
     Evaluate the proposed layout against brand guidelines and industry standards.
     
@@ -95,7 +107,7 @@ const LAYOUT_GENERATION_PROMPTS = {
     
     Provide compliance score and specific recommendations.
   `,
-  
+
   PERFORMANCE_PREDICTION: `
     Predict the performance potential of this layout based on design principles and market data.
     
@@ -121,25 +133,26 @@ class LayoutGenerationService {
    */
   async generateLayouts(request: LayoutGenerationRequest): Promise<LayoutVariation[]> {
     console.log('🎨 Starting AI-powered layout generation...');
-    
+
     try {
       const variations: LayoutVariation[] = [];
-      
+
       // Generate layouts for each target format
       for (const format of request.targetFormats) {
         const formatVariations = await this.generateLayoutsForFormat(request, format);
         variations.push(...formatVariations);
       }
-      
+
       // Sort by performance prediction
       variations.sort((a, b) => b.performancePrediction - a.performancePrediction);
-      
+
       console.log(`✅ Generated ${variations.length} layout variations`);
       return variations;
-      
     } catch (error) {
       console.error('Error generating layouts:', error);
-      throw new Error(`Layout generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Layout generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -152,16 +165,16 @@ class LayoutGenerationService {
   ): Promise<LayoutVariation[]> {
     const specs = CHANNEL_SPECIFICATIONS[format];
     const variations: LayoutVariation[] = [];
-    
+
     // Get visual intelligence analysis
     const visualIntelligence = await visualIntelligenceService.analyzeAssetTerritoryMatch(
       request.assets,
       request.territory
     );
-    
+
     // Generate 3 different layout styles
     const styles: TemplatePreference['style'][] = ['minimal', 'bold', 'elegant'];
-    
+
     for (const style of styles) {
       const variation = await this.generateSingleLayout(
         request,
@@ -172,7 +185,7 @@ class LayoutGenerationService {
       );
       variations.push(variation);
     }
-    
+
     return variations;
   }
 
@@ -187,34 +200,41 @@ class LayoutGenerationService {
     visualIntelligence: any
   ): Promise<LayoutVariation> {
     // AI-powered composition analysis
-    const compositionPrompt = LAYOUT_GENERATION_PROMPTS.COMPOSITION_ANALYSIS
-      .replace('{territory}', JSON.stringify(request.territory))
-      .replace('{assets}', JSON.stringify(request.assets.map(a => ({ id: a.id, type: a.type, aiAnalysis: a.aiAnalysis }))))
+    const compositionPrompt = LAYOUT_GENERATION_PROMPTS.COMPOSITION_ANALYSIS.replace(
+      '{territory}',
+      JSON.stringify(request.territory)
+    )
+      .replace(
+        '{assets}',
+        JSON.stringify(
+          request.assets.map(a => ({ id: a.id, type: a.type, aiAnalysis: a.aiAnalysis }))
+        )
+      )
       .replace('{format}', format)
       .replace('{brandGuidelines}', JSON.stringify(request.brandGuidelines));
 
     // Generate layout with AI
     const aiResponse = await generateWithOpenAI(compositionPrompt, false, 'layout_generation');
-    
+
     // Create layout composition (in production, this would parse AI response)
     const imageComposition = this.generateImageComposition(request.assets, specs, style);
     const textPlacement = this.generateTextPlacement(request.territory, specs, style);
     const colorScheme = this.generateColorScheme(request.brandGuidelines, style);
-    
+
     // Check brand compliance
     const brandCompliance = await this.checkBrandCompliance(
       { imageComposition, textPlacement, colorScheme },
       request.brandGuidelines,
       format
     );
-    
+
     // Predict performance
     const performancePrediction = await this.predictLayoutPerformance(
       { imageComposition, textPlacement, colorScheme },
       request.territory,
       format
     );
-    
+
     const variation: LayoutVariation = {
       id: `layout_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       templateId: `template_${style}_${format}`,
@@ -236,7 +256,7 @@ class LayoutGenerationService {
         generationPrompt: compositionPrompt,
       },
     };
-    
+
     return variation;
   }
 
@@ -249,16 +269,16 @@ class LayoutGenerationService {
     style: TemplatePreference['style']
   ): ImagePlacement[] {
     const placements: ImagePlacement[] = [];
-    
+
     // Prioritize assets by type and AI analysis
     const prioritizedAssets = this.prioritizeAssets(assets);
-    
+
     // Generate placements based on style
     prioritizedAssets.forEach((asset, index) => {
       const placement = this.calculateOptimalPlacement(asset, index, specs, style);
       placements.push(placement);
     });
-    
+
     return placements;
   }
 
@@ -271,7 +291,7 @@ class LayoutGenerationService {
     style: TemplatePreference['style']
   ): TextPlacement[] {
     const placements: TextPlacement[] = [];
-    
+
     // Main headline
     if (territory.headlines.length > 0) {
       const headline = territory.headlines[0];
@@ -304,7 +324,7 @@ class LayoutGenerationService {
         },
       });
     }
-    
+
     // Territory positioning as subheading
     placements.push({
       id: 'positioning_text',
@@ -334,7 +354,7 @@ class LayoutGenerationService {
         strokeWidth: 0,
       },
     });
-    
+
     return placements;
   }
 
@@ -347,7 +367,7 @@ class LayoutGenerationService {
   ): ColorPalette {
     // Base on brand colors but adapt for style
     const baseColors = brandGuidelines.colors;
-    
+
     switch (style) {
       case 'minimal':
         return {
@@ -358,7 +378,7 @@ class LayoutGenerationService {
           background: '#ffffff',
           text: '#333333',
         };
-      
+
       case 'bold':
         return {
           primary: baseColors.primary,
@@ -368,7 +388,7 @@ class LayoutGenerationService {
           background: baseColors.primary,
           text: '#ffffff',
         };
-      
+
       case 'elegant':
         return {
           primary: baseColors.primary,
@@ -378,7 +398,7 @@ class LayoutGenerationService {
           background: '#f9f9f9',
           text: '#2c2c2c',
         };
-      
+
       default:
         return baseColors;
     }
@@ -388,19 +408,25 @@ class LayoutGenerationService {
    * Check brand compliance for generated layout
    */
   private async checkBrandCompliance(
-    layout: { imageComposition: ImagePlacement[]; textPlacement: TextPlacement[]; colorScheme: ColorPalette },
+    layout: {
+      imageComposition: ImagePlacement[];
+      textPlacement: TextPlacement[];
+      colorScheme: ColorPalette;
+    },
     brandGuidelines: BrandGuidelines,
     format: ChannelFormat
   ): Promise<ComplianceScore> {
     // AI-powered compliance check
-    const compliancePrompt = LAYOUT_GENERATION_PROMPTS.BRAND_COMPLIANCE_CHECK
-      .replace('{layout}', JSON.stringify(layout))
+    const compliancePrompt = LAYOUT_GENERATION_PROMPTS.BRAND_COMPLIANCE_CHECK.replace(
+      '{layout}',
+      JSON.stringify(layout)
+    )
       .replace('{brandGuidelines}', JSON.stringify(brandGuidelines))
       .replace('{channel}', format);
 
     try {
       await generateWithOpenAI(compliancePrompt, false, 'compliance_check');
-      
+
       // Generate compliance score (in production, parse AI response)
       const score: ComplianceScore = {
         overall: 85,
@@ -418,7 +444,7 @@ class LayoutGenerationService {
           'Ensure logo meets minimum size requirements',
         ],
       };
-      
+
       return score;
     } catch (error) {
       console.warn('Compliance check failed, using default score:', error);
@@ -442,27 +468,32 @@ class LayoutGenerationService {
    * Predict layout performance using AI
    */
   private async predictLayoutPerformance(
-    layout: { imageComposition: ImagePlacement[]; textPlacement: TextPlacement[]; colorScheme: ColorPalette },
+    layout: {
+      imageComposition: ImagePlacement[];
+      textPlacement: TextPlacement[];
+      colorScheme: ColorPalette;
+    },
     territory: Territory,
     format: ChannelFormat
   ): Promise<number> {
-    const performancePrompt = LAYOUT_GENERATION_PROMPTS.PERFORMANCE_PREDICTION
-      .replace('{layout}', JSON.stringify(layout))
+    const performancePrompt = LAYOUT_GENERATION_PROMPTS.PERFORMANCE_PREDICTION.replace(
+      '{layout}',
+      JSON.stringify(layout)
+    )
       .replace('{territory}', JSON.stringify(territory))
       .replace('{audience}', 'Primary target audience')
       .replace('{channel}', format);
 
     try {
       await generateWithOpenAI(performancePrompt, false, 'performance_prediction');
-      
+
       // Calculate performance score based on multiple factors
       const visualImpact = this.calculateVisualImpact(layout);
       const messageClarity = this.calculateMessageClarity(layout, territory);
       const channelOptimization = this.calculateChannelOptimization(layout, format);
-      
+
       const overallScore = Math.round((visualImpact + messageClarity + channelOptimization) / 3);
       return Math.min(Math.max(overallScore, 0), 100);
-      
     } catch (error) {
       console.warn('Performance prediction failed, using heuristic:', error);
       return 75; // Default score
@@ -473,12 +504,20 @@ class LayoutGenerationService {
   private prioritizeAssets(assets: UploadedAsset[]): UploadedAsset[] {
     return assets.sort((a, b) => {
       // Prioritize by type: logo > product > lifestyle > background
-      const typeOrder = { logo: 0, product: 1, lifestyle: 2, background: 3, texture: 4, icon: 5, other: 6 };
+      const typeOrder = {
+        logo: 0,
+        product: 1,
+        lifestyle: 2,
+        background: 3,
+        texture: 4,
+        icon: 5,
+        other: 6,
+      };
       const aOrder = typeOrder[a.type] ?? 6;
       const bOrder = typeOrder[b.type] ?? 6;
-      
+
       if (aOrder !== bOrder) return aOrder - bOrder;
-      
+
       // Then by AI analysis quality score
       const aQuality = a.aiAnalysis?.quality_score ?? 50;
       const bQuality = b.aiAnalysis?.quality_score ?? 50;
@@ -494,11 +533,12 @@ class LayoutGenerationService {
   ): ImagePlacement {
     // Calculate placement based on asset priority and style
     const isHero = index === 0;
-    const aspectRatio = asset.metadata.dimensions ? 
-      asset.metadata.dimensions.width / asset.metadata.dimensions.height : 1;
-    
+    const aspectRatio = asset.metadata.dimensions
+      ? asset.metadata.dimensions.width / asset.metadata.dimensions.height
+      : 1;
+
     let x, y, width, height;
-    
+
     if (isHero) {
       // Hero asset gets prominent placement
       switch (style) {
@@ -527,7 +567,7 @@ class LayoutGenerationService {
       width = specs.width * 0.25;
       height = width / aspectRatio;
     }
-    
+
     return {
       assetId: asset.id,
       x,
@@ -546,7 +586,11 @@ class LayoutGenerationService {
     };
   }
 
-  private calculateTextX(specs: ChannelSpecs, role: string, style: TemplatePreference['style']): number {
+  private calculateTextX(
+    specs: ChannelSpecs,
+    role: string,
+    style: TemplatePreference['style']
+  ): number {
     switch (style) {
       case 'minimal':
         return specs.width * 0.1;
@@ -557,18 +601,26 @@ class LayoutGenerationService {
     }
   }
 
-  private calculateTextY(specs: ChannelSpecs, role: string, style: TemplatePreference['style']): number {
+  private calculateTextY(
+    specs: ChannelSpecs,
+    role: string,
+    style: TemplatePreference['style']
+  ): number {
     if (role === 'headline') {
       return style === 'bold' ? specs.height * 0.75 : specs.height * 0.7;
     }
     return specs.height * 0.85;
   }
 
-  private calculateFontSize(specs: ChannelSpecs, role: string, style: TemplatePreference['style']): number {
+  private calculateFontSize(
+    specs: ChannelSpecs,
+    role: string,
+    style: TemplatePreference['style']
+  ): number {
     const baseSize = Math.min(specs.width, specs.height) / 20;
     const multiplier = role === 'headline' ? 1.5 : 1;
     const styleMultiplier = style === 'bold' ? 1.2 : 1;
-    
+
     return Math.round(baseSize * multiplier * styleMultiplier);
   }
 

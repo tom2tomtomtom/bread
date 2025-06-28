@@ -1,6 +1,6 @@
 /**
  * 🧠 Visual Intelligence Service
- * 
+ *
  * Advanced AI-powered visual analysis for asset-territory matching,
  * color harmony analysis, and style consistency checking.
  */
@@ -38,7 +38,7 @@ const VISUAL_ANALYSIS_PROMPTS = {
     
     Provide detailed match scores (0-100) and specific reasoning for each asset.
   `,
-  
+
   COLOR_HARMONY_ANALYSIS: `
     Analyze the color harmony and palette effectiveness of these assets and territory.
     
@@ -55,7 +55,7 @@ const VISUAL_ANALYSIS_PROMPTS = {
     
     Suggest optimal color palette and identify any conflicts or improvements.
   `,
-  
+
   STYLE_CONSISTENCY_CHECK: `
     Check style consistency across assets and alignment with territory positioning.
     
@@ -72,7 +72,7 @@ const VISUAL_ANALYSIS_PROMPTS = {
     
     Identify inconsistencies and provide specific recommendations.
   `,
-  
+
   COMPOSITION_SUGGESTIONS: `
     Generate composition suggestions for optimal layout arrangement.
     
@@ -90,7 +90,7 @@ const VISUAL_ANALYSIS_PROMPTS = {
     
     Provide specific, actionable composition recommendations.
   `,
-  
+
   PERFORMANCE_PREDICTION: `
     Predict the performance potential of this visual composition.
     
@@ -121,7 +121,7 @@ class VisualIntelligenceService {
     brandGuidelines?: any
   ): Promise<VisualIntelligence> {
     console.log('🧠 Starting comprehensive visual intelligence analysis...');
-    
+
     try {
       const [
         assetTerritoryMatch,
@@ -136,7 +136,7 @@ class VisualIntelligenceService {
         this.generateCompositionSuggestions(assets, territory, targetFormat),
         this.predictLayoutPerformance(assets, territory, targetFormat),
       ]);
-      
+
       const intelligence: VisualIntelligence = {
         assetTerritoryMatch,
         colorHarmony,
@@ -144,13 +144,14 @@ class VisualIntelligenceService {
         compositionSuggestions,
         performancePrediction,
       };
-      
+
       console.log('✅ Visual intelligence analysis completed');
       return intelligence;
-      
     } catch (error) {
       console.error('Error in visual intelligence analysis:', error);
-      throw new Error(`Visual intelligence analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Visual intelligence analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -162,28 +163,32 @@ class VisualIntelligenceService {
     territory: Territory
   ): Promise<AssetTerritoryMatch[]> {
     console.log('🎯 Analyzing asset-territory matching...');
-    
+
     const matches: AssetTerritoryMatch[] = [];
-    
+
     for (const asset of assets) {
       try {
-        const prompt = VISUAL_ANALYSIS_PROMPTS.ASSET_TERRITORY_MATCH
-          .replace('{territory}', JSON.stringify({
+        const prompt = VISUAL_ANALYSIS_PROMPTS.ASSET_TERRITORY_MATCH.replace(
+          '{territory}',
+          JSON.stringify({
             positioning: territory.positioning,
             tone: territory.tone,
             title: territory.title,
             headlines: territory.headlines.map(h => h.text),
-          }))
-          .replace('{assets}', JSON.stringify({
+          })
+        ).replace(
+          '{assets}',
+          JSON.stringify({
             id: asset.id,
             type: asset.type,
             aiAnalysis: asset.aiAnalysis,
             tags: asset.tags,
-          }));
+          })
+        );
 
         // Use Claude for detailed analysis
         const analysis = await generateWithClaude(prompt);
-        
+
         // Generate match analysis (in production, parse AI response)
         const match: AssetTerritoryMatch = {
           assetId: asset.id,
@@ -194,9 +199,8 @@ class VisualIntelligenceService {
           concerns: this.identifyAssetConcerns(asset, territory),
           recommendations: this.generateAssetRecommendations(asset, territory),
         };
-        
+
         matches.push(match);
-        
       } catch (error) {
         console.warn(`Failed to analyze asset ${asset.id}:`, error);
         // Provide fallback analysis
@@ -211,7 +215,7 @@ class VisualIntelligenceService {
         });
       }
     }
-    
+
     return matches;
   }
 
@@ -224,19 +228,23 @@ class VisualIntelligenceService {
     brandGuidelines?: any
   ): Promise<ColorHarmonyAnalysis> {
     console.log('🎨 Analyzing color harmony...');
-    
+
     try {
-      const prompt = VISUAL_ANALYSIS_PROMPTS.COLOR_HARMONY_ANALYSIS
-        .replace('{assets}', JSON.stringify(assets.map(a => ({
-          id: a.id,
-          type: a.type,
-          aiAnalysis: a.aiAnalysis,
-        }))))
+      const prompt = VISUAL_ANALYSIS_PROMPTS.COLOR_HARMONY_ANALYSIS.replace(
+        '{assets}',
+        JSON.stringify(
+          assets.map(a => ({
+            id: a.id,
+            type: a.type,
+            aiAnalysis: a.aiAnalysis,
+          }))
+        )
+      )
         .replace('{territoryColors}', JSON.stringify([]))
         .replace('{brandGuidelines}', JSON.stringify(brandGuidelines || {}));
 
       await generateWithClaude(prompt);
-      
+
       // Generate color harmony analysis
       const analysis: ColorHarmonyAnalysis = {
         harmonyScore: this.calculateColorHarmonyScore(assets),
@@ -245,9 +253,8 @@ class VisualIntelligenceService {
         conflicts: this.identifyColorConflicts(assets),
         improvements: this.suggestColorImprovements(assets, territory),
       };
-      
+
       return analysis;
-      
     } catch (error) {
       console.warn('Color harmony analysis failed:', error);
       return this.getFallbackColorAnalysis();
@@ -262,22 +269,29 @@ class VisualIntelligenceService {
     territory: Territory
   ): Promise<StyleConsistencyCheck> {
     console.log('🎭 Checking style consistency...');
-    
+
     try {
-      const prompt = VISUAL_ANALYSIS_PROMPTS.STYLE_CONSISTENCY_CHECK
-        .replace('{assets}', JSON.stringify(assets.map(a => ({
-          id: a.id,
-          type: a.type,
-          aiAnalysis: a.aiAnalysis,
-        }))))
+      const prompt = VISUAL_ANALYSIS_PROMPTS.STYLE_CONSISTENCY_CHECK.replace(
+        '{assets}',
+        JSON.stringify(
+          assets.map(a => ({
+            id: a.id,
+            type: a.type,
+            aiAnalysis: a.aiAnalysis,
+          }))
+        )
+      )
         .replace('{territory}', JSON.stringify(territory))
-        .replace('{styleRequirements}', JSON.stringify({
-          tone: territory.tone,
-          positioning: territory.positioning,
-        }));
+        .replace(
+          '{styleRequirements}',
+          JSON.stringify({
+            tone: territory.tone,
+            positioning: territory.positioning,
+          })
+        );
 
       await generateWithClaude(prompt);
-      
+
       const check: StyleConsistencyCheck = {
         consistencyScore: this.calculateStyleConsistencyScore(assets),
         styleElements: {
@@ -289,9 +303,8 @@ class VisualIntelligenceService {
         inconsistencies: this.identifyStyleInconsistencies(assets),
         recommendations: this.generateStyleRecommendations(assets, territory),
       };
-      
+
       return check;
-      
     } catch (error) {
       console.warn('Style consistency check failed:', error);
       return this.getFallbackStyleCheck();
@@ -307,20 +320,24 @@ class VisualIntelligenceService {
     targetFormat?: string
   ): Promise<CompositionSuggestion[]> {
     console.log('📐 Generating composition suggestions...');
-    
+
     try {
-      const prompt = VISUAL_ANALYSIS_PROMPTS.COMPOSITION_SUGGESTIONS
-        .replace('{assets}', JSON.stringify(assets.map(a => ({
-          id: a.id,
-          type: a.type,
-          aiAnalysis: a.aiAnalysis,
-        }))))
+      const prompt = VISUAL_ANALYSIS_PROMPTS.COMPOSITION_SUGGESTIONS.replace(
+        '{assets}',
+        JSON.stringify(
+          assets.map(a => ({
+            id: a.id,
+            type: a.type,
+            aiAnalysis: a.aiAnalysis,
+          }))
+        )
+      )
         .replace('{territory}', JSON.stringify(territory))
         .replace('{format}', targetFormat || 'general')
         .replace('{audience}', 'general audience');
 
       await generateWithOpenAI(prompt, false);
-      
+
       const suggestions: CompositionSuggestion[] = [
         {
           type: 'hierarchy',
@@ -347,9 +364,8 @@ class VisualIntelligenceService {
           priority: 'high',
         },
       ];
-      
+
       return suggestions;
-      
     } catch (error) {
       console.warn('Composition suggestions failed:', error);
       return this.getFallbackCompositionSuggestions();
@@ -365,20 +381,24 @@ class VisualIntelligenceService {
     targetFormat?: string
   ): Promise<LayoutPerformancePrediction> {
     console.log('📊 Predicting layout performance...');
-    
+
     try {
-      const prompt = VISUAL_ANALYSIS_PROMPTS.PERFORMANCE_PREDICTION
-        .replace('{assets}', JSON.stringify(assets.map(a => ({
-          id: a.id,
-          type: a.type,
-          aiAnalysis: a.aiAnalysis,
-        }))))
+      const prompt = VISUAL_ANALYSIS_PROMPTS.PERFORMANCE_PREDICTION.replace(
+        '{assets}',
+        JSON.stringify(
+          assets.map(a => ({
+            id: a.id,
+            type: a.type,
+            aiAnalysis: a.aiAnalysis,
+          }))
+        )
+      )
         .replace('{territory}', JSON.stringify(territory))
         .replace('{composition}', 'Current asset arrangement')
         .replace('{market}', 'Australian market');
 
       await generateWithOpenAI(prompt, false, 'performance_prediction');
-      
+
       const prediction: LayoutPerformancePrediction = {
         overallScore: this.calculateOverallPerformanceScore(assets, territory),
         categoryScores: {
@@ -393,9 +413,8 @@ class VisualIntelligenceService {
         optimizationSuggestions: this.generateOptimizationSuggestions(assets, territory),
         confidence: 85,
       };
-      
+
       return prediction;
-      
     } catch (error) {
       console.warn('Performance prediction failed:', error);
       return this.getFallbackPerformancePrediction();
@@ -405,92 +424,93 @@ class VisualIntelligenceService {
   // Helper methods for calculations and analysis
   private calculateAssetMatchScore(asset: UploadedAsset, territory: Territory): number {
     let score = 50; // Base score
-    
+
     // Asset type relevance
-    if (asset.type === 'product' && territory.positioning.toLowerCase().includes('product')) score += 20;
+    if (asset.type === 'product' && territory.positioning.toLowerCase().includes('product'))
+      score += 20;
     if (asset.type === 'lifestyle' && territory.tone === 'aspirational') score += 15;
     if (asset.type === 'logo') score += 10; // Always valuable
-    
+
     // AI analysis quality
     if (asset.aiAnalysis?.quality_score) {
       score += (asset.aiAnalysis.quality_score - 50) * 0.3;
     }
-    
+
     // Tag relevance
     const territoryKeywords = [
       ...territory.positioning.toLowerCase().split(' '),
       territory.tone?.toLowerCase() || '',
       ...(territory.title?.toLowerCase().split(' ') || []),
     ];
-    
-    const matchingTags = asset.tags.filter(tag => 
-      territoryKeywords.some(keyword => 
-        keyword.includes(tag.toLowerCase()) || tag.toLowerCase().includes(keyword)
+
+    const matchingTags = asset.tags.filter(tag =>
+      territoryKeywords.some(
+        keyword => keyword.includes(tag.toLowerCase()) || tag.toLowerCase().includes(keyword)
       )
     );
-    
+
     score += matchingTags.length * 5;
-    
+
     return Math.min(Math.max(Math.round(score), 0), 100);
   }
 
   private identifyAssetStrengths(asset: UploadedAsset, territory: Territory): string[] {
     const strengths: string[] = [];
-    
+
     if (asset.aiAnalysis?.quality_score && asset.aiAnalysis.quality_score > 80) {
       strengths.push('High technical quality');
     }
-    
+
     if (asset.type === 'product') {
       strengths.push('Clear product representation');
     }
-    
+
     if (asset.type === 'lifestyle') {
       strengths.push('Strong emotional appeal');
     }
-    
+
     if (asset.tags.length > 3) {
       strengths.push('Well-categorized and tagged');
     }
-    
+
     return strengths.length > 0 ? strengths : ['Asset available for use'];
   }
 
   private identifyAssetConcerns(asset: UploadedAsset, territory: Territory): string[] {
     const concerns: string[] = [];
-    
+
     if (asset.aiAnalysis?.quality_score && asset.aiAnalysis.quality_score < 60) {
       concerns.push('Lower technical quality');
     }
-    
+
     if (asset.tags.length < 2) {
       concerns.push('Limited categorization');
     }
-    
+
     if (!asset.metadata.dimensions) {
       concerns.push('Missing dimension information');
     }
-    
+
     return concerns;
   }
 
   private generateAssetRecommendations(asset: UploadedAsset, territory: Territory): string[] {
     const recommendations: string[] = [];
-    
+
     if (asset.type === 'background') {
       recommendations.push('Consider using as background element with overlay');
     }
-    
+
     if (asset.type === 'product') {
       recommendations.push('Feature prominently in layout composition');
     }
-    
+
     if (asset.type === 'logo') {
       recommendations.push('Ensure proper sizing and clear space requirements');
     }
-    
+
     recommendations.push('Test in multiple layout variations');
-    
+
     return recommendations;
   }
 
@@ -502,20 +522,20 @@ class VisualIntelligenceService {
   private extractDominantColors(assets: UploadedAsset[]): string[] {
     // Extract dominant colors from asset analysis
     const colors: string[] = [];
-    
+
     assets.forEach(asset => {
       if (asset.aiAnalysis?.colors?.palette) {
         colors.push(...asset.aiAnalysis.colors.palette);
       }
     });
-    
+
     // Return unique colors
     return [...new Set(colors)].slice(0, 5);
   }
 
   private generateSuggestedPalette(assets: UploadedAsset[], territory: Territory): ColorPalette {
     const dominantColors = this.extractDominantColors(assets);
-    
+
     return {
       primary: dominantColors[0] || '#007bff',
       secondary: dominantColors.slice(1, 3),
@@ -538,7 +558,10 @@ class VisualIntelligenceService {
     ];
   }
 
-  private suggestColorImprovements(assets: UploadedAsset[], territory: Territory): ColorImprovement[] {
+  private suggestColorImprovements(
+    assets: UploadedAsset[],
+    territory: Territory
+  ): ColorImprovement[] {
     return [
       {
         type: 'enhancement',
@@ -596,29 +619,30 @@ class VisualIntelligenceService {
       this.calculateMessageClarityScore(assets, territory),
       this.calculateAudienceAppealScore(assets, territory),
     ];
-    
+
     return Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length);
   }
 
   private calculateVisualImpactScore(assets: UploadedAsset[]): number {
     // Calculate based on asset quality and variety
-    const avgQuality = assets.reduce((sum, asset) => 
-      sum + (asset.aiAnalysis?.quality_score || 70), 0) / assets.length;
-    
+    const avgQuality =
+      assets.reduce((sum, asset) => sum + (asset.aiAnalysis?.quality_score || 70), 0) /
+      assets.length;
+
     const typeVariety = new Set(assets.map(a => a.type)).size;
     const varietyBonus = Math.min(typeVariety * 5, 20);
-    
+
     return Math.min(Math.round(avgQuality + varietyBonus), 100);
   }
 
   private calculateBrandRecognitionScore(assets: UploadedAsset[], territory: Territory): number {
     const hasLogo = assets.some(a => a.type === 'logo');
     const hasProduct = assets.some(a => a.type === 'product');
-    
+
     let score = 60;
     if (hasLogo) score += 20;
     if (hasProduct) score += 15;
-    
+
     return Math.min(score, 100);
   }
 
@@ -632,7 +656,10 @@ class VisualIntelligenceService {
     return 80;
   }
 
-  private calculateChannelOptimizationScore(assets: UploadedAsset[], targetFormat?: string): number {
+  private calculateChannelOptimizationScore(
+    assets: UploadedAsset[],
+    targetFormat?: string
+  ): number {
     // Calculate based on asset suitability for target format
     return 88;
   }
@@ -646,10 +673,7 @@ class VisualIntelligenceService {
   }
 
   private identifyPerformanceWeaknesses(assets: UploadedAsset[], territory: Territory): string[] {
-    return [
-      'Could benefit from more lifestyle imagery',
-      'Consider additional supporting elements',
-    ];
+    return ['Could benefit from more lifestyle imagery', 'Consider additional supporting elements'];
   }
 
   private generateOptimizationSuggestions(assets: UploadedAsset[], territory: Territory): string[] {

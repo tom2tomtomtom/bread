@@ -34,7 +34,11 @@ interface SecurityContextType {
   secureRequest: (url: string, options?: RequestInit) => Promise<Response>;
 
   // Security Logging
-  logSecurityEvent: (event: string, details?: any, severity?: 'low' | 'medium' | 'high' | 'critical') => void;
+  logSecurityEvent: (
+    event: string,
+    details?: any,
+    severity?: 'low' | 'medium' | 'high' | 'critical'
+  ) => void;
 
   // Accessibility Features
   auditAccessibility: (container?: Element) => any[];
@@ -50,14 +54,14 @@ const SecurityContext = createContext<SecurityContextType | null>(null);
 
 /**
  * Security Provider Component
- * 
+ *
  * Provides comprehensive client-side security features:
  * - CSRF protection
  * - Input validation and sanitization
  * - Rate limiting
  * - Secure API request handling
  * - Security event logging
- * 
+ *
  * This complements the server-side security implemented in Netlify Functions.
  */
 interface SecurityProviderProps {
@@ -74,15 +78,23 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
       initializeSecurity();
       setIsSecurityInitialized(true);
 
-      logSecurityEvent('security_provider_initialized', {
-        timestamp: Date.now(),
-        userAgent: navigator.userAgent,
-      }, 'low');
+      logSecurityEvent(
+        'security_provider_initialized',
+        {
+          timestamp: Date.now(),
+          userAgent: navigator.userAgent,
+        },
+        'low'
+      );
     } catch (error) {
       console.error('Failed to initialize security:', error);
-      logSecurityEvent('security_initialization_failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-      }, 'critical');
+      logSecurityEvent(
+        'security_initialization_failed',
+        {
+          error: error instanceof Error ? error.message : 'Unknown error',
+        },
+        'critical'
+      );
     }
 
     // Initialize accessibility features
@@ -90,14 +102,22 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
       initializeAccessibility();
       setIsAccessibilityInitialized(true);
 
-      logSecurityEvent('accessibility_initialized', {
-        timestamp: Date.now(),
-      }, 'low');
+      logSecurityEvent(
+        'accessibility_initialized',
+        {
+          timestamp: Date.now(),
+        },
+        'low'
+      );
     } catch (error) {
       console.error('Failed to initialize accessibility:', error);
-      logSecurityEvent('accessibility_initialization_failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-      }, 'critical');
+      logSecurityEvent(
+        'accessibility_initialization_failed',
+        {
+          error: error instanceof Error ? error.message : 'Unknown error',
+        },
+        'critical'
+      );
     }
 
     // Cleanup on unmount
@@ -137,9 +157,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
   };
 
   return (
-    <SecurityContext.Provider value={securityContextValue}>
-      {children}
-    </SecurityContext.Provider>
+    <SecurityContext.Provider value={securityContextValue}>{children}</SecurityContext.Provider>
   );
 };
 
@@ -162,7 +180,7 @@ export const withSecureAPI = <P extends object>(
 ): React.ComponentType<P> => {
   return (props: P) => {
     const security = useSecurity();
-    
+
     // Add security methods to props
     const secureProps = {
       ...props,
@@ -170,7 +188,7 @@ export const withSecureAPI = <P extends object>(
       validateInput: security.validateBrief,
       logSecurityEvent: security.logSecurityEvent,
     } as P;
-    
+
     return <Component {...secureProps} />;
   };
 };
@@ -184,16 +202,16 @@ interface SecurityGuardProps {
   fallback?: ReactNode;
 }
 
-export const SecurityGuard: React.FC<SecurityGuardProps> = ({ 
-  children, 
-  fallback = <div>Initializing security...</div> 
+export const SecurityGuard: React.FC<SecurityGuardProps> = ({
+  children,
+  fallback = <div>Initializing security...</div>,
 }) => {
   const { isSecurityInitialized } = useSecurity();
-  
+
   if (!isSecurityInitialized) {
     return <>{fallback}</>;
   }
-  
+
   return <>{children}</>;
 };
 
@@ -213,39 +231,38 @@ export const SecureInput: React.FC<SecureInputProps> = ({
   ...props
 }) => {
   const { validateBrief, logSecurityEvent } = useSecurity();
-  
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    
+
     // Validate based on type
     let validation = { valid: true, errors: [] as string[] };
-    
+
     if (validationType === 'brief') {
       validation = validateBrief(value);
     }
-    
+
     // Log security events for invalid input
     if (!validation.valid) {
-      logSecurityEvent('invalid_input_detected', {
-        type: validationType,
-        errors: validation.errors,
-        inputLength: value.length,
-      }, 'medium');
+      logSecurityEvent(
+        'invalid_input_detected',
+        {
+          type: validationType,
+          errors: validation.errors,
+          inputLength: value.length,
+        },
+        'medium'
+      );
     }
-    
+
     // Call validation callback
     onValidatedChange?.(value, validation.valid, validation.errors);
-    
+
     // Call original onChange
     onChange?.(event);
   };
-  
-  return (
-    <input
-      {...props}
-      onChange={handleChange}
-    />
-  );
+
+  return <input {...props} onChange={handleChange} />;
 };
 
 /**
@@ -265,28 +282,32 @@ export const SecureFileUpload: React.FC<SecureFileUploadProps> = ({
   className,
 }) => {
   const { validateFileUpload, logSecurityEvent } = useSecurity();
-  
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files) return;
-    
+
     Array.from(files).forEach(file => {
       const validation = validateFileUpload(file);
-      
+
       // Log security events for invalid files
       if (!validation.valid) {
-        logSecurityEvent('invalid_file_upload_attempt', {
-          fileName: file.name,
-          fileType: file.type,
-          fileSize: file.size,
-          errors: validation.errors,
-        }, 'high');
+        logSecurityEvent(
+          'invalid_file_upload_attempt',
+          {
+            fileName: file.name,
+            fileType: file.type,
+            fileSize: file.size,
+            errors: validation.errors,
+          },
+          'high'
+        );
       }
-      
+
       onFileValidated?.(file, validation.valid, validation.errors);
     });
   };
-  
+
   return (
     <input
       type="file"

@@ -9,24 +9,21 @@ interface ExportManagerProps {
 
 /**
  * ExportManager - Handles all export functionality
- * 
+ *
  * Responsibilities:
  * - PDF export with customizable options
  * - CSV export for data analysis
  * - Export configuration management
  * - Export status and error handling
  */
-export const ExportManager: React.FC<ExportManagerProps> = ({
-  generatedOutput,
-  onShowToast,
-}) => {
+export const ExportManager: React.FC<ExportManagerProps> = ({ generatedOutput, onShowToast }) => {
   const [isExporting, setIsExporting] = useState(false);
   const [exportOptions, setExportOptions] = useState<PDFExportOptions>({
     includeImages: false,
     includeConfidenceScores: true,
     includeCompliance: true,
     format: 'a4',
-    orientation: 'portrait'
+    orientation: 'portrait',
   });
 
   // PDF Export Handler
@@ -34,7 +31,7 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
     setIsExporting(true);
     try {
       const result = await pdfExportService.exportTerritoriesToPDF(generatedOutput, exportOptions);
-      
+
       if (result.success) {
         console.log(`✅ PDF exported successfully: ${result.filename}`);
         onShowToast?.(`PDF exported: ${result.filename}`, 'success');
@@ -71,14 +68,15 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
       ]);
 
       // Data rows
-      generatedOutput.territories.forEach((territory) => {
+      generatedOutput.territories.forEach(territory => {
         const avgConfidence = Math.round(
           (territory.confidence.marketFit +
             territory.confidence.complianceConfidence +
-            territory.confidence.audienceResonance) / 3
+            territory.confidence.audienceResonance) /
+            3
         );
 
-        territory.headlines.forEach((headline) => {
+        territory.headlines.forEach(headline => {
           csvData.push([
             territory.id,
             territory.title,
@@ -95,26 +93,29 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
       });
 
       // Convert to CSV string
-      const csvContent = csvData.map(row => 
-        row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(',')
-      ).join('\n');
+      const csvContent = csvData
+        .map(row => row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(','))
+        .join('\n');
 
       // Create and download file
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
-      
+
       link.setAttribute('href', url);
-      link.setAttribute('download', `aideas-territories-${new Date().toISOString().split('T')[0]}.csv`);
+      link.setAttribute(
+        'download',
+        `aideas-territories-${new Date().toISOString().split('T')[0]}.csv`
+      );
       link.style.visibility = 'hidden';
-      
+
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       // Clean up
       URL.revokeObjectURL(url);
-      
+
       onShowToast?.('CSV exported successfully', 'success');
     } catch (error) {
       console.error('❌ CSV export error:', error);
@@ -147,7 +148,7 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
               <input
                 type="checkbox"
                 checked={exportOptions.includeConfidenceScores}
-                onChange={(e) => updateExportOption('includeConfidenceScores', e.target.checked)}
+                onChange={e => updateExportOption('includeConfidenceScores', e.target.checked)}
                 className="rounded"
               />
               Include confidence scores
@@ -156,7 +157,7 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
               <input
                 type="checkbox"
                 checked={exportOptions.includeCompliance}
-                onChange={(e) => updateExportOption('includeCompliance', e.target.checked)}
+                onChange={e => updateExportOption('includeCompliance', e.target.checked)}
                 className="rounded"
               />
               Include compliance section
@@ -165,7 +166,7 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
               <input
                 type="checkbox"
                 checked={exportOptions.includeImages}
-                onChange={(e) => updateExportOption('includeImages', e.target.checked)}
+                onChange={e => updateExportOption('includeImages', e.target.checked)}
                 className="rounded"
               />
               Include images (if available)
@@ -179,7 +180,7 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
           <div className="flex gap-2">
             <select
               value={exportOptions.format}
-              onChange={(e) => updateExportOption('format', e.target.value as 'a4' | 'letter')}
+              onChange={e => updateExportOption('format', e.target.value as 'a4' | 'letter')}
               className="bg-white/10 border border-white/20 rounded px-2 py-1 text-white text-sm"
             >
               <option value="a4">A4</option>
@@ -187,7 +188,9 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
             </select>
             <select
               value={exportOptions.orientation}
-              onChange={(e) => updateExportOption('orientation', e.target.value as 'portrait' | 'landscape')}
+              onChange={e =>
+                updateExportOption('orientation', e.target.value as 'portrait' | 'landscape')
+              }
               className="bg-white/10 border border-white/20 rounded px-2 py-1 text-white text-sm"
             >
               <option value="portrait">Portrait</option>

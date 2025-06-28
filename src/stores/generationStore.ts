@@ -10,14 +10,14 @@ import { APP_CONFIG } from '../config/app';
 
 /**
  * GenerationStore - Focused store for brief generation and output management
- * 
+ *
  * Responsibilities:
  * - Brief content management
  * - Generation state tracking
  * - Output management
  * - Brief analysis (basic and enhanced)
  * - Real-time analysis
- * 
+ *
  * Benefits:
  * - Single responsibility principle
  * - Easier testing and debugging
@@ -32,7 +32,7 @@ interface GenerationState {
   showOutput: boolean;
   generatedOutput: EnhancedGeneratedOutput | null;
   error: string;
-  
+
   // Basic brief analysis
   showBriefAnalysis: boolean;
   briefAnalysis: BriefAnalysis | null;
@@ -49,10 +49,10 @@ interface GenerationState {
   setShowOutput: (show: boolean) => void;
   setGeneratedOutput: (output: EnhancedGeneratedOutput | null) => void;
   setError: (error: string) => void;
-  
+
   // Core generation function
   generate: () => Promise<void>;
-  
+
   // Basic brief analysis actions
   setShowBriefAnalysis: (show: boolean) => void;
   setBriefAnalysis: (analysis: BriefAnalysis | null) => void;
@@ -92,7 +92,7 @@ export const useGenerationStore = create<GenerationState>()(
       setBrief: (brief: string) => set({ brief }),
       setIsGenerating: (isGenerating: boolean) => set({ isGenerating }),
       setShowOutput: (showOutput: boolean) => set({ showOutput }),
-      setGeneratedOutput: (generatedOutput: EnhancedGeneratedOutput | null) => 
+      setGeneratedOutput: (generatedOutput: EnhancedGeneratedOutput | null) =>
         set({ generatedOutput }),
       setError: (error: string) => set({ error }),
 
@@ -109,10 +109,10 @@ export const useGenerationStore = create<GenerationState>()(
         try {
           // Import the API service
           const { generateWithOpenAI } = await import('../services/secureApiService');
-          
+
           // Generate territories using the secure API
           const result = await generateWithOpenAI(brief);
-          
+
           // Convert GeneratedOutput to EnhancedGeneratedOutput
           const enhancedResult: EnhancedGeneratedOutput = {
             ...result,
@@ -132,18 +132,17 @@ export const useGenerationStore = create<GenerationState>()(
               processingTime: 0,
             },
           };
-          
-          set({ 
+
+          set({
             generatedOutput: enhancedResult,
             showOutput: true,
-            isGenerating: false 
+            isGenerating: false,
           });
-          
         } catch (error) {
           console.error('Generation failed:', error);
-          set({ 
+          set({
             error: error instanceof Error ? error.message : 'Generation failed. Please try again.',
-            isGenerating: false 
+            isGenerating: false,
           });
         }
       },
@@ -153,13 +152,11 @@ export const useGenerationStore = create<GenerationState>()(
       setBriefAnalysis: (briefAnalysis: BriefAnalysis | null) => set({ briefAnalysis }),
 
       // Enhanced Brief Intelligence actions
-      setEnhancedBriefAnalysis: (enhancedBriefAnalysis: EnhancedBriefAnalysis | null) => 
+      setEnhancedBriefAnalysis: (enhancedBriefAnalysis: EnhancedBriefAnalysis | null) =>
         set({ enhancedBriefAnalysis }),
       setIsAnalyzingBrief: (isAnalyzingBrief: boolean) => set({ isAnalyzingBrief }),
-      setRealTimeAnalysis: (realTimeAnalysis: RealTimeAnalysis | null) => 
-        set({ realTimeAnalysis }),
-      setShowEnhancedAnalysis: (showEnhancedAnalysis: boolean) => 
-        set({ showEnhancedAnalysis }),
+      setRealTimeAnalysis: (realTimeAnalysis: RealTimeAnalysis | null) => set({ realTimeAnalysis }),
+      setShowEnhancedAnalysis: (showEnhancedAnalysis: boolean) => set({ showEnhancedAnalysis }),
 
       analyzeEnhancedBrief: async () => {
         const { brief } = get();
@@ -171,20 +168,44 @@ export const useGenerationStore = create<GenerationState>()(
           // TODO: Implement enhanced brief analysis API call
           // This would call the enhanced brief intelligence service
           console.log('Enhanced brief analysis not yet implemented');
-          
+
           // Mock implementation for now
           await new Promise(resolve => setTimeout(resolve, 1000));
-          
+
           set({
             enhancedBriefAnalysis: {
               overallScore: 80,
               categoryScores: {
-                strategicClarity: { score: 80, reasoning: 'Good strategic focus', improvements: [] },
-                audienceDefinition: { score: 75, reasoning: 'Clear audience targeting', improvements: [] },
-                competitiveContext: { score: 70, reasoning: 'Some competitive context', improvements: [] },
-                culturalRelevance: { score: 85, reasoning: 'Culturally appropriate', improvements: [] },
-                executionClarity: { score: 80, reasoning: 'Clear execution path', improvements: [] },
-                practicalConstraints: { score: 75, reasoning: 'Realistic constraints', improvements: [] },
+                strategicClarity: {
+                  score: 80,
+                  reasoning: 'Good strategic focus',
+                  improvements: [],
+                },
+                audienceDefinition: {
+                  score: 75,
+                  reasoning: 'Clear audience targeting',
+                  improvements: [],
+                },
+                competitiveContext: {
+                  score: 70,
+                  reasoning: 'Some competitive context',
+                  improvements: [],
+                },
+                culturalRelevance: {
+                  score: 85,
+                  reasoning: 'Culturally appropriate',
+                  improvements: [],
+                },
+                executionClarity: {
+                  score: 80,
+                  reasoning: 'Clear execution path',
+                  improvements: [],
+                },
+                practicalConstraints: {
+                  score: 75,
+                  reasoning: 'Realistic constraints',
+                  improvements: [],
+                },
               },
               missingElements: [],
               improvementSuggestions: [],
@@ -239,7 +260,7 @@ export const useGenerationStore = create<GenerationState>()(
     }),
     {
       name: `${APP_CONFIG.storage.keys.appState}-generation`,
-      partialize: (state) => ({
+      partialize: state => ({
         // Persist only essential data
         brief: state.brief,
         generatedOutput: state.generatedOutput,

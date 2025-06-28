@@ -69,7 +69,11 @@ export const UIStateManager: React.FC<UIStateManagerProps> = ({ children }) => {
   };
 
   const handleNewBrief = () => {
-    if (window.confirm('Are you sure you want to start a new brief? This will clear all current results.')) {
+    if (
+      window.confirm(
+        'Are you sure you want to start a new brief? This will clear all current results.'
+      )
+    ) {
       resetGeneration();
       clearStarredItems();
     }
@@ -120,7 +124,7 @@ export const UIStateManager: React.FC<UIStateManagerProps> = ({ children }) => {
     toastMessage,
     toastType,
     error,
-    
+
     // Handlers
     handleAdminToggle,
     handleShowAssets,
@@ -138,7 +142,7 @@ export const UIStateManager: React.FC<UIStateManagerProps> = ({ children }) => {
   return (
     <>
       {/* Pass UI state and handlers to children */}
-      {React.Children.map(children, (child) => {
+      {React.Children.map(children, child => {
         if (React.isValidElement(child)) {
           return React.cloneElement(child, {
             ...uiContextValue,
@@ -152,21 +156,10 @@ export const UIStateManager: React.FC<UIStateManagerProps> = ({ children }) => {
 
 // Hook for accessing UI state in child components
 export const useUIState = () => {
-  const {
-    showAdmin,
-    showAssets,
-    showEvolutionPanel,
-    showToast,
-    toastMessage,
-    toastType,
-  } = useUIStore();
+  const { showAdmin, showAssets, showEvolutionPanel, showToast, toastMessage, toastType } =
+    useUIStore();
 
-  const {
-    showOutput,
-    showBriefAnalysis,
-    showEnhancedAnalysis,
-    error,
-  } = useGenerationStore();
+  const { showOutput, showBriefAnalysis, showEnhancedAnalysis, error } = useGenerationStore();
 
   return {
     showAdmin,

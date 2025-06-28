@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useMotivationStore, Motivation, MotivationGenerationRequest } from '../../stores/motivationStore';
+import {
+  useMotivationStore,
+  Motivation,
+  MotivationGenerationRequest,
+} from '../../stores/motivationStore';
 import { useTemplateWorkflowStore } from '../../stores/templateWorkflowStore';
 
 interface MotivationGeneratorProps {
@@ -44,19 +48,20 @@ export const MotivationGenerator: React.FC<MotivationGeneratorProps> = ({
     clearError,
   } = useMotivationStore();
 
-  const {
-    selectedTemplate,
-    brief,
-    targetAudience,
-    campaignGoal,
-    markStepCompleted,
-  } = useTemplateWorkflowStore();
+  const { selectedTemplate, brief, targetAudience, campaignGoal, markStepCompleted } =
+    useTemplateWorkflowStore();
 
   const [hasGenerated, setHasGenerated] = useState(false);
 
   // Auto-generate motivations when component mounts if we have the required data
   useEffect(() => {
-    if (brief && targetAudience && campaignGoal && !hasGenerated && generatedMotivations.length === 0) {
+    if (
+      brief &&
+      targetAudience &&
+      campaignGoal &&
+      !hasGenerated &&
+      generatedMotivations.length === 0
+    ) {
       handleGenerateMotivations();
     }
   }, [brief, targetAudience, campaignGoal, hasGenerated, generatedMotivations.length]);
@@ -128,7 +133,9 @@ export const MotivationGenerator: React.FC<MotivationGeneratorProps> = ({
           </div>
           <div>
             <div className="text-sm text-gray-400 mb-1">Template Type</div>
-            <div className="text-white font-medium">{selectedTemplate?.type || 'Not specified'}</div>
+            <div className="text-white font-medium">
+              {selectedTemplate?.type || 'Not specified'}
+            </div>
           </div>
         </div>
       </div>
@@ -149,7 +156,12 @@ export const MotivationGenerator: React.FC<MotivationGeneratorProps> = ({
               className="text-red-300 hover:text-red-100 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -191,22 +203,20 @@ export const MotivationGenerator: React.FC<MotivationGeneratorProps> = ({
       {generatedMotivations.length > 0 && (
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white">
-              Select Your Motivations (Choose 1-3)
-            </h2>
-            <div className="text-sm text-gray-400">
-              {selectedMotivations.length} of 3 selected
-            </div>
+            <h2 className="text-2xl font-bold text-white">Select Your Motivations (Choose 1-3)</h2>
+            <div className="text-sm text-gray-400">{selectedMotivations.length} of 3 selected</div>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {generatedMotivations.map((motivation) => (
+            {generatedMotivations.map(motivation => (
               <MotivationCard
                 key={motivation.id}
                 motivation={motivation}
                 isSelected={selectedMotivations.includes(motivation.id)}
                 onToggle={() => handleMotivationToggle(motivation.id)}
-                disabled={!selectedMotivations.includes(motivation.id) && selectedMotivations.length >= 3}
+                disabled={
+                  !selectedMotivations.includes(motivation.id) && selectedMotivations.length >= 3
+                }
                 getConfidenceColor={getConfidenceColor}
               />
             ))}
@@ -259,8 +269,8 @@ const MotivationCard: React.FC<MotivationCardProps> = ({
         isSelected
           ? 'border-orange-400 bg-orange-400/10 shadow-orange-400/20'
           : disabled
-          ? 'border-gray-600 bg-gray-800/50 opacity-50 cursor-not-allowed'
-          : `${PSYCHOLOGY_TYPE_COLORS[motivation.psychologyType]} hover:border-opacity-60`
+            ? 'border-gray-600 bg-gray-800/50 opacity-50 cursor-not-allowed'
+            : `${PSYCHOLOGY_TYPE_COLORS[motivation.psychologyType]} hover:border-opacity-60`
       }`}
       onClick={!disabled ? onToggle : undefined}
     >
@@ -268,39 +278,43 @@ const MotivationCard: React.FC<MotivationCardProps> = ({
       {isSelected && (
         <div className="absolute top-3 right-3">
           <div className="w-6 h-6 bg-orange-400 rounded-full flex items-center justify-center">
-            <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <svg
+              className="w-4 h-4 text-black"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
             </svg>
           </div>
         </div>
       )}
 
       {/* Psychology Type Icon */}
-      <div className="text-3xl mb-4">
-        {PSYCHOLOGY_TYPE_ICONS[motivation.psychologyType]}
-      </div>
+      <div className="text-3xl mb-4">{PSYCHOLOGY_TYPE_ICONS[motivation.psychologyType]}</div>
 
       {/* Title */}
-      <h3 className="text-lg font-bold text-gray-900 mb-2">
-        {motivation.title}
-      </h3>
+      <h3 className="text-lg font-bold text-gray-900 mb-2">{motivation.title}</h3>
 
       {/* Description */}
-      <p className="text-gray-700 text-sm mb-4 leading-relaxed">
-        {motivation.description}
-      </p>
+      <p className="text-gray-700 text-sm mb-4 leading-relaxed">{motivation.description}</p>
 
       {/* Target Emotion */}
       <div className="mb-4">
         <div className="text-xs font-medium text-gray-600 mb-1">TARGET EMOTION</div>
-        <div className="text-sm font-medium text-gray-800">
-          {motivation.targetEmotion}
-        </div>
+        <div className="text-sm font-medium text-gray-800">{motivation.targetEmotion}</div>
       </div>
 
       {/* Confidence Score */}
       <div className="flex items-center justify-between">
-        <div className={`px-2 py-1 rounded-full text-xs font-bold ${getConfidenceColor(motivation.confidenceScore)}`}>
+        <div
+          className={`px-2 py-1 rounded-full text-xs font-bold ${getConfidenceColor(motivation.confidenceScore)}`}
+        >
           {motivation.confidenceScore}% Confidence
         </div>
         <div className="text-xs text-gray-500 capitalize">
@@ -312,9 +326,7 @@ const MotivationCard: React.FC<MotivationCardProps> = ({
       {isSelected && (
         <div className="mt-4 pt-4 border-t border-gray-300">
           <div className="text-xs font-medium text-gray-600 mb-1">WHY THIS WORKS</div>
-          <p className="text-xs text-gray-700 italic">
-            {motivation.reasoning}
-          </p>
+          <p className="text-xs text-gray-700 italic">{motivation.reasoning}</p>
         </div>
       )}
     </div>

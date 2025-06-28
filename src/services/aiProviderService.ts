@@ -1,6 +1,6 @@
 /**
  * 🤖 AI Provider Service
- * 
+ *
  * Unified interface for multiple AI providers with fallback mechanisms,
  * rate limiting, cost optimization, and provider-specific configurations.
  */
@@ -64,7 +64,7 @@ const PROVIDER_CONFIGS: Record<AIProvider, Partial<ProviderConfig>> = {
       requestsPerMinute: 10,
       requestsPerHour: 100,
     },
-    costPerGeneration: 0.50, // $0.50 per video
+    costPerGeneration: 0.5, // $0.50 per video
     supportedFormats: ['mp4', 'mov'],
     maxDimensions: { width: 1920, height: 1080 },
   },
@@ -77,7 +77,7 @@ const PROVIDER_CONFIGS: Record<AIProvider, Partial<ProviderConfig>> = {
       requestsPerMinute: 15,
       requestsPerHour: 150,
     },
-    costPerGeneration: 0.30, // $0.30 per video
+    costPerGeneration: 0.3, // $0.30 per video
     supportedFormats: ['mp4', 'webm'],
     maxDimensions: { width: 1920, height: 1080 },
   },
@@ -91,14 +91,14 @@ class RateLimiter {
     const now = Date.now();
     const key = `${provider}_minute`;
     const hourKey = `${provider}_hour`;
-    
+
     // Clean old requests
     this.cleanOldRequests(key, now, 60000); // 1 minute
     this.cleanOldRequests(hourKey, now, 3600000); // 1 hour
-    
+
     const minuteRequests = this.requests.get(key) || [];
     const hourRequests = this.requests.get(hourKey) || [];
-    
+
     return (
       minuteRequests.length < config.rateLimit.requestsPerMinute &&
       hourRequests.length < config.rateLimit.requestsPerHour
@@ -109,13 +109,13 @@ class RateLimiter {
     const now = Date.now();
     const minuteKey = `${provider}_minute`;
     const hourKey = `${provider}_hour`;
-    
+
     const minuteRequests = this.requests.get(minuteKey) || [];
     const hourRequests = this.requests.get(hourKey) || [];
-    
+
     minuteRequests.push(now);
     hourRequests.push(now);
-    
+
     this.requests.set(minuteKey, minuteRequests);
     this.requests.set(hourKey, hourRequests);
   }
@@ -129,12 +129,12 @@ class RateLimiter {
   getNextAvailableTime(provider: AIProvider, config: ProviderConfig): Date {
     const now = Date.now();
     const minuteKey = `${provider}_minute`;
-    
+
     const minuteRequests = this.requests.get(minuteKey) || [];
     if (minuteRequests.length < config.rateLimit.requestsPerMinute) {
       return new Date(now);
     }
-    
+
     // Find oldest request in current minute window
     const oldestRequest = Math.min(...minuteRequests);
     return new Date(oldestRequest + 60000); // Add 1 minute
@@ -154,17 +154,19 @@ class AIProviderService {
    */
   async generateImage(request: TextToImageRequest): Promise<GeneratedAsset> {
     const providers = this.getProviderFallbackChain(request.provider);
-    
+
     for (const provider of providers) {
       try {
         console.log(`🎨 Attempting image generation with ${provider}...`);
-        
+
         const providerConfig = this.getProviderConfig(provider);
-        
+
         // Check rate limits
         if (!this.rateLimiter.canMakeRequest(provider, providerConfig)) {
           const nextAvailable = this.rateLimiter.getNextAvailableTime(provider, providerConfig);
-          console.log(`⏳ Rate limit reached for ${provider}, next available: ${nextAvailable.toISOString()}`);
+          console.log(
+            `⏳ Rate limit reached for ${provider}, next available: ${nextAvailable.toISOString()}`
+          );
           continue;
         }
 
@@ -173,18 +175,17 @@ class AIProviderService {
 
         // Generate with specific provider
         const result = await this.generateImageWithProvider(request, provider, providerConfig);
-        
+
         console.log(`✅ Image generated successfully with ${provider}`);
         return result;
-
       } catch (error) {
         console.error(`❌ Image generation failed with ${provider}:`, error);
-        
+
         // If this is the last provider, throw the error
         if (provider === providers[providers.length - 1]) {
           throw error;
         }
-        
+
         // Continue to next provider
         continue;
       }
@@ -198,17 +199,19 @@ class AIProviderService {
    */
   async generateVideo(request: ImageToVideoRequest): Promise<GeneratedAsset> {
     const providers = this.getVideoProviderFallbackChain(request.provider);
-    
+
     for (const provider of providers) {
       try {
         console.log(`🎬 Attempting video generation with ${provider}...`);
-        
+
         const providerConfig = this.getProviderConfig(provider);
-        
+
         // Check rate limits
         if (!this.rateLimiter.canMakeRequest(provider, providerConfig)) {
           const nextAvailable = this.rateLimiter.getNextAvailableTime(provider, providerConfig);
-          console.log(`⏳ Rate limit reached for ${provider}, next available: ${nextAvailable.toISOString()}`);
+          console.log(
+            `⏳ Rate limit reached for ${provider}, next available: ${nextAvailable.toISOString()}`
+          );
           continue;
         }
 
@@ -217,18 +220,17 @@ class AIProviderService {
 
         // Generate with specific provider
         const result = await this.generateVideoWithProvider(request, provider, providerConfig);
-        
+
         console.log(`✅ Video generated successfully with ${provider}`);
         return result;
-
       } catch (error) {
         console.error(`❌ Video generation failed with ${provider}:`, error);
-        
+
         // If this is the last provider, throw the error
         if (provider === providers[providers.length - 1]) {
           throw error;
         }
-        
+
         // Continue to next provider
         continue;
       }
@@ -243,7 +245,7 @@ class AIProviderService {
   private getProviderConfig(provider: AIProvider): ProviderConfig {
     const baseConfig = PROVIDER_CONFIGS[provider];
     const userConfig = this.config.providers.find(p => p.provider === provider);
-    
+
     return {
       ...baseConfig,
       ...userConfig,
@@ -255,20 +257,20 @@ class AIProviderService {
    */
   private getProviderFallbackChain(preferredProvider?: AIProvider): AIProvider[] {
     const imageProviders: AIProvider[] = ['openai', 'midjourney', 'stable-diffusion'];
-    
+
     if (preferredProvider && imageProviders.includes(preferredProvider)) {
       // Put preferred provider first, then fallbacks
       return [
         preferredProvider,
-        ...this.config.fallbackProviders.filter(p => 
-          p !== preferredProvider && imageProviders.includes(p)
+        ...this.config.fallbackProviders.filter(
+          p => p !== preferredProvider && imageProviders.includes(p)
         ),
-        ...imageProviders.filter(p => 
-          p !== preferredProvider && !this.config.fallbackProviders.includes(p)
+        ...imageProviders.filter(
+          p => p !== preferredProvider && !this.config.fallbackProviders.includes(p)
         ),
       ];
     }
-    
+
     return [this.config.defaultProvider, ...this.config.fallbackProviders];
   }
 
@@ -277,14 +279,11 @@ class AIProviderService {
    */
   private getVideoProviderFallbackChain(preferredProvider?: AIProvider): AIProvider[] {
     const videoProviders: AIProvider[] = ['runway', 'stable-video'];
-    
+
     if (preferredProvider && videoProviders.includes(preferredProvider)) {
-      return [
-        preferredProvider,
-        ...videoProviders.filter(p => p !== preferredProvider),
-      ];
+      return [preferredProvider, ...videoProviders.filter(p => p !== preferredProvider)];
     }
-    
+
     return videoProviders;
   }
 
@@ -297,10 +296,10 @@ class AIProviderService {
     config: ProviderConfig
   ): Promise<GeneratedAsset> {
     const startTime = Date.now();
-    
+
     // Provider-specific implementation would go here
     // For now, we'll simulate the generation
-    
+
     switch (provider) {
       case 'openai':
         return this.generateWithOpenAI(request, config, startTime);
@@ -322,7 +321,7 @@ class AIProviderService {
     config: ProviderConfig
   ): Promise<GeneratedAsset> {
     const startTime = Date.now();
-    
+
     switch (provider) {
       case 'runway':
         return this.generateWithRunway(request, config, startTime);
@@ -343,9 +342,9 @@ class AIProviderService {
   ): Promise<GeneratedAsset> {
     // This would integrate with the actual OpenAI API
     // For now, return a mock result
-    
+
     await new Promise(resolve => setTimeout(resolve, 3000)); // Simulate generation time
-    
+
     return {
       id: `openai_${Date.now()}`,
       type: 'image',
@@ -379,7 +378,7 @@ class AIProviderService {
   ): Promise<GeneratedAsset> {
     // Midjourney API integration would go here
     await new Promise(resolve => setTimeout(resolve, 5000));
-    
+
     return {
       id: `midjourney_${Date.now()}`,
       type: 'image',
@@ -413,7 +412,7 @@ class AIProviderService {
   ): Promise<GeneratedAsset> {
     // Stable Diffusion API integration would go here
     await new Promise(resolve => setTimeout(resolve, 4000));
-    
+
     return {
       id: `stable_${Date.now()}`,
       type: 'image',
@@ -447,7 +446,7 @@ class AIProviderService {
   ): Promise<GeneratedAsset> {
     // RunwayML API integration would go here
     await new Promise(resolve => setTimeout(resolve, 8000));
-    
+
     return {
       id: `runway_${Date.now()}`,
       type: 'video',
@@ -462,7 +461,7 @@ class AIProviderService {
         duration: request.duration,
         fps: request.fps,
         model: config.model,
-        parameters: { 
+        parameters: {
           animationType: request.animationType,
           quality: request.quality,
           platformOptimization: request.platformOptimization,
@@ -486,7 +485,7 @@ class AIProviderService {
   ): Promise<GeneratedAsset> {
     // Stable Video Diffusion API integration would go here
     await new Promise(resolve => setTimeout(resolve, 6000));
-    
+
     return {
       id: `stable_video_${Date.now()}`,
       type: 'video',
@@ -501,7 +500,7 @@ class AIProviderService {
         duration: request.duration,
         fps: request.fps,
         model: config.model,
-        parameters: { 
+        parameters: {
           animationType: request.animationType,
           quality: request.quality,
           platformOptimization: request.platformOptimization,
@@ -524,7 +523,7 @@ class AIProviderService {
       openai: { requests: 0, cost: 0, successRate: 0.95 },
       midjourney: { requests: 0, cost: 0, successRate: 0.92 },
       'stable-diffusion': { requests: 0, cost: 0, successRate: 0.88 },
-      runway: { requests: 0, cost: 0, successRate: 0.90 },
+      runway: { requests: 0, cost: 0, successRate: 0.9 },
       'stable-video': { requests: 0, cost: 0, successRate: 0.85 },
     };
   }

@@ -37,28 +37,40 @@ export const BrandComplianceChecker: React.FC<BrandComplianceCheckerProps> = ({
 
   const getViolationIcon = (type: ComplianceViolation['type']): string => {
     switch (type) {
-      case 'error': return '❌';
-      case 'warning': return '⚠️';
-      case 'suggestion': return '💡';
-      default: return 'ℹ️';
+      case 'error':
+        return '❌';
+      case 'warning':
+        return '⚠️';
+      case 'suggestion':
+        return '💡';
+      default:
+        return 'ℹ️';
     }
   };
 
   const getViolationColor = (type: ComplianceViolation['type']): string => {
     switch (type) {
-      case 'error': return 'text-red-700 bg-red-50 border-red-200';
-      case 'warning': return 'text-yellow-700 bg-yellow-50 border-yellow-200';
-      case 'suggestion': return 'text-blue-700 bg-blue-50 border-blue-200';
-      default: return 'text-gray-700 bg-gray-50 border-gray-200';
+      case 'error':
+        return 'text-red-700 bg-red-50 border-red-200';
+      case 'warning':
+        return 'text-yellow-700 bg-yellow-50 border-yellow-200';
+      case 'suggestion':
+        return 'text-blue-700 bg-blue-50 border-blue-200';
+      default:
+        return 'text-gray-700 bg-gray-50 border-gray-200';
     }
   };
 
   const getImpactColor = (impact: ComplianceViolation['impact']): string => {
     switch (impact) {
-      case 'high': return 'text-red-600 bg-red-100';
-      case 'medium': return 'text-yellow-600 bg-yellow-100';
-      case 'low': return 'text-green-600 bg-green-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'high':
+        return 'text-red-600 bg-red-100';
+      case 'medium':
+        return 'text-yellow-600 bg-yellow-100';
+      case 'low':
+        return 'text-green-600 bg-green-100';
+      default:
+        return 'text-gray-600 bg-gray-100';
     }
   };
 
@@ -78,7 +90,9 @@ export const BrandComplianceChecker: React.FC<BrandComplianceCheckerProps> = ({
   return (
     <div className="space-y-4">
       {/* Overall Score */}
-      <div className={`rounded-lg border p-4 ${getScoreBackground(compliance.overall)} ${getScoreBorder(compliance.overall)}`}>
+      <div
+        className={`rounded-lg border p-4 ${getScoreBackground(compliance.overall)} ${getScoreBorder(compliance.overall)}`}
+      >
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-semibold text-gray-900">🏆 Brand Compliance Score</h3>
@@ -91,9 +105,13 @@ export const BrandComplianceChecker: React.FC<BrandComplianceCheckerProps> = ({
               {compliance.overall}%
             </div>
             <div className="text-sm text-gray-500">
-              {compliance.overall >= 90 ? 'Excellent' :
-               compliance.overall >= 75 ? 'Good' :
-               compliance.overall >= 60 ? 'Fair' : 'Needs Work'}
+              {compliance.overall >= 90
+                ? 'Excellent'
+                : compliance.overall >= 75
+                  ? 'Good'
+                  : compliance.overall >= 60
+                    ? 'Fair'
+                    : 'Needs Work'}
             </div>
           </div>
         </div>
@@ -115,7 +133,12 @@ export const BrandComplianceChecker: React.FC<BrandComplianceCheckerProps> = ({
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </button>
 
@@ -130,16 +153,18 @@ export const BrandComplianceChecker: React.FC<BrandComplianceCheckerProps> = ({
                     <div className="w-24 bg-gray-200 rounded-full h-2">
                       <div
                         className={`h-2 rounded-full ${
-                          score >= 90 ? 'bg-green-500' :
-                          score >= 75 ? 'bg-yellow-500' :
-                          score >= 60 ? 'bg-orange-500' : 'bg-red-500'
+                          score >= 90
+                            ? 'bg-green-500'
+                            : score >= 75
+                              ? 'bg-yellow-500'
+                              : score >= 60
+                                ? 'bg-orange-500'
+                                : 'bg-red-500'
                         }`}
                         style={{ width: `${score}%` }}
                       />
                     </div>
-                    <span className={`text-sm font-medium ${getScoreColor(score)}`}>
-                      {score}%
-                    </span>
+                    <span className={`text-sm font-medium ${getScoreColor(score)}`}>{score}%</span>
                   </div>
                 </div>
               ))}
@@ -166,7 +191,12 @@ export const BrandComplianceChecker: React.FC<BrandComplianceCheckerProps> = ({
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </button>
 
@@ -182,19 +212,21 @@ export const BrandComplianceChecker: React.FC<BrandComplianceCheckerProps> = ({
                       <div className="flex items-center mb-2">
                         <span className="text-lg mr-2">{getViolationIcon(violation.type)}</span>
                         <span className="font-medium">{violation.category}</span>
-                        <span className={`ml-2 px-2 py-1 text-xs rounded-full ${getImpactColor(violation.impact)}`}>
+                        <span
+                          className={`ml-2 px-2 py-1 text-xs rounded-full ${getImpactColor(violation.impact)}`}
+                        >
                           {violation.impact} impact
                         </span>
                       </div>
-                      
+
                       <p className="text-sm mb-2">{violation.description}</p>
-                      
+
                       {violation.element && (
                         <p className="text-xs opacity-75 mb-2">
                           <strong>Element:</strong> {violation.element}
                         </p>
                       )}
-                      
+
                       <div className="bg-white bg-opacity-50 rounded p-2 text-sm">
                         <strong>Fix:</strong> {violation.fix}
                       </div>
@@ -234,7 +266,12 @@ export const BrandComplianceChecker: React.FC<BrandComplianceCheckerProps> = ({
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </button>
 
@@ -256,11 +293,11 @@ export const BrandComplianceChecker: React.FC<BrandComplianceCheckerProps> = ({
         <button className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium">
           📋 Export Report
         </button>
-        
+
         <button className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium">
           ✅ Mark as Reviewed
         </button>
-        
+
         {compliance.violations.length > 0 && (
           <button className="px-4 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors text-sm font-medium">
             🔧 Auto-Fix Issues
@@ -277,25 +314,23 @@ export const BrandComplianceChecker: React.FC<BrandComplianceCheckerProps> = ({
             </div>
             <div className="text-gray-600">Errors</div>
           </div>
-          
+
           <div className="text-center">
             <div className="font-bold text-yellow-600">
               {compliance.violations.filter(v => v.type === 'warning').length}
             </div>
             <div className="text-gray-600">Warnings</div>
           </div>
-          
+
           <div className="text-center">
             <div className="font-bold text-blue-600">
               {compliance.violations.filter(v => v.type === 'suggestion').length}
             </div>
             <div className="text-gray-600">Suggestions</div>
           </div>
-          
+
           <div className="text-center">
-            <div className="font-bold text-green-600">
-              {compliance.recommendations.length}
-            </div>
+            <div className="font-bold text-green-600">{compliance.recommendations.length}</div>
             <div className="text-gray-600">Recommendations</div>
           </div>
         </div>

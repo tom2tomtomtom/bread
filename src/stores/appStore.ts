@@ -351,13 +351,13 @@ export const useAppStore = create<AppState>()(
           const templates = templateService.getAllTemplates();
           set({
             availableTemplates: templates,
-            isLoadingTemplates: false
+            isLoadingTemplates: false,
           });
         } catch (error) {
           console.error('Failed to load templates:', error);
           set({
             templateError: error instanceof Error ? error.message : 'Failed to load templates',
-            isLoadingTemplates: false
+            isLoadingTemplates: false,
           });
         }
       },
@@ -381,13 +381,14 @@ export const useAppStore = create<AppState>()(
 
           set({
             templateRecommendations: recommendations,
-            isGeneratingRecommendations: false
+            isGeneratingRecommendations: false,
           });
         } catch (error) {
           console.error('Failed to generate template recommendations:', error);
           set({
-            templateError: error instanceof Error ? error.message : 'Failed to generate recommendations',
-            isGeneratingRecommendations: false
+            templateError:
+              error instanceof Error ? error.message : 'Failed to generate recommendations',
+            isGeneratingRecommendations: false,
           });
         }
       },
@@ -404,14 +405,16 @@ export const useAppStore = create<AppState>()(
               previewAssets: [],
               isCustomizing: true,
               customizationProgress: 0,
-            }
+            },
           }));
         }
       },
 
       updateTemplateCustomization: (field: string, value: any) => {
         set(state => {
-          const existingCustomization = state.templateSelection.customizations.find(c => c.field === field);
+          const existingCustomization = state.templateSelection.customizations.find(
+            c => c.field === field
+          );
           let updatedCustomizations;
 
           if (existingCustomization) {
@@ -421,7 +424,7 @@ export const useAppStore = create<AppState>()(
           } else {
             updatedCustomizations = [
               ...state.templateSelection.customizations,
-              { field, value, isValid: true, brandAlignment: 85 }
+              { field, value, isValid: true, brandAlignment: 85 },
             ];
           }
 
@@ -430,10 +433,13 @@ export const useAppStore = create<AppState>()(
               ...state.templateSelection,
               customizations: updatedCustomizations,
               customizationProgress: Math.min(
-                (updatedCustomizations.length / (state.templateSelection.selectedTemplate?.templateConfiguration.requiredInputs.length || 1)) * 100,
+                (updatedCustomizations.length /
+                  (state.templateSelection.selectedTemplate?.templateConfiguration.requiredInputs
+                    .length || 1)) *
+                  100,
                 100
               ),
-            }
+            },
           };
         });
       },
@@ -452,7 +458,7 @@ export const useAppStore = create<AppState>()(
           templateSelection: {
             ...state.templateSelection,
             validationResults,
-          }
+          },
         }));
 
         return validationResults;
@@ -474,11 +480,13 @@ export const useAppStore = create<AppState>()(
             templateSelection: {
               ...state.templateSelection,
               previewAssets,
-            }
+            },
           }));
         } catch (error) {
           console.error('Failed to generate template preview:', error);
-          set({ templateError: error instanceof Error ? error.message : 'Failed to generate preview' });
+          set({
+            templateError: error instanceof Error ? error.message : 'Failed to generate preview',
+          });
         }
       },
 
@@ -495,7 +503,7 @@ export const useAppStore = create<AppState>()(
             previewAssets: [],
             isCustomizing: false,
             customizationProgress: 0,
-          }
+          },
         }));
       },
 
@@ -516,20 +524,22 @@ export const useAppStore = create<AppState>()(
                 ...(state.templateUsageHistory[templateId] || []),
                 {
                   id: `usage_${Date.now()}`,
-                  templateId: templateId,
+                  templateId,
                   userId: 'current_user',
                   timestamp: new Date(),
                   success: true,
                   generatedContent: { territories: 0, headlines: 0, assets: 0 },
                   customizations: templateSelection.customizations,
                   channels: templateSelection.previewAssets.map(p => p.channel),
-                }
-              ]
-            }
+                },
+              ],
+            },
           }));
         } catch (error) {
           console.error('Failed to save template configuration:', error);
-          set({ templateError: error instanceof Error ? error.message : 'Failed to save configuration' });
+          set({
+            templateError: error instanceof Error ? error.message : 'Failed to save configuration',
+          });
         }
       },
 
@@ -541,17 +551,23 @@ export const useAppStore = create<AppState>()(
       optimizeTemplate: async (templateId: string, performanceData: any, feedback: string[]) => {
         try {
           const { templateService } = await import('../services/templateService');
-          const optimizedTemplate = await templateService.optimizeTemplate(templateId, performanceData, feedback);
+          const optimizedTemplate = await templateService.optimizeTemplate(
+            templateId,
+            performanceData,
+            feedback
+          );
 
           // Update the template in the store
           set(state => ({
             availableTemplates: state.availableTemplates.map(t =>
               t.id === templateId ? optimizedTemplate : t
-            )
+            ),
           }));
         } catch (error) {
           console.error('Failed to optimize template:', error);
-          set({ templateError: error instanceof Error ? error.message : 'Failed to optimize template' });
+          set({
+            templateError: error instanceof Error ? error.message : 'Failed to optimize template',
+          });
         }
       },
 

@@ -1,6 +1,6 @@
 /**
  * Focused Store Types
- * 
+ *
  * Type definitions for the focused store architecture.
  * These types are extracted from the individual store files for better organization.
  */
@@ -30,7 +30,7 @@ export interface GenerationState {
   showOutput: boolean;
   generatedOutput: EnhancedGeneratedOutput | null;
   error: string;
-  
+
   // Basic brief analysis
   showBriefAnalysis: boolean;
   briefAnalysis: BriefAnalysis | null;
@@ -47,7 +47,7 @@ export interface GenerationState {
   setShowOutput: (show: boolean) => void;
   setGeneratedOutput: (output: EnhancedGeneratedOutput | null) => void;
   setError: (error: string) => void;
-  
+
   // Basic brief analysis actions
   setShowBriefAnalysis: (show: boolean) => void;
   setBriefAnalysis: (analysis: BriefAnalysis | null) => void;
@@ -154,7 +154,7 @@ export interface ConfigState {
 
   // Preference actions
   updatePreference: <K extends keyof ConfigState['preferences']>(
-    key: K, 
+    key: K,
     value: ConfigState['preferences'][K]
   ) => void;
 
@@ -178,7 +178,7 @@ export interface TerritoryState {
   evolutionSuggestions: EvolutionSuggestion[];
   evolutionHistory: { [territoryId: string]: EvolutionHistory };
   performancePredictions: { [territoryId: string]: PerformancePrediction };
-  
+
   // UI state for territory features
   isEvolvingTerritory: boolean;
   selectedTerritoryForEvolution: string | null;
@@ -268,15 +268,32 @@ export interface StarredState {
 
   // Collection management
   createCollection: (name: string, description?: string) => string;
-  addToCollection: (collectionId: string, territoryId?: string, headlineRef?: { territoryId: string; headlineIndex: number }) => void;
-  removeFromCollection: (collectionId: string, territoryId?: string, headlineRef?: { territoryId: string; headlineIndex: number }) => void;
+  addToCollection: (
+    collectionId: string,
+    territoryId?: string,
+    headlineRef?: { territoryId: string; headlineIndex: number }
+  ) => void;
+  removeFromCollection: (
+    collectionId: string,
+    territoryId?: string,
+    headlineRef?: { territoryId: string; headlineIndex: number }
+  ) => void;
   deleteCollection: (collectionId: string) => void;
-  updateCollection: (collectionId: string, updates: { name?: string; description?: string }) => void;
+  updateCollection: (
+    collectionId: string,
+    updates: { name?: string; description?: string }
+  ) => void;
 
   // Query and analytics
   getStarredCount: () => { territories: number; headlines: number };
-  getStarredByTag: (tag: string) => { territories: string[]; headlines: { territoryId: string; headlineIndex: number }[] };
-  getRecentlyStarred: (limit?: number) => { territories: string[]; headlines: { territoryId: string; headlineIndex: number }[] };
+  getStarredByTag: (tag: string) => {
+    territories: string[];
+    headlines: { territoryId: string; headlineIndex: number }[];
+  };
+  getRecentlyStarred: (limit?: number) => {
+    territories: string[];
+    headlines: { territoryId: string; headlineIndex: number }[];
+  };
   getStarredAnalytics: () => {
     totalStarred: number;
     starredByMonth: { [month: string]: number };

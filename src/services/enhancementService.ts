@@ -5,7 +5,7 @@ import {
   BriefAnalysis,
   TerritoryConfidence,
   EnhancedTerritory,
-  EnhancedGeneratedOutput
+  EnhancedGeneratedOutput,
 } from '../types';
 
 // Analyze brief quality and provide suggestions

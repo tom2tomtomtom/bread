@@ -1,6 +1,6 @@
 /**
  * 🚨 Enhanced Error Handling and User Feedback System
- * 
+ *
  * Provides comprehensive error handling, user-friendly error messages,
  * and automatic error reporting for the BREAD platform frontend.
  */
@@ -40,7 +40,10 @@ export interface EnhancedError {
 }
 
 // Error message mappings for user-friendly display
-const ERROR_MESSAGES: Record<string, { category: ErrorCategory; userMessage: string; retryable: boolean }> = {
+const ERROR_MESSAGES: Record<
+  string,
+  { category: ErrorCategory; userMessage: string; retryable: boolean }
+> = {
   // Authentication errors
   'Invalid email or password': {
     category: ErrorCategory.AUTHENTICATION,
@@ -71,12 +74,12 @@ const ERROR_MESSAGES: Record<string, { category: ErrorCategory; userMessage: str
   // Rate limiting errors
   'Rate limit exceeded': {
     category: ErrorCategory.RATE_LIMIT,
-    userMessage: 'You\'ve made too many requests. Please wait a moment before trying again.',
+    userMessage: "You've made too many requests. Please wait a moment before trying again.",
     retryable: true,
   },
   'Plan rate limit exceeded': {
     category: ErrorCategory.RATE_LIMIT,
-    userMessage: 'You\'ve reached your plan\'s usage limit. Consider upgrading for more requests.',
+    userMessage: "You've reached your plan's usage limit. Consider upgrading for more requests.",
     retryable: false,
   },
 
@@ -95,7 +98,8 @@ const ERROR_MESSAGES: Record<string, { category: ErrorCategory; userMessage: str
   // Network errors
   'Failed to fetch': {
     category: ErrorCategory.NETWORK,
-    userMessage: 'Unable to connect to our servers. Please check your internet connection and try again.',
+    userMessage:
+      'Unable to connect to our servers. Please check your internet connection and try again.',
     retryable: true,
   },
   'Network error': {
@@ -107,7 +111,8 @@ const ERROR_MESSAGES: Record<string, { category: ErrorCategory; userMessage: str
   // Server errors
   'Internal server error': {
     category: ErrorCategory.SERVER,
-    userMessage: 'Something went wrong on our end. We\'re working to fix it. Please try again in a few minutes.',
+    userMessage:
+      "Something went wrong on our end. We're working to fix it. Please try again in a few minutes.",
     retryable: true,
   },
   'Service unavailable': {
@@ -143,14 +148,10 @@ const determineErrorSeverity = (category: ErrorCategory, message: string): Error
 /**
  * Enhanced error handler that converts raw errors into user-friendly format
  */
-export const handleError = (
-  error: any,
-  context?: any,
-  requestId?: string
-): EnhancedError => {
+export const handleError = (error: any, context?: any, requestId?: string): EnhancedError => {
   const errorId = generateErrorId();
   const timestamp = new Date().toISOString();
-  
+
   let message = 'An unexpected error occurred';
   let category = ErrorCategory.UNKNOWN;
   let userMessage = 'Something went wrong. Please try again.';
@@ -192,19 +193,20 @@ export const handleError = (
       userMessage = 'Please sign in again to continue.';
     } else if (error?.status === 403) {
       category = ErrorCategory.AUTHORIZATION;
-      userMessage = 'You don\'t have permission to perform this action.';
+      userMessage = "You don't have permission to perform this action.";
     } else if (error?.status === 429) {
       category = ErrorCategory.RATE_LIMIT;
       userMessage = 'Too many requests. Please wait a moment before trying again.';
     } else if (error?.status >= 500) {
       category = ErrorCategory.SERVER;
-      userMessage = 'Server error. We\'re working to fix it. Please try again in a few minutes.';
+      userMessage = "Server error. We're working to fix it. Please try again in a few minutes.";
     } else if (error?.status >= 400) {
       category = ErrorCategory.VALIDATION;
       userMessage = 'Please check your input and try again.';
     } else if (message.includes('fetch') || message.includes('network')) {
       category = ErrorCategory.NETWORK;
-      userMessage = 'Network connection error. Please check your internet connection and try again.';
+      userMessage =
+        'Network connection error. Please check your internet connection and try again.';
     }
   }
 
@@ -257,14 +259,14 @@ const reportError = (error: EnhancedError): void => {
  */
 export const getErrorMessage = (error: EnhancedError): string => {
   let message = error.userMessage;
-  
+
   if (error.retryAfter) {
     const minutes = Math.ceil(error.retryAfter / 60);
     message += ` Please try again in ${minutes} minute${minutes > 1 ? 's' : ''}.`;
   } else if (error.retryable) {
     message += ' Please try again.';
   }
-  
+
   return message;
 };
 
@@ -275,10 +277,12 @@ export const shouldRetry = (error: EnhancedError, attemptCount: number = 0): boo
   if (!error.retryable || attemptCount >= 3) {
     return false;
   }
-  
+
   // Retry network errors and some server errors
-  return error.category === ErrorCategory.NETWORK || 
-         (error.category === ErrorCategory.SERVER && error.severity !== ErrorSeverity.CRITICAL);
+  return (
+    error.category === ErrorCategory.NETWORK ||
+    (error.category === ErrorCategory.SERVER && error.severity !== ErrorSeverity.CRITICAL)
+  );
 };
 
 /**
@@ -303,9 +307,9 @@ export const createErrorBoundary = (componentName: string) => {
  * Circuit Breaker Pattern Implementation for Service Resilience
  */
 export enum CircuitState {
-  CLOSED = 'CLOSED',     // Normal operation
-  OPEN = 'OPEN',         // Failing, reject requests
-  HALF_OPEN = 'HALF_OPEN' // Testing if service recovered
+  CLOSED = 'CLOSED', // Normal operation
+  OPEN = 'OPEN', // Failing, reject requests
+  HALF_OPEN = 'HALF_OPEN', // Testing if service recovered
 }
 
 export class CircuitBreaker {
@@ -326,14 +330,11 @@ export class CircuitBreaker {
         this.state = CircuitState.HALF_OPEN;
         this.successCount = 0;
       } else {
-        throw handleError(
-          new Error('Service temporarily unavailable'),
-          {
-            circuitState: this.state,
-            failureCount: this.failureCount,
-            category: ErrorCategory.NETWORK
-          }
-        );
+        throw handleError(new Error('Service temporarily unavailable'), {
+          circuitState: this.state,
+          failureCount: this.failureCount,
+          category: ErrorCategory.NETWORK,
+        });
       }
     }
 

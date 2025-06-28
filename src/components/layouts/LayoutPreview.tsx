@@ -71,11 +71,11 @@ export const LayoutPreview: React.FC<LayoutPreviewProps> = ({
 
   const handleMouseDown = (e: React.MouseEvent, elementId: string) => {
     if (!interactive) return;
-    
+
     e.preventDefault();
     setSelectedElement(elementId);
     setIsDragging(true);
-    
+
     const rect = previewRef.current?.getBoundingClientRect();
     if (rect) {
       setDragOffset({
@@ -87,17 +87,17 @@ export const LayoutPreview: React.FC<LayoutPreviewProps> = ({
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging || !selectedElement || !interactive) return;
-    
+
     const rect = previewRef.current?.getBoundingClientRect();
     if (!rect) return;
-    
+
     const x = (e.clientX - rect.left - dragOffset.x) / scale;
     const y = (e.clientY - rect.top - dragOffset.y) / scale;
-    
+
     // Update element position
     const isImage = layout.imageComposition.some(img => img.assetId === selectedElement);
     const isText = layout.textPlacement.some(text => text.id === selectedElement);
-    
+
     if (isImage && onLayoutUpdate) {
       const updatedImages = layout.imageComposition.map(img =>
         img.assetId === selectedElement ? { ...img, x, y } : img
@@ -119,7 +119,7 @@ export const LayoutPreview: React.FC<LayoutPreviewProps> = ({
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove as any);
       document.addEventListener('mouseup', handleMouseUp);
-      
+
       return () => {
         document.removeEventListener('mousemove', handleMouseMove as any);
         document.removeEventListener('mouseup', handleMouseUp);
@@ -131,7 +131,7 @@ export const LayoutPreview: React.FC<LayoutPreviewProps> = ({
   const renderImageElement = (image: ImagePlacement) => {
     const asset = assets.find(a => a.id === image.assetId);
     const isSelected = selectedElement === image.assetId;
-    
+
     return (
       <div
         key={image.assetId}
@@ -148,7 +148,7 @@ export const LayoutPreview: React.FC<LayoutPreviewProps> = ({
           zIndex: image.zIndex,
         }}
         onClick={() => handleElementClick(image.assetId)}
-        onMouseDown={(e) => handleMouseDown(e, image.assetId)}
+        onMouseDown={e => handleMouseDown(e, image.assetId)}
       >
         {asset ? (
           <img
@@ -165,7 +165,7 @@ export const LayoutPreview: React.FC<LayoutPreviewProps> = ({
             <span className="text-gray-500 text-xs">Missing Asset</span>
           </div>
         )}
-        
+
         {isSelected && interactive && (
           <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full"></div>
         )}
@@ -175,7 +175,7 @@ export const LayoutPreview: React.FC<LayoutPreviewProps> = ({
 
   const renderTextElement = (text: TextPlacement) => {
     const isSelected = selectedElement === text.id;
-    
+
     return (
       <div
         key={text.id}
@@ -192,7 +192,7 @@ export const LayoutPreview: React.FC<LayoutPreviewProps> = ({
           zIndex: text.zIndex,
         }}
         onClick={() => handleElementClick(text.id)}
-        onMouseDown={(e) => handleMouseDown(e, text.id)}
+        onMouseDown={e => handleMouseDown(e, text.id)}
       >
         <div
           className="w-full h-full flex items-center"
@@ -215,7 +215,7 @@ export const LayoutPreview: React.FC<LayoutPreviewProps> = ({
         >
           <span className="w-full">{text.content}</span>
         </div>
-        
+
         {isSelected && interactive && (
           <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full"></div>
         )}
@@ -232,9 +232,7 @@ export const LayoutPreview: React.FC<LayoutPreviewProps> = ({
           <p className="text-sm text-gray-600">{layout.description}</p>
         </div>
         <div className="text-right">
-          <div className="text-lg font-bold text-green-600">
-            {layout.performancePrediction}%
-          </div>
+          <div className="text-lg font-bold text-green-600">{layout.performancePrediction}%</div>
           <div className="text-xs text-gray-500">Performance Score</div>
         </div>
       </div>
@@ -254,17 +252,17 @@ export const LayoutPreview: React.FC<LayoutPreviewProps> = ({
         >
           {/* Render Images */}
           {layout.imageComposition.map(renderImageElement)}
-          
+
           {/* Render Text */}
           {layout.textPlacement.map(renderTextElement)}
-          
+
           {/* Grid Overlay (when interactive) */}
           {interactive && (
             <div className="absolute inset-0 pointer-events-none opacity-20">
               <svg width="100%" height="100%">
                 <defs>
                   <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e5e7eb" strokeWidth="1"/>
+                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e5e7eb" strokeWidth="1" />
                   </pattern>
                 </defs>
                 <rect width="100%" height="100%" fill="url(#grid)" />
@@ -332,9 +330,7 @@ export const LayoutPreview: React.FC<LayoutPreviewProps> = ({
           </div>
           <div>
             <span className="font-medium text-gray-700">Compliance:</span>
-            <span className="ml-2 text-gray-600">
-              {layout.brandCompliance.overall}%
-            </span>
+            <span className="ml-2 text-gray-600">{layout.brandCompliance.overall}%</span>
           </div>
           <div>
             <span className="font-medium text-gray-700">Created:</span>

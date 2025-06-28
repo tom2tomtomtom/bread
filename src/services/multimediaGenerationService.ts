@@ -1,6 +1,6 @@
 /**
  * 🎬 Multimedia Generation Service
- * 
+ *
  * Advanced AI-powered multimedia generation engine that creates high-quality
  * images and videos with territory-driven prompts and brand consistency.
  */
@@ -31,7 +31,7 @@ import {
   generateEnhancedImages_API,
   generateSimpleImage_API,
   generateVideo_API,
-  batchGenerateMultimedia_API
+  batchGenerateMultimedia_API,
 } from './secureApiService';
 
 // Enhanced prompt templates for different image types
@@ -103,13 +103,16 @@ Avoid: {negativePrompts}`,
 };
 
 // Template-specific prompt engineering for campaign frameworks
-const TEMPLATE_GENERATION_PROMPTS: Record<CampaignTemplateType, {
-  imagePrompt: string;
-  videoPrompt: string;
-  styleModifiers: string[];
-  emotionalTone: string[];
-  visualElements: string[];
-}> = {
+const TEMPLATE_GENERATION_PROMPTS: Record<
+  CampaignTemplateType,
+  {
+    imagePrompt: string;
+    videoPrompt: string;
+    styleModifiers: string[];
+    emotionalTone: string[];
+    visualElements: string[];
+  }
+> = {
   launch: {
     imagePrompt: `Create a dynamic launch campaign image for {productDescription}.
 Campaign objective: Generate awareness and trial for new offering
@@ -153,14 +156,27 @@ Emotional journey: Curiosity → Interest → Excitement → Desire → Action
 Avoid: {negativePrompts}, slow pacing, unclear messaging`,
 
     styleModifiers: [
-      'cutting-edge', 'innovative', 'dynamic', 'bold', 'modern', 'premium',
-      'high-tech', 'revolutionary', 'game-changing', 'breakthrough'
+      'cutting-edge',
+      'innovative',
+      'dynamic',
+      'bold',
+      'modern',
+      'premium',
+      'high-tech',
+      'revolutionary',
+      'game-changing',
+      'breakthrough',
     ],
     emotionalTone: ['excitement', 'anticipation', 'confidence', 'innovation', 'energy'],
     visualElements: [
-      'hero product shots', 'dynamic lighting', 'new badges', 'innovation indicators',
-      'clean composition', 'premium materials', 'future-focused imagery'
-    ]
+      'hero product shots',
+      'dynamic lighting',
+      'new badges',
+      'innovation indicators',
+      'clean composition',
+      'premium materials',
+      'future-focused imagery',
+    ],
   },
 
   promotional: {
@@ -206,14 +222,25 @@ Emotional journey: Attention → Interest → Urgency → Decision → Action
 Avoid: {negativePrompts}, slow reveals, weak calls-to-action`,
 
     styleModifiers: [
-      'high-energy', 'urgent', 'bold', 'attention-grabbing', 'value-focused',
-      'sale-oriented', 'conversion-driven', 'action-packed'
+      'high-energy',
+      'urgent',
+      'bold',
+      'attention-grabbing',
+      'value-focused',
+      'sale-oriented',
+      'conversion-driven',
+      'action-packed',
     ],
     emotionalTone: ['urgency', 'excitement', 'opportunity', 'value', 'action'],
     visualElements: [
-      'sale badges', 'discount highlights', 'countdown timers', 'value indicators',
-      'high-contrast design', 'promotional elements', 'urgency signals'
-    ]
+      'sale badges',
+      'discount highlights',
+      'countdown timers',
+      'value indicators',
+      'high-contrast design',
+      'promotional elements',
+      'urgency signals',
+    ],
   },
 
   brand_building: {
@@ -259,14 +286,26 @@ Emotional journey: Awareness → Interest → Consideration → Affinity → Adv
 Avoid: {negativePrompts}, hard selling, inauthentic moments`,
 
     styleModifiers: [
-      'premium', 'authentic', 'aspirational', 'sophisticated', 'timeless',
-      'elegant', 'meaningful', 'inspiring', 'trustworthy'
+      'premium',
+      'authentic',
+      'aspirational',
+      'sophisticated',
+      'timeless',
+      'elegant',
+      'meaningful',
+      'inspiring',
+      'trustworthy',
     ],
     emotionalTone: ['aspiration', 'authenticity', 'trust', 'premium', 'connection'],
     visualElements: [
-      'lifestyle imagery', 'brand storytelling', 'premium materials', 'authentic moments',
-      'sophisticated composition', 'emotional connections', 'quality focus'
-    ]
+      'lifestyle imagery',
+      'brand storytelling',
+      'premium materials',
+      'authentic moments',
+      'sophisticated composition',
+      'emotional connections',
+      'quality focus',
+    ],
   },
 
   retention_loyalty: {
@@ -312,15 +351,27 @@ Emotional journey: Recognition → Appreciation → Exclusivity → Pride → Ad
 Avoid: {negativePrompts}, impersonal messaging, generic loyalty content`,
 
     styleModifiers: [
-      'warm', 'exclusive', 'personal', 'appreciative', 'community-focused',
-      'intimate', 'rewarding', 'caring', 'loyal'
+      'warm',
+      'exclusive',
+      'personal',
+      'appreciative',
+      'community-focused',
+      'intimate',
+      'rewarding',
+      'caring',
+      'loyal',
     ],
     emotionalTone: ['appreciation', 'exclusivity', 'belonging', 'warmth', 'recognition'],
     visualElements: [
-      'customer appreciation', 'exclusive badges', 'community imagery', 'reward highlights',
-      'personal touches', 'loyalty indicators', 'warm lighting'
-    ]
-  }
+      'customer appreciation',
+      'exclusive badges',
+      'community imagery',
+      'reward highlights',
+      'personal touches',
+      'loyalty indicators',
+      'warm lighting',
+    ],
+  },
 };
 
 const VIDEO_GENERATION_PROMPTS = {
@@ -432,15 +483,16 @@ class MultimediaGenerationService {
     console.log('🎨 Enhancing prompt for territory-driven generation...');
 
     // Get base template for image type
-    const template = IMAGE_GENERATION_PROMPTS[imageType.toUpperCase() as keyof typeof IMAGE_GENERATION_PROMPTS];
-    
+    const template =
+      IMAGE_GENERATION_PROMPTS[imageType.toUpperCase() as keyof typeof IMAGE_GENERATION_PROMPTS];
+
     if (!template) {
       throw new Error(`Unsupported image type: ${imageType}`);
     }
 
     // Extract style keywords from territory tone
     const styleKeywords = this.extractStyleKeywords(territory.tone);
-    
+
     // Generate quality modifiers
     const qualityModifiers = [
       'ultra-high resolution',
@@ -468,11 +520,14 @@ class MultimediaGenerationService {
       .replace('{styleKeywords}', styleKeywords.join(', '))
       .replace('{culturalContext}', culturalAdaptations.join(', '))
       .replace('{brandElements}', brandConsistencyElements.join(', '))
-      .replace('{colorPalette}', [
-        brandGuidelines.colors.primary,
-        ...brandGuidelines.colors.secondary,
-        ...brandGuidelines.colors.accent,
-      ].join(', '))
+      .replace(
+        '{colorPalette}',
+        [
+          brandGuidelines.colors.primary,
+          ...brandGuidelines.colors.secondary,
+          ...brandGuidelines.colors.accent,
+        ].join(', ')
+      )
       .replace('{qualityModifiers}', qualityModifiers.join(', '))
       .replace('{negativePrompts}', this.generateNegativePrompts(brandGuidelines));
 
@@ -533,12 +588,12 @@ class MultimediaGenerationService {
   /**
    * Generate enhanced video animation prompt
    */
-  async enhanceVideoPrompt(
-    request: ImageToVideoRequest,
-    territory: Territory
-  ): Promise<string> {
-    const template = VIDEO_GENERATION_PROMPTS[request.animationType.toUpperCase() as keyof typeof VIDEO_GENERATION_PROMPTS];
-    
+  async enhanceVideoPrompt(request: ImageToVideoRequest, territory: Territory): Promise<string> {
+    const template =
+      VIDEO_GENERATION_PROMPTS[
+        request.animationType.toUpperCase() as keyof typeof VIDEO_GENERATION_PROMPTS
+      ];
+
     if (!template) {
       throw new Error(`Unsupported animation type: ${request.animationType}`);
     }
@@ -564,7 +619,8 @@ class MultimediaGenerationService {
 
     // Get template-specific prompt
     const templatePrompts = TEMPLATE_GENERATION_PROMPTS[template.type];
-    const basePrompt = mediaType === 'image' ? templatePrompts.imagePrompt : templatePrompts.videoPrompt;
+    const basePrompt =
+      mediaType === 'image' ? templatePrompts.imagePrompt : templatePrompts.videoPrompt;
 
     // Extract customization values
     const customizationValues = this.extractCustomizationValues(customizations);
@@ -788,13 +844,15 @@ class MultimediaGenerationService {
     if ('prompt' in request) {
       // Image generation: 30-120 seconds
       const baseTime = 45000; // 45 seconds
-      const qualityMultiplier = request.quality === 'ultra' ? 2 : request.quality === 'hd' ? 1.5 : 1;
+      const qualityMultiplier =
+        request.quality === 'ultra' ? 2 : request.quality === 'hd' ? 1.5 : 1;
       return baseTime * qualityMultiplier;
     } else {
       // Video generation: 2-10 minutes
       const baseTime = 180000; // 3 minutes
       const durationMultiplier = request.duration / 5; // Scale by duration
-      const qualityMultiplier = request.quality === 'ultra' ? 2 : request.quality === 'hd' ? 1.5 : 1;
+      const qualityMultiplier =
+        request.quality === 'ultra' ? 2 : request.quality === 'hd' ? 1.5 : 1;
       return baseTime * durationMultiplier * qualityMultiplier;
     }
   }
@@ -821,8 +879,9 @@ class MultimediaGenerationService {
       });
 
     // Process items up to max concurrent limit
-    const processingItems = Array.from(this.generationQueue.values())
-      .filter(item => item.status === 'processing');
+    const processingItems = Array.from(this.generationQueue.values()).filter(
+      item => item.status === 'processing'
+    );
 
     const availableSlots = this.config.batchProcessing.maxConcurrent - processingItems.length;
     const itemsToProcess = queuedItems.slice(0, availableSlots);
@@ -860,7 +919,6 @@ class MultimediaGenerationService {
       this.generationQueue.set(item.id, item);
 
       console.log(`✅ Completed ${item.type} generation: ${item.id}`);
-
     } catch (error) {
       console.error(`❌ Failed ${item.type} generation: ${item.id}`, error);
 
@@ -873,7 +931,9 @@ class MultimediaGenerationService {
       if (item.retryCount < item.maxRetries) {
         item.status = 'queued';
         item.retryCount++;
-        console.log(`🔄 Retrying ${item.type} generation: ${item.id} (${item.retryCount}/${item.maxRetries})`);
+        console.log(
+          `🔄 Retrying ${item.type} generation: ${item.id} (${item.retryCount}/${item.maxRetries})`
+        );
       }
 
       this.generationQueue.set(item.id, item);
@@ -897,14 +957,11 @@ class MultimediaGenerationService {
 
     try {
       // Call simple API for better reliability
-      const apiResults = await generateSimpleImage_API(
-        request.prompt,
-        {
-          imageType: request.imageType,
-          quality: request.quality,
-          territory: request.territory,
-        }
-      );
+      const apiResults = await generateSimpleImage_API(request.prompt, {
+        imageType: request.imageType,
+        quality: request.quality,
+        territory: request.territory,
+      });
 
       clearInterval(progressInterval);
 
@@ -941,7 +998,6 @@ class MultimediaGenerationService {
       };
 
       return generatedAsset;
-
     } finally {
       clearInterval(progressInterval);
     }
@@ -989,7 +1045,9 @@ class MultimediaGenerationService {
         thumbnailUrl: apiResult.thumbnailUrl,
         metadata: {
           originalPrompt: request.customPrompt || `${request.animationType} animation`,
-          enhancedPrompt: request.customPrompt || `${request.animationType} animation for ${request.duration} seconds`,
+          enhancedPrompt:
+            request.customPrompt ||
+            `${request.animationType} animation for ${request.duration} seconds`,
           dimensions: { width: 1920, height: 1080 }, // Default HD
           fileSize: apiResult.size || 10 * 1024 * 1024, // Estimated 10MB
           format: request.outputFormat,
@@ -1003,13 +1061,12 @@ class MultimediaGenerationService {
           },
         },
         provider: (request.provider || 'runway') as any,
-        generationTime: apiResult.generationTime || (Date.now() - item.createdAt.getTime()),
+        generationTime: apiResult.generationTime || Date.now() - item.createdAt.getTime(),
         quality: request.quality || 'standard',
         createdAt: new Date(),
       };
 
       return generatedAsset;
-
     } finally {
       clearInterval(progressInterval);
     }
@@ -1039,7 +1096,10 @@ class MultimediaGenerationService {
     return values;
   }
 
-  private buildTemplateFramework(template: CampaignTemplate, customizations: TemplateCustomization[]): string {
+  private buildTemplateFramework(
+    template: CampaignTemplate,
+    customizations: TemplateCustomization[]
+  ): string {
     const framework = template.strategicFramework;
     return `${framework.primaryObjective} with ${framework.messagingHierarchy.join(', ')} approach`;
   }
@@ -1048,7 +1108,10 @@ class MultimediaGenerationService {
     return `${territory.positioning} aligned with ${template.strategicFramework.competitivePositioning.valueProposition}`;
   }
 
-  private extractTargetAudience(template: CampaignTemplate, customizations: TemplateCustomization[]): string {
+  private extractTargetAudience(
+    template: CampaignTemplate,
+    customizations: TemplateCustomization[]
+  ): string {
     const audience = template.strategicFramework.audienceStrategy;
     return `${audience.primaryAudience} with ${audience.psychographicProfile} characteristics`;
   }
@@ -1136,7 +1199,10 @@ class MultimediaGenerationService {
     return typeMapping[templateType];
   }
 
-  private getCulturalContextForTemplate(template: CampaignTemplate, brandGuidelines: BrandGuidelines): CulturalContext {
+  private getCulturalContextForTemplate(
+    template: CampaignTemplate,
+    brandGuidelines: BrandGuidelines
+  ): CulturalContext {
     return 'australian';
   }
 
@@ -1169,7 +1235,10 @@ class MultimediaGenerationService {
     };
   }
 
-  private getChannelPriority(template: CampaignTemplate, channel: ChannelFormat): 'low' | 'normal' | 'high' {
+  private getChannelPriority(
+    template: CampaignTemplate,
+    channel: ChannelFormat
+  ): 'low' | 'normal' | 'high' {
     const channelPriority = template.channelSpecs.channelPriority.find(p => p.channel === channel);
     if (channelPriority?.priority === 'primary') return 'high';
     if (channelPriority?.priority === 'secondary') return 'normal';

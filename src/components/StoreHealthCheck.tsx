@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  getStoreHealth, 
-  getStoreSizes
-} from '../stores';
+import { getStoreHealth, getStoreSizes } from '../stores';
 
 /**
  * StoreHealthCheck - Development component to monitor store architecture
- * 
+ *
  * This component helps verify that the focused store architecture is working correctly
  * and provides insights into store performance and migration status.
- * 
+ *
  * Only available in development mode.
  */
 export const StoreHealthCheck: React.FC = () => {
@@ -44,9 +41,10 @@ export const StoreHealthCheck: React.FC = () => {
         onClick={() => setIsVisible(!isVisible)}
         className={`
           px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
-          ${healthData.healthy 
-            ? 'bg-green-500 hover:bg-green-600 text-white' 
-            : 'bg-red-500 hover:bg-red-600 text-white animate-pulse'
+          ${
+            healthData.healthy
+              ? 'bg-green-500 hover:bg-green-600 text-white'
+              : 'bg-red-500 hover:bg-red-600 text-white animate-pulse'
           }
         `}
         title="Store Health Check"
@@ -68,7 +66,9 @@ export const StoreHealthCheck: React.FC = () => {
           </div>
 
           {/* Overall Health */}
-          <div className={`p-2 rounded mb-3 ${healthData.healthy ? 'bg-green-100 dark:bg-green-900' : 'bg-red-100 dark:bg-red-900'}`}>
+          <div
+            className={`p-2 rounded mb-3 ${healthData.healthy ? 'bg-green-100 dark:bg-green-900' : 'bg-red-100 dark:bg-red-900'}`}
+          >
             <div className="flex items-center gap-2">
               <span className="text-lg">{healthData.healthy ? '✅' : '❌'}</span>
               <span className="font-medium text-gray-900 dark:text-white">
@@ -80,11 +80,13 @@ export const StoreHealthCheck: React.FC = () => {
           {/* Migration Status */}
           <div className="mb-3">
             <h4 className="font-medium text-gray-900 dark:text-white mb-1">Migration Status</h4>
-            <div className={`p-2 rounded text-sm ${
-              migrationData?.complete 
-                ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' 
-                : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
-            }`}>
+            <div
+              className={`p-2 rounded text-sm ${
+                migrationData?.complete
+                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
+                  : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
+              }`}
+            >
               {migrationData?.complete ? '✅ Migration Complete' : '🔄 Migration Pending'}
             </div>
             {migrationData.warnings.length > 0 && (
@@ -117,7 +119,9 @@ export const StoreHealthCheck: React.FC = () => {
               <h4 className="font-medium text-red-600 dark:text-red-400 mb-1">Issues</h4>
               <div className="space-y-1 text-xs">
                 {healthData.issues.map((issue: string, i: number) => (
-                  <div key={i} className="text-red-600 dark:text-red-400">❌ {issue}</div>
+                  <div key={i} className="text-red-600 dark:text-red-400">
+                    ❌ {issue}
+                  </div>
                 ))}
               </div>
             </div>
@@ -129,7 +133,9 @@ export const StoreHealthCheck: React.FC = () => {
               <h4 className="font-medium text-yellow-600 dark:text-yellow-400 mb-1">Warnings</h4>
               <div className="space-y-1 text-xs">
                 {healthData.warnings.map((warning: string, i: number) => (
-                  <div key={i} className="text-yellow-600 dark:text-yellow-400">⚠️ {warning}</div>
+                  <div key={i} className="text-yellow-600 dark:text-yellow-400">
+                    ⚠️ {warning}
+                  </div>
                 ))}
               </div>
             </div>

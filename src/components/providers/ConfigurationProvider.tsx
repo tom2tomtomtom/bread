@@ -22,7 +22,7 @@ export const ConfigurationProvider: React.FC<ConfigurationProviderProps> = ({ ch
     apiKeys,
     apiKeysSaved,
     generateImages,
-    
+
     // Configuration Actions
     updatePrompt,
     updateApiKey,
@@ -43,7 +43,7 @@ export const ConfigurationProvider: React.FC<ConfigurationProviderProps> = ({ ch
   const handleSaveApiKeys = () => {
     // Validate API keys before saving
     const hasValidKeys = Object.values(apiKeys).some(key => key.trim().length > 0);
-    
+
     if (hasValidKeys) {
       setApiKeysSaved(true);
       showToastMessage(APP_CONFIG.success.apiKey, 'success');
@@ -60,10 +60,7 @@ export const ConfigurationProvider: React.FC<ConfigurationProviderProps> = ({ ch
 
   const handleGenerateImagesToggle = (enabled: boolean) => {
     setGenerateImages(enabled);
-    showToastMessage(
-      `Image generation ${enabled ? 'enabled' : 'disabled'}`,
-      'info'
-    );
+    showToastMessage(`Image generation ${enabled ? 'enabled' : 'disabled'}`, 'info');
   };
 
   // Validation helpers
@@ -91,14 +88,14 @@ export const ConfigurationProvider: React.FC<ConfigurationProviderProps> = ({ ch
     apiKeysSaved,
     generateImages,
     apiStatus: getApiStatus(),
-    
+
     // Handlers
     handlePromptUpdate,
     handleApiKeyUpdate,
     handleSaveApiKeys,
     handleSaveConfiguration,
     handleGenerateImagesToggle,
-    
+
     // Validation
     validateApiKey,
     validatePrompt,
@@ -107,7 +104,7 @@ export const ConfigurationProvider: React.FC<ConfigurationProviderProps> = ({ ch
   return (
     <>
       {/* Pass configuration state and handlers to children */}
-      {React.Children.map(children, (child) => {
+      {React.Children.map(children, child => {
         if (React.isValidElement(child)) {
           return React.cloneElement(child, {
             ...configurationContextValue,
@@ -121,12 +118,7 @@ export const ConfigurationProvider: React.FC<ConfigurationProviderProps> = ({ ch
 
 // Hook for accessing configuration in child components
 export const useConfiguration = () => {
-  const {
-    prompts,
-    apiKeys,
-    apiKeysSaved,
-    generateImages,
-  } = useAppStore();
+  const { prompts, apiKeys, apiKeysSaved, generateImages } = useAppStore();
 
   return {
     prompts,

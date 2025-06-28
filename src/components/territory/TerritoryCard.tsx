@@ -10,7 +10,7 @@ interface TerritoryCardProps {
   starredItems: { territories: string[]; headlines: { [territoryId: string]: number[] } };
   onToggleTerritoryStarred: (territoryId: string) => void;
   onToggleHeadlineStarred: (territoryId: string, headlineIndex: number) => void;
-  
+
   // Enhanced features (optional)
   onSelectTerritoryForEvolution?: (territoryId: string | null) => void;
   onPredictTerritoryPerformance?: (territoryId: string) => void;
@@ -57,12 +57,18 @@ const TerritoryCardComponent: React.FC<TerritoryCardProps> = ({
 
   // Calculate average confidence (memoized for performance)
   const averageConfidence = useMemo(
-    () => Math.round(
-      (territory.confidence.marketFit +
-        territory.confidence.complianceConfidence +
-        territory.confidence.audienceResonance) / 3
-    ),
-    [territory.confidence.marketFit, territory.confidence.complianceConfidence, territory.confidence.audienceResonance]
+    () =>
+      Math.round(
+        (territory.confidence.marketFit +
+          territory.confidence.complianceConfidence +
+          territory.confidence.audienceResonance) /
+          3
+      ),
+    [
+      territory.confidence.marketFit,
+      territory.confidence.complianceConfidence,
+      territory.confidence.audienceResonance,
+    ]
   );
 
   // Memoized confidence color class calculation
@@ -77,9 +83,12 @@ const TerritoryCardComponent: React.FC<TerritoryCardProps> = ({
     onToggleTerritoryStarred(territory.id);
   }, [onToggleTerritoryStarred, territory.id]);
 
-  const handleToggleHeadlineStarred = useCallback((headlineIndex: number) => {
-    onToggleHeadlineStarred(territory.id, headlineIndex);
-  }, [onToggleHeadlineStarred, territory.id]);
+  const handleToggleHeadlineStarred = useCallback(
+    (headlineIndex: number) => {
+      onToggleHeadlineStarred(territory.id, headlineIndex);
+    },
+    [onToggleHeadlineStarred, territory.id]
+  );
 
   return (
     <div
@@ -98,9 +107,7 @@ const TerritoryCardComponent: React.FC<TerritoryCardProps> = ({
           <button
             onClick={handleToggleStarred}
             className={`text-lg transition-all duration-300 hover:scale-110 ${
-              isStarred
-                ? 'text-yellow-500 drop-shadow-lg'
-                : 'text-gray-400 hover:text-yellow-400'
+              isStarred ? 'text-yellow-500 drop-shadow-lg' : 'text-gray-400 hover:text-yellow-400'
             }`}
             title={isStarred ? 'Unstar territory' : 'Star territory'}
           >
@@ -158,9 +165,7 @@ const TerritoryCardComponent: React.FC<TerritoryCardProps> = ({
       {/* Tone */}
       <div className="bg-black/10 p-3 rounded-xl mb-4">
         <div className="text-xs font-subheading mb-2">TONE</div>
-        <p className="font-body font-normal text-sm text-gray-800 normal-case">
-          {territory.tone}
-        </p>
+        <p className="font-body font-normal text-sm text-gray-800 normal-case">{territory.tone}</p>
       </div>
 
       {/* Confidence Display */}
@@ -186,8 +191,10 @@ export const TerritoryCard = memo(TerritoryCardComponent, (prevProps, nextProps)
     prevProps.territory.positioning === nextProps.territory.positioning &&
     prevProps.territory.tone === nextProps.territory.tone &&
     prevProps.territory.confidence.marketFit === nextProps.territory.confidence.marketFit &&
-    prevProps.territory.confidence.complianceConfidence === nextProps.territory.confidence.complianceConfidence &&
-    prevProps.territory.confidence.audienceResonance === nextProps.territory.confidence.audienceResonance &&
+    prevProps.territory.confidence.complianceConfidence ===
+      nextProps.territory.confidence.complianceConfidence &&
+    prevProps.territory.confidence.audienceResonance ===
+      nextProps.territory.confidence.audienceResonance &&
     prevProps.territory.confidence.riskLevel === nextProps.territory.confidence.riskLevel &&
     prevProps.territory.headlines.length === nextProps.territory.headlines.length &&
     prevProps.starredItems.territories.includes(prevProps.territory.id) ===

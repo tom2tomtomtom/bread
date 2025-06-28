@@ -34,21 +34,21 @@ interface CopyState {
   // Generated copy variations
   generatedCopyVariations: CopyVariation[];
   selectedCopy: SelectedCopy | null;
-  
+
   // Generation state
   isGenerating: boolean;
   error: string | null;
-  
+
   // Request tracking
   lastRequest: CopyGenerationRequest | null;
-  
+
   // Actions
   generateCopy: (request: CopyGenerationRequest) => Promise<void>;
   selectCopy: (variation: CopyVariation) => void;
   clearSelectedCopy: () => void;
   clearGeneratedCopy: () => void;
   clearError: () => void;
-  
+
   // Custom copy editing
   updateSelectedCopy: (updates: Partial<SelectedCopy>) => void;
 }
@@ -72,85 +72,91 @@ export const useCopyStore = create<CopyState>()(
           if (process.env.NODE_ENV === 'development') {
             // Simulate API delay
             await new Promise(resolve => setTimeout(resolve, 2500));
-            
+
             const mockCopyVariations: CopyVariation[] = [
               {
                 id: 'copy-1',
-                headline: 'Don\'t Miss Out - Limited Time Only!',
-                bodyText: 'Join thousands who\'ve already discovered the secret to [benefit]. Available for a limited time only.',
+                headline: "Don't Miss Out - Limited Time Only!",
+                bodyText:
+                  "Join thousands who've already discovered the secret to [benefit]. Available for a limited time only.",
                 callToAction: 'Claim Yours Now',
                 subheadline: 'Only 48 hours left',
                 motivationId: 'mot-1', // FOMO
                 confidenceScore: 89,
                 reasoning: 'Creates immediate urgency while highlighting social proof and scarcity',
-                tone: 'urgent'
+                tone: 'urgent',
               },
               {
                 id: 'copy-2',
                 headline: 'Join 50,000+ Happy Customers',
-                bodyText: 'See why industry leaders and everyday heroes choose [product] to achieve their goals. Trusted by professionals worldwide.',
+                bodyText:
+                  'See why industry leaders and everyday heroes choose [product] to achieve their goals. Trusted by professionals worldwide.',
                 callToAction: 'Join the Community',
                 subheadline: 'Rated #1 by customers',
                 motivationId: 'mot-2', // Social Proof
                 confidenceScore: 85,
                 reasoning: 'Leverages social validation and peer approval to build trust',
-                tone: 'professional'
+                tone: 'professional',
               },
               {
                 id: 'copy-3',
                 headline: 'Transform Your [Goal] in 30 Days',
-                bodyText: 'Unlock your potential and achieve the results you\'ve always dreamed of. Your future self will thank you.',
+                bodyText:
+                  "Unlock your potential and achieve the results you've always dreamed of. Your future self will thank you.",
                 callToAction: 'Start Your Journey',
                 subheadline: 'Results guaranteed',
                 motivationId: 'mot-3', // Aspirational
                 confidenceScore: 82,
                 reasoning: 'Appeals to personal growth and future-focused thinking',
-                tone: 'emotional'
+                tone: 'emotional',
               },
               {
                 id: 'copy-4',
                 headline: 'Recommended by Top Experts',
-                bodyText: 'Leading professionals trust [product] for their most important projects. Experience the difference expertise makes.',
+                bodyText:
+                  'Leading professionals trust [product] for their most important projects. Experience the difference expertise makes.',
                 callToAction: 'Get Expert Results',
                 subheadline: 'Professionally endorsed',
                 motivationId: 'mot-4', // Authority
                 confidenceScore: 87,
                 reasoning: 'Builds credibility through expert endorsement and authority',
-                tone: 'authoritative'
+                tone: 'authoritative',
               },
               {
                 id: 'copy-5',
                 headline: 'Exclusive Access for VIP Members',
-                bodyText: 'You\'re invited to experience [product] before anyone else. This exclusive offer is reserved for select individuals.',
+                bodyText:
+                  "You're invited to experience [product] before anyone else. This exclusive offer is reserved for select individuals.",
                 callToAction: 'Access VIP Offer',
                 subheadline: 'Invitation only',
                 motivationId: 'mot-5', // Exclusivity
                 confidenceScore: 83,
                 reasoning: 'Creates sense of exclusivity and special treatment',
-                tone: 'professional'
+                tone: 'professional',
               },
               {
                 id: 'copy-6',
                 headline: 'Finally, A Solution That Actually Works',
-                bodyText: 'Stop struggling with [problem]. Our proven solution eliminates the frustration and delivers real results.',
+                bodyText:
+                  'Stop struggling with [problem]. Our proven solution eliminates the frustration and delivers real results.',
                 callToAction: 'Solve This Today',
                 subheadline: 'End the struggle now',
                 motivationId: 'mot-6', // Problem Solution
                 confidenceScore: 91,
                 reasoning: 'Directly addresses pain points and offers clear resolution',
-                tone: 'friendly'
-              }
+                tone: 'friendly',
+              },
             ];
 
             // Filter variations based on selected motivations
-            const filteredVariations = mockCopyVariations.filter(variation => 
+            const filteredVariations = mockCopyVariations.filter(variation =>
               request.selectedMotivations.includes(variation.motivationId)
             );
 
-            set({ 
-              generatedCopyVariations: filteredVariations, 
-              isGenerating: false, 
-              error: null 
+            set({
+              generatedCopyVariations: filteredVariations,
+              isGenerating: false,
+              error: null,
             });
             return;
           }
@@ -169,23 +175,23 @@ export const useCopyStore = create<CopyState>()(
           }
 
           const data = await response.json();
-          
+
           if (!data.success) {
             throw new Error(data.error || 'Failed to generate copy');
           }
 
-          set({ 
-            generatedCopyVariations: data.copyVariations, 
-            isGenerating: false, 
-            error: null 
+          set({
+            generatedCopyVariations: data.copyVariations,
+            isGenerating: false,
+            error: null,
           });
-
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-          set({ 
-            generatedCopyVariations: [], 
-            isGenerating: false, 
-            error: errorMessage 
+          const errorMessage =
+            error instanceof Error ? error.message : 'An unexpected error occurred';
+          set({
+            generatedCopyVariations: [],
+            isGenerating: false,
+            error: errorMessage,
           });
         }
       },
@@ -228,7 +234,7 @@ export const useCopyStore = create<CopyState>()(
     }),
     {
       name: 'copy-storage',
-      partialize: (state) => ({
+      partialize: state => ({
         generatedCopyVariations: state.generatedCopyVariations,
         selectedCopy: state.selectedCopy,
         lastRequest: state.lastRequest,

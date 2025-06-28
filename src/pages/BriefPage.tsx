@@ -13,7 +13,7 @@ export const BriefPage: React.FC = () => {
   const { brief, setBrief, error } = useGenerationStore();
 
   const handleAdminToggle = () => setShowAdmin(!showAdmin);
-  
+
   const handleMomentSelect = (moment: { name: string; date: string; brief: string }) => {
     // Replace the entire brief with the shopping moment brief
     setBrief(moment.brief);
@@ -59,17 +59,23 @@ export const BriefPage: React.FC = () => {
         <div className="mb-8">
           <div className="flex items-center justify-center space-x-4 mb-4">
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-semibold">1</div>
+              <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-semibold">
+                1
+              </div>
               <span className="ml-2 text-orange-400 font-medium">Brief</span>
             </div>
             <div className="w-16 h-1 bg-gray-600 rounded"></div>
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-gray-400 font-semibold">2</div>
+              <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-gray-400 font-semibold">
+                2
+              </div>
               <span className="ml-2 text-gray-400">Generate</span>
             </div>
             <div className="w-16 h-1 bg-gray-600 rounded"></div>
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-gray-400 font-semibold">3</div>
+              <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-gray-400 font-semibold">
+                3
+              </div>
               <span className="ml-2 text-gray-400">Results</span>
             </div>
           </div>
@@ -111,7 +117,7 @@ export const BriefPage: React.FC = () => {
           <div className="text-sm text-gray-400">
             {brief.trim() ? `${brief.length} characters` : 'Start writing your brief above'}
           </div>
-          
+
           <div className="flex gap-4">
             <button
               onClick={handleBackToDashboard}

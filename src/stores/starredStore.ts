@@ -5,14 +5,14 @@ import { APP_CONFIG } from '../config/app';
 
 /**
  * StarredStore - Focused store for starred items management
- * 
+ *
  * Responsibilities:
  * - Starred territories management
  * - Starred headlines management
  * - Favorites organization
  * - Export of starred content
  * - Starred items analytics
- * 
+ *
  * Benefits:
  * - Dedicated favorites management
  * - Easy starred content operations
@@ -68,15 +68,32 @@ interface StarredState {
 
   // Collection management
   createCollection: (name: string, description?: string) => string;
-  addToCollection: (collectionId: string, territoryId?: string, headlineRef?: { territoryId: string; headlineIndex: number }) => void;
-  removeFromCollection: (collectionId: string, territoryId?: string, headlineRef?: { territoryId: string; headlineIndex: number }) => void;
+  addToCollection: (
+    collectionId: string,
+    territoryId?: string,
+    headlineRef?: { territoryId: string; headlineIndex: number }
+  ) => void;
+  removeFromCollection: (
+    collectionId: string,
+    territoryId?: string,
+    headlineRef?: { territoryId: string; headlineIndex: number }
+  ) => void;
   deleteCollection: (collectionId: string) => void;
-  updateCollection: (collectionId: string, updates: { name?: string; description?: string }) => void;
+  updateCollection: (
+    collectionId: string,
+    updates: { name?: string; description?: string }
+  ) => void;
 
   // Query and analytics
   getStarredCount: () => { territories: number; headlines: number };
-  getStarredByTag: (tag: string) => { territories: string[]; headlines: { territoryId: string; headlineIndex: number }[] };
-  getRecentlyStarred: (limit?: number) => { territories: string[]; headlines: { territoryId: string; headlineIndex: number }[] };
+  getStarredByTag: (tag: string) => {
+    territories: string[];
+    headlines: { territoryId: string; headlineIndex: number }[];
+  };
+  getRecentlyStarred: (limit?: number) => {
+    territories: string[];
+    headlines: { territoryId: string; headlineIndex: number }[];
+  };
   getStarredAnalytics: () => {
     totalStarred: number;
     starredByMonth: { [month: string]: number };
@@ -105,7 +122,7 @@ export const useStarredStore = create<StarredState>()(
 
       // Basic starred actions
       toggleTerritoryStarred: (territoryId: string) =>
-        set((state) => {
+        set(state => {
           const isStarred = state.starredItems.territories.includes(territoryId);
           const newTerritories = isStarred
             ? state.starredItems.territories.filter(id => id !== territoryId)
@@ -130,10 +147,10 @@ export const useStarredStore = create<StarredState>()(
         }),
 
       toggleHeadlineStarred: (territoryId: string, headlineIndex: number) =>
-        set((state) => {
+        set(state => {
           const territoryHeadlines = state.starredItems.headlines[territoryId] || [];
           const isStarred = territoryHeadlines.includes(headlineIndex);
-          
+
           const newHeadlines = isStarred
             ? territoryHeadlines.filter(index => index !== headlineIndex)
             : [...territoryHeadlines, headlineIndex];
@@ -167,14 +184,15 @@ export const useStarredStore = create<StarredState>()(
           };
         }),
 
-      clearStarredItems: () => set({
-        starredItems: { territories: [], headlines: {} },
-        starredMetadata: { territories: {}, headlines: {} },
-      }),
+      clearStarredItems: () =>
+        set({
+          starredItems: { territories: [], headlines: {} },
+          starredMetadata: { territories: {}, headlines: {} },
+        }),
 
       // Advanced starred operations
       addTerritoryNote: (territoryId: string, note: string) =>
-        set((state) => ({
+        set(state => ({
           starredMetadata: {
             ...state.starredMetadata,
             territories: {
@@ -188,7 +206,7 @@ export const useStarredStore = create<StarredState>()(
         })),
 
       addHeadlineNote: (territoryId: string, headlineIndex: number, note: string) =>
-        set((state) => ({
+        set(state => ({
           starredMetadata: {
             ...state.starredMetadata,
             headlines: {
@@ -205,7 +223,7 @@ export const useStarredStore = create<StarredState>()(
         })),
 
       addTerritoryTags: (territoryId: string, tags: string[]) =>
-        set((state) => ({
+        set(state => ({
           starredMetadata: {
             ...state.starredMetadata,
             territories: {
@@ -219,7 +237,7 @@ export const useStarredStore = create<StarredState>()(
         })),
 
       addHeadlineTags: (territoryId: string, headlineIndex: number, tags: string[]) =>
-        set((state) => ({
+        set(state => ({
           starredMetadata: {
             ...state.starredMetadata,
             headlines: {
@@ -228,7 +246,10 @@ export const useStarredStore = create<StarredState>()(
                 ...state.starredMetadata.headlines[territoryId],
                 [headlineIndex]: {
                   ...state.starredMetadata.headlines[territoryId]?.[headlineIndex],
-                  tags: [...(state.starredMetadata.headlines[territoryId]?.[headlineIndex]?.tags || []), ...tags],
+                  tags: [
+                    ...(state.starredMetadata.headlines[territoryId]?.[headlineIndex]?.tags || []),
+                    ...tags,
+                  ],
                 },
               },
             },
@@ -238,7 +259,7 @@ export const useStarredStore = create<StarredState>()(
       // Collection management
       createCollection: (name: string, description?: string) => {
         const id = `collection-${Date.now()}`;
-        set((state) => ({
+        set(state => ({
           collections: [
             ...state.collections,
             {
@@ -255,28 +276,41 @@ export const useStarredStore = create<StarredState>()(
         return id;
       },
 
-      addToCollection: (collectionId: string, territoryId?: string, headlineRef?: { territoryId: string; headlineIndex: number }) =>
-        set((state) => ({
+      addToCollection: (
+        collectionId: string,
+        territoryId?: string,
+        headlineRef?: { territoryId: string; headlineIndex: number }
+      ) =>
+        set(state => ({
           collections: state.collections.map(collection =>
             collection.id === collectionId
               ? {
                   ...collection,
-                  territoryIds: territoryId && !collection.territoryIds.includes(territoryId)
-                    ? [...collection.territoryIds, territoryId]
-                    : collection.territoryIds,
-                  headlineRefs: headlineRef && !collection.headlineRefs.some(ref => 
-                    ref.territoryId === headlineRef.territoryId && ref.headlineIndex === headlineRef.headlineIndex
-                  )
-                    ? [...collection.headlineRefs, headlineRef]
-                    : collection.headlineRefs,
+                  territoryIds:
+                    territoryId && !collection.territoryIds.includes(territoryId)
+                      ? [...collection.territoryIds, territoryId]
+                      : collection.territoryIds,
+                  headlineRefs:
+                    headlineRef &&
+                    !collection.headlineRefs.some(
+                      ref =>
+                        ref.territoryId === headlineRef.territoryId &&
+                        ref.headlineIndex === headlineRef.headlineIndex
+                    )
+                      ? [...collection.headlineRefs, headlineRef]
+                      : collection.headlineRefs,
                   updatedAt: new Date().toISOString(),
                 }
               : collection
           ),
         })),
 
-      removeFromCollection: (collectionId: string, territoryId?: string, headlineRef?: { territoryId: string; headlineIndex: number }) =>
-        set((state) => ({
+      removeFromCollection: (
+        collectionId: string,
+        territoryId?: string,
+        headlineRef?: { territoryId: string; headlineIndex: number }
+      ) =>
+        set(state => ({
           collections: state.collections.map(collection =>
             collection.id === collectionId
               ? {
@@ -285,8 +319,12 @@ export const useStarredStore = create<StarredState>()(
                     ? collection.territoryIds.filter(id => id !== territoryId)
                     : collection.territoryIds,
                   headlineRefs: headlineRef
-                    ? collection.headlineRefs.filter(ref => 
-                        !(ref.territoryId === headlineRef.territoryId && ref.headlineIndex === headlineRef.headlineIndex)
+                    ? collection.headlineRefs.filter(
+                        ref =>
+                          !(
+                            ref.territoryId === headlineRef.territoryId &&
+                            ref.headlineIndex === headlineRef.headlineIndex
+                          )
                       )
                     : collection.headlineRefs,
                   updatedAt: new Date().toISOString(),
@@ -296,12 +334,12 @@ export const useStarredStore = create<StarredState>()(
         })),
 
       deleteCollection: (collectionId: string) =>
-        set((state) => ({
+        set(state => ({
           collections: state.collections.filter(collection => collection.id !== collectionId),
         })),
 
       updateCollection: (collectionId: string, updates: { name?: string; description?: string }) =>
-        set((state) => ({
+        set(state => ({
           collections: state.collections.map(collection =>
             collection.id === collectionId
               ? {
@@ -316,9 +354,11 @@ export const useStarredStore = create<StarredState>()(
       // Query and analytics
       getStarredCount: () => {
         const { starredItems } = get();
-        const headlineCount = Object.values(starredItems.headlines)
-          .reduce((total, headlines) => total + (headlines?.length || 0), 0);
-        
+        const headlineCount = Object.values(starredItems.headlines).reduce(
+          (total, headlines) => total + (headlines?.length || 0),
+          0
+        );
+
         return {
           territories: starredItems.territories.length,
           headlines: headlineCount,
@@ -327,7 +367,7 @@ export const useStarredStore = create<StarredState>()(
 
       getStarredByTag: (tag: string) => {
         const { starredItems, starredMetadata } = get();
-        
+
         const territories = starredItems.territories.filter(territoryId =>
           starredMetadata.territories[territoryId]?.tags?.includes(tag)
         );
@@ -346,7 +386,7 @@ export const useStarredStore = create<StarredState>()(
 
       getRecentlyStarred: (limit = 10) => {
         const { starredItems, starredMetadata } = get();
-        
+
         // Get all starred items with timestamps
         const allStarred: Array<{
           type: 'territory' | 'headline';
@@ -388,7 +428,9 @@ export const useStarredStore = create<StarredState>()(
           .slice(0, limit);
 
         return {
-          territories: recent.filter(item => item.type === 'territory').map(item => item.territoryId),
+          territories: recent
+            .filter(item => item.type === 'territory')
+            .map(item => item.territoryId),
           headlines: recent
             .filter(item => item.type === 'headline')
             .map(item => ({ territoryId: item.territoryId, headlineIndex: item.headlineIndex! })),
@@ -397,14 +439,16 @@ export const useStarredStore = create<StarredState>()(
 
       getStarredAnalytics: () => {
         const { starredItems, starredMetadata, collections } = get();
-        
+
         const totalTerritories = starredItems.territories.length;
-        const totalHeadlines = Object.values(starredItems.headlines)
-          .reduce((total, headlines) => total + (headlines?.length || 0), 0);
-        
+        const totalHeadlines = Object.values(starredItems.headlines).reduce(
+          (total, headlines) => total + (headlines?.length || 0),
+          0
+        );
+
         // Get starred by month
         const starredByMonth: { [month: string]: number } = {};
-        
+
         // Process territories
         Object.values(starredMetadata.territories).forEach(metadata => {
           const month = new Date(metadata.starredAt).toISOString().substring(0, 7); // YYYY-MM
@@ -421,7 +465,7 @@ export const useStarredStore = create<StarredState>()(
 
         // Get top tags
         const tagCounts: { [tag: string]: number } = {};
-        
+
         // Count territory tags
         Object.values(starredMetadata.territories).forEach(metadata => {
           metadata.tags?.forEach(tag => {
@@ -454,11 +498,11 @@ export const useStarredStore = create<StarredState>()(
       // Export functionality
       exportStarredItems: async (format: 'json' | 'csv' | 'pdf') => {
         const { starredItems, starredMetadata } = get();
-        
+
         // TODO: Implement actual export functionality
         console.log('Exporting starred items in format:', format);
         console.log('Data:', { starredItems, starredMetadata });
-        
+
         // Mock implementation
         await new Promise(resolve => setTimeout(resolve, 1000));
       },
@@ -466,7 +510,7 @@ export const useStarredStore = create<StarredState>()(
       exportCollection: async (collectionId: string, format: 'json' | 'csv' | 'pdf') => {
         const { collections } = get();
         const collection = collections.find(c => c.id === collectionId);
-        
+
         if (!collection) {
           throw new Error('Collection not found');
         }
@@ -474,14 +518,14 @@ export const useStarredStore = create<StarredState>()(
         // TODO: Implement actual export functionality
         console.log('Exporting collection in format:', format);
         console.log('Collection:', collection);
-        
+
         // Mock implementation
         await new Promise(resolve => setTimeout(resolve, 1000));
       },
     }),
     {
       name: `${APP_CONFIG.storage.keys.appState}-starred`,
-      partialize: (state) => ({
+      partialize: state => ({
         // Persist all starred data
         starredItems: state.starredItems,
         starredMetadata: state.starredMetadata,

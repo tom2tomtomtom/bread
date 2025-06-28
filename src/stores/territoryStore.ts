@@ -11,14 +11,14 @@ import { APP_CONFIG } from '../config/app';
 
 /**
  * TerritoryStore - Focused store for territory evolution and performance
- * 
+ *
  * Responsibilities:
  * - Territory evolution management
  * - Performance predictions
  * - Evolution suggestions
  * - Evolution history tracking
  * - Territory analytics
- * 
+ *
  * Benefits:
  * - Specialized territory intelligence
  * - Better performance tracking
@@ -32,7 +32,7 @@ interface TerritoryState {
   evolutionSuggestions: EvolutionSuggestion[];
   evolutionHistory: { [territoryId: string]: EvolutionHistory };
   performancePredictions: { [territoryId: string]: PerformancePrediction };
-  
+
   // UI state for territory features
   isEvolvingTerritory: boolean;
   selectedTerritoryForEvolution: string | null;
@@ -85,7 +85,7 @@ export const useTerritoryStore = create<TerritoryState>()(
 
       // Basic actions
       addTerritoryEvolution: (territoryId: string, evolution: TerritoryEvolution) =>
-        set((state) => ({
+        set(state => ({
           territoryEvolutions: {
             ...state.territoryEvolutions,
             [territoryId]: [...(state.territoryEvolutions[territoryId] || []), evolution],
@@ -96,7 +96,7 @@ export const useTerritoryStore = create<TerritoryState>()(
         set({ evolutionSuggestions }),
 
       setPerformancePrediction: (territoryId: string, prediction: PerformancePrediction) =>
-        set((state) => ({
+        set(state => ({
           performancePredictions: {
             ...state.performancePredictions,
             [territoryId]: prediction,
@@ -114,10 +114,10 @@ export const useTerritoryStore = create<TerritoryState>()(
         try {
           // TODO: Implement AI-powered evolution suggestion generation
           console.log('Generating evolution suggestions for territory:', territoryId);
-          
+
           // Mock implementation
           await new Promise(resolve => setTimeout(resolve, 2000));
-          
+
           const mockSuggestions: EvolutionSuggestion[] = [
             {
               type: 'TONE_SHIFT',
@@ -139,7 +139,7 @@ export const useTerritoryStore = create<TerritoryState>()(
             },
           ];
 
-          set({ 
+          set({
             evolutionSuggestions: mockSuggestions,
             isEvolvingTerritory: false,
           });
@@ -155,10 +155,10 @@ export const useTerritoryStore = create<TerritoryState>()(
         try {
           // TODO: Implement AI-powered territory evolution
           console.log('Evolving territory with AI:', territoryId, suggestion);
-          
+
           // Mock implementation
           await new Promise(resolve => setTimeout(resolve, 3000));
-          
+
           // Create a mock evolved territory based on the suggestion
           const evolvedTerritory: Territory = {
             id: `evolved-${territoryId}-${Date.now()}`,
@@ -210,10 +210,10 @@ export const useTerritoryStore = create<TerritoryState>()(
         try {
           // TODO: Implement AI-powered performance prediction
           console.log('Predicting performance for territory:', territoryId);
-          
+
           // Mock implementation
           await new Promise(resolve => setTimeout(resolve, 1500));
-          
+
           const prediction: PerformancePrediction = {
             overallScore: Math.random() * 40 + 60, // 60-100
             categoryScores: {
@@ -250,10 +250,10 @@ export const useTerritoryStore = create<TerritoryState>()(
         try {
           // TODO: Implement territory trend analysis
           console.log('Analyzing trends for territory:', territoryId);
-          
+
           // Mock implementation
           await new Promise(resolve => setTimeout(resolve, 1000));
-          
+
           const analytics = {
             engagementScore: Math.random() * 0.4 + 0.6,
             conversionRate: Math.random() * 0.3 + 0.5,
@@ -270,7 +270,7 @@ export const useTerritoryStore = create<TerritoryState>()(
 
       // Analytics actions
       updateTerritoryAnalytics: (territoryId: string, analytics: any) =>
-        set((state) => ({
+        set(state => ({
           territoryAnalytics: {
             ...state.territoryAnalytics,
             [territoryId]: analytics,
@@ -279,7 +279,7 @@ export const useTerritoryStore = create<TerritoryState>()(
 
       getTerritoryInsights: (territoryId: string) => {
         const { territoryAnalytics, performancePredictions, territoryEvolutions } = get();
-        
+
         return {
           analytics: territoryAnalytics[territoryId],
           prediction: performancePredictions[territoryId],
@@ -289,7 +289,7 @@ export const useTerritoryStore = create<TerritoryState>()(
 
       compareTerritories: (territoryIds: string[]) => {
         const { territoryAnalytics, performancePredictions } = get();
-        
+
         return territoryIds.map(id => ({
           territoryId: id,
           analytics: territoryAnalytics[id],
@@ -300,10 +300,10 @@ export const useTerritoryStore = create<TerritoryState>()(
       // Utility actions
       clearEvolutionData: (territoryId?: string) => {
         if (territoryId) {
-          set((state) => {
+          set(state => {
             const newPerformancePredictions = { ...state.performancePredictions };
             delete newPerformancePredictions[territoryId];
-            
+
             return {
               territoryEvolutions: {
                 ...state.territoryEvolutions,
@@ -322,19 +322,20 @@ export const useTerritoryStore = create<TerritoryState>()(
         }
       },
 
-      resetTerritoryState: () => set({
-        territoryEvolutions: {},
-        evolutionSuggestions: [],
-        evolutionHistory: {},
-        performancePredictions: {},
-        isEvolvingTerritory: false,
-        selectedTerritoryForEvolution: null,
-        territoryAnalytics: {},
-      }),
+      resetTerritoryState: () =>
+        set({
+          territoryEvolutions: {},
+          evolutionSuggestions: [],
+          evolutionHistory: {},
+          performancePredictions: {},
+          isEvolvingTerritory: false,
+          selectedTerritoryForEvolution: null,
+          territoryAnalytics: {},
+        }),
     }),
     {
       name: `${APP_CONFIG.storage.keys.appState}-territory`,
-      partialize: (state) => ({
+      partialize: state => ({
         // Persist territory data
         territoryEvolutions: state.territoryEvolutions,
         evolutionHistory: state.evolutionHistory,

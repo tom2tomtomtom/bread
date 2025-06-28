@@ -378,21 +378,21 @@ export const generateSimpleImage_API = async (
 
   try {
     console.log('🔄 Sending API request...');
-    
-    // Add timeout to the request
+
+    // Add timeout to the request  
     const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('Request timeout after 25 seconds')), 25000);
+      setTimeout(() => reject(new Error('Request timeout after 40 seconds')), 40000);
     });
-    
+
     const response = await Promise.race([makeRequest(), timeoutPromise]);
     console.log('📥 Response received:', response.status, response.statusText);
-    
+
     if (!response.ok) {
       const errorText = await response.text();
       console.error('❌ API Error Response:', errorText);
       throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
     }
-    
+
     const result: ApiResponse = await response.json();
     console.log('📊 Parsed result:', result);
 
@@ -409,7 +409,7 @@ export const generateSimpleImage_API = async (
     console.error('❌ Error details:', {
       name: error.name,
       message: error.message,
-      stack: error.stack
+      stack: error.stack,
     });
     throw error;
   }
@@ -444,12 +444,12 @@ export const generateEnhancedImages_API = async (
 
   try {
     const response = await makeRequest();
-    
+
     if (!response.ok) {
       const result = await handleApiError(response, makeRequest);
       return (result.data as any[]) || [];
     }
-    
+
     const result: ApiResponse = await response.json();
 
     if (!result.success) {
@@ -499,12 +499,12 @@ export const generateVideo_API = async (
 
   try {
     const response = await makeRequest();
-    
+
     if (!response.ok) {
       const result = await handleApiError(response, makeRequest);
       return (result.data as any[]) || [];
     }
-    
+
     const result: ApiResponse = await response.json();
 
     if (!result.success) {
@@ -540,7 +540,7 @@ export const batchGenerateMultimedia_API = async (
     for (let i = 0; i < requests.length; i += batchSize) {
       const batch = requests.slice(i, i + batchSize);
 
-      const batchPromises = batch.map(async (request) => {
+      const batchPromises = batch.map(async request => {
         if (request.type === 'image') {
           return await generateEnhancedImages_API(
             request.data.territories,

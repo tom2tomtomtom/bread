@@ -113,7 +113,7 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
   };
 
   return (
@@ -127,12 +127,14 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
           </p>
         </div>
         {onClose && (
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         )}
@@ -194,9 +196,7 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
                 <div className="font-medium text-gray-900 mb-2">
                   {key.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                 </div>
-                <div className="text-sm text-gray-600 mb-3">
-                  {configs.length} formats included
-                </div>
+                <div className="text-sm text-gray-600 mb-3">{configs.length} formats included</div>
                 <div className="space-y-1">
                   {configs.slice(0, 3).map((config, index) => (
                     <div key={index} className="text-xs text-gray-500">
@@ -204,9 +204,7 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
                     </div>
                   ))}
                   {configs.length > 3 && (
-                    <div className="text-xs text-gray-500">
-                      • +{configs.length - 3} more
-                    </div>
+                    <div className="text-xs text-gray-500">• +{configs.length - 3} more</div>
                   )}
                 </div>
               </button>
@@ -231,15 +229,15 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
       {exportMode === 'custom' && (
         <div className="space-y-4">
           <h3 className="font-semibold text-gray-900">Custom Export Settings</h3>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Format
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Format</label>
               <select
                 value={customConfig.format || ''}
-                onChange={(e) => setCustomConfig(prev => ({ ...prev, format: e.target.value as ChannelFormat }))}
+                onChange={e =>
+                  setCustomConfig(prev => ({ ...prev, format: e.target.value as ChannelFormat }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select format...</option>
@@ -253,12 +251,12 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Quality
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Quality</label>
               <select
                 value={customConfig.quality || 'production'}
-                onChange={(e) => setCustomConfig(prev => ({ ...prev, quality: e.target.value as any }))}
+                onChange={e =>
+                  setCustomConfig(prev => ({ ...prev, quality: e.target.value as any }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="draft">Draft</option>
@@ -276,7 +274,9 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
                 min="50"
                 max="100"
                 value={customConfig.compression || 85}
-                onChange={(e) => setCustomConfig(prev => ({ ...prev, compression: parseInt(e.target.value) }))}
+                onChange={e =>
+                  setCustomConfig(prev => ({ ...prev, compression: parseInt(e.target.value) }))
+                }
                 className="w-full"
               />
               <div className="text-sm text-gray-500 text-center">
@@ -289,7 +289,9 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
                 <input
                   type="checkbox"
                   checked={customConfig.includeBleed || false}
-                  onChange={(e) => setCustomConfig(prev => ({ ...prev, includeBleed: e.target.checked }))}
+                  onChange={e =>
+                    setCustomConfig(prev => ({ ...prev, includeBleed: e.target.checked }))
+                  }
                   className="mr-2"
                 />
                 <span className="text-sm text-gray-700">Include Bleed</span>
@@ -298,7 +300,9 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
                 <input
                   type="checkbox"
                   checked={customConfig.includeMarks || false}
-                  onChange={(e) => setCustomConfig(prev => ({ ...prev, includeMarks: e.target.checked }))}
+                  onChange={e =>
+                    setCustomConfig(prev => ({ ...prev, includeMarks: e.target.checked }))
+                  }
                   className="mr-2"
                 />
                 <span className="text-sm text-gray-700">Include Crop Marks</span>
@@ -324,18 +328,16 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
       {exportMode === 'single' && layouts.length > 1 && (
         <div className="space-y-4">
           <h3 className="font-semibold text-gray-900">Project Export</h3>
-          <p className="text-gray-600">
-            Export all {layouts.length} layouts to the same format
-          </p>
+          <p className="text-gray-600">Export all {layouts.length} layouts to the same format</p>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Format
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Format</label>
               <select
                 value={customConfig.format || ''}
-                onChange={(e) => setCustomConfig(prev => ({ ...prev, format: e.target.value as ChannelFormat }))}
+                onChange={e =>
+                  setCustomConfig(prev => ({ ...prev, format: e.target.value as ChannelFormat }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select format...</option>
@@ -346,12 +348,12 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Quality
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Quality</label>
               <select
                 value={customConfig.quality || 'production'}
-                onChange={(e) => setCustomConfig(prev => ({ ...prev, quality: e.target.value as any }))}
+                onChange={e =>
+                  setCustomConfig(prev => ({ ...prev, quality: e.target.value as any }))
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="draft">Draft</option>
@@ -379,7 +381,7 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
       {exportResults && (
         <div className="mt-8 bg-gray-50 rounded-lg p-6">
           <h3 className="font-semibold text-gray-900 mb-4">📋 Export Results</h3>
-          
+
           <div className="grid grid-cols-3 gap-4 mb-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">
@@ -407,23 +409,19 @@ export const ExportManager: React.FC<ExportManagerProps> = ({
                 <div
                   key={index}
                   className={`flex items-center justify-between p-3 rounded-lg ${
-                    result.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+                    result.success
+                      ? 'bg-green-50 border border-green-200'
+                      : 'bg-red-50 border border-red-200'
                   }`}
                 >
                   <div className="flex items-center">
-                    <span className="mr-3">
-                      {result.success ? '✅' : '❌'}
-                    </span>
+                    <span className="mr-3">{result.success ? '✅' : '❌'}</span>
                     <div>
-                      <div className="font-medium">
-                        {result.filename || result.format}
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        {formatFileSize(result.size)}
-                      </div>
+                      <div className="font-medium">{result.filename || result.format}</div>
+                      <div className="text-sm text-gray-600">{formatFileSize(result.size)}</div>
                     </div>
                   </div>
-                  
+
                   {result.success && result.url && (
                     <button
                       onClick={() => handleDownload(result.url, result.filename)}

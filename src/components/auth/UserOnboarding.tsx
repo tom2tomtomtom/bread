@@ -25,7 +25,8 @@ export const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete, onSk
     {
       id: 'welcome',
       title: `Welcome to BREAD, ${user?.name?.split(' ')[0] || 'there'}! 🎉`,
-      description: 'BREAD is your AI-powered creative platform for generating advertising territories and headlines. Let\'s get you started with a quick tour.',
+      description:
+        "BREAD is your AI-powered creative platform for generating advertising territories and headlines. Let's get you started with a quick tour.",
       icon: '👋',
     },
     {
@@ -42,13 +43,15 @@ export const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete, onSk
     {
       id: 'features',
       title: 'Key Features',
-      description: 'BREAD offers enhanced brief intelligence, territory evolution, and AI-powered content generation. Each feature is designed to boost your creative workflow.',
+      description:
+        'BREAD offers enhanced brief intelligence, territory evolution, and AI-powered content generation. Each feature is designed to boost your creative workflow.',
       icon: '🚀',
     },
     {
       id: 'brief-intelligence',
       title: 'Brief Intelligence',
-      description: 'Get real-time analysis of your creative briefs with scoring, suggestions, and Australian market insights.',
+      description:
+        'Get real-time analysis of your creative briefs with scoring, suggestions, and Australian market insights.',
       icon: '🧠',
       action: () => {
         // Could highlight the brief analyzer
@@ -59,7 +62,8 @@ export const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete, onSk
     {
       id: 'territory-evolution',
       title: 'Territory Evolution',
-      description: 'Evolve your creative territories with AI-powered suggestions and performance predictions.',
+      description:
+        'Evolve your creative territories with AI-powered suggestions and performance predictions.',
       icon: '🧬',
       action: () => {
         // Could highlight the territory evolver
@@ -69,8 +73,9 @@ export const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete, onSk
     },
     {
       id: 'ready',
-      title: 'You\'re All Set!',
-      description: 'You\'re ready to start creating amazing advertising content with BREAD. Remember, you can always access help and documentation from the menu.',
+      title: "You're All Set!",
+      description:
+        "You're ready to start creating amazing advertising content with BREAD. Remember, you can always access help and documentation from the menu.",
       icon: '✨',
     },
   ];
@@ -154,7 +159,12 @@ export const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete, onSk
               >
                 {currentStepData?.actionLabel}
                 <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </button>
             </div>
@@ -182,7 +192,7 @@ export const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete, onSk
                   Skip Tour
                 </button>
               )}
-              
+
               <button
                 onClick={handleNext}
                 className="px-6 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-semibold rounded-xl hover:from-yellow-300 hover:to-orange-400 transition-all duration-300 shadow-lg"
@@ -202,8 +212,8 @@ export const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete, onSk
                   index === currentStep
                     ? 'bg-yellow-400 scale-125'
                     : index < currentStep
-                    ? 'bg-yellow-400/60'
-                    : 'bg-white/20'
+                      ? 'bg-yellow-400/60'
+                      : 'bg-white/20'
                 }`}
               />
             ))}
@@ -216,7 +226,12 @@ export const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete, onSk
           className="absolute -top-4 -right-4 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>

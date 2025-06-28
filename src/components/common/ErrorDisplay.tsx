@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { EnhancedError, ErrorCategory, ErrorSeverity, getErrorMessage, shouldRetry, getRetryDelay } from '../../utils/errorHandler';
+import {
+  EnhancedError,
+  ErrorCategory,
+  ErrorSeverity,
+  getErrorMessage,
+  shouldRetry,
+  getRetryDelay,
+} from '../../utils/errorHandler';
 
 interface ErrorDisplayProps {
   error: EnhancedError | null;
@@ -52,7 +59,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
 
     setIsRetrying(true);
     setAutoRetryCountdown(null);
-    
+
     try {
       await onRetry();
       setRetryCount(0); // Reset on successful retry
@@ -106,7 +113,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
     <div className={`rounded-lg border-2 p-4 ${getErrorColor()} ${className}`}>
       <div className="flex items-start space-x-3">
         <span className="text-2xl flex-shrink-0">{getErrorIcon()}</span>
-        
+
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-semibold text-sm">
@@ -118,7 +125,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
               {error.category === ErrorCategory.RATE_LIMIT && 'Rate Limit Error'}
               {error.category === ErrorCategory.UNKNOWN && 'Unexpected Error'}
             </h3>
-            
+
             {onDismiss && (
               <button
                 onClick={handleDismiss}
@@ -126,14 +133,19 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
                 aria-label="Dismiss error"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             )}
           </div>
-          
+
           <p className="text-sm mb-3">{getErrorMessage(error)}</p>
-          
+
           {/* Retry Section */}
           {(canRetry || showAutoRetry) && (
             <div className="flex items-center space-x-3 mb-3">
@@ -161,52 +173,75 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
                     </>
                   ) : (
                     <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                        />
                       </svg>
                       <span>Try Again</span>
                     </>
                   )}
                 </button>
               ) : null}
-              
+
               {retryCount > 0 && (
-                <span className="text-xs opacity-75">
-                  Attempt {retryCount + 1}
-                </span>
+                <span className="text-xs opacity-75">Attempt {retryCount + 1}</span>
               )}
             </div>
           )}
-          
+
           {/* Technical Details */}
-          {(showTechnicalDetails || process.env.NODE_ENV === 'development') && error.technicalDetails && (
-            <div className="mt-3">
-              <button
-                onClick={() => setShowDetails(!showDetails)}
-                className="text-xs underline hover:no-underline mb-2"
-              >
-                {showDetails ? 'Hide' : 'Show'} Technical Details
-              </button>
-              
-              {showDetails && (
-                <div className="bg-black/10 rounded p-2 text-xs font-mono overflow-auto max-h-32">
-                  <div className="mb-1"><strong>Error ID:</strong> {error.id}</div>
-                  <div className="mb-1"><strong>Timestamp:</strong> {error.timestamp}</div>
-                  {error.requestId && <div className="mb-1"><strong>Request ID:</strong> {error.requestId}</div>}
-                  <div className="mb-1"><strong>Category:</strong> {error.category}</div>
-                  <div className="mb-1"><strong>Severity:</strong> {error.severity}</div>
-                  <div className="mb-1"><strong>Message:</strong> {error.message}</div>
-                  {error.technicalDetails && (
-                    <div>
-                      <strong>Details:</strong>
-                      <pre className="mt-1 whitespace-pre-wrap">{error.technicalDetails}</pre>
+          {(showTechnicalDetails || process.env.NODE_ENV === 'development') &&
+            error.technicalDetails && (
+              <div className="mt-3">
+                <button
+                  onClick={() => setShowDetails(!showDetails)}
+                  className="text-xs underline hover:no-underline mb-2"
+                >
+                  {showDetails ? 'Hide' : 'Show'} Technical Details
+                </button>
+
+                {showDetails && (
+                  <div className="bg-black/10 rounded p-2 text-xs font-mono overflow-auto max-h-32">
+                    <div className="mb-1">
+                      <strong>Error ID:</strong> {error.id}
                     </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-          
+                    <div className="mb-1">
+                      <strong>Timestamp:</strong> {error.timestamp}
+                    </div>
+                    {error.requestId && (
+                      <div className="mb-1">
+                        <strong>Request ID:</strong> {error.requestId}
+                      </div>
+                    )}
+                    <div className="mb-1">
+                      <strong>Category:</strong> {error.category}
+                    </div>
+                    <div className="mb-1">
+                      <strong>Severity:</strong> {error.severity}
+                    </div>
+                    <div className="mb-1">
+                      <strong>Message:</strong> {error.message}
+                    </div>
+                    {error.technicalDetails && (
+                      <div>
+                        <strong>Details:</strong>
+                        <pre className="mt-1 whitespace-pre-wrap">{error.technicalDetails}</pre>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
           {/* Rate Limit Info */}
           {error.retryAfter && (
             <div className="mt-2 text-xs opacity-75">
@@ -235,14 +270,18 @@ export const ErrorToast: React.FC<{
 
   return (
     <div className="fixed top-4 right-4 z-50 max-w-sm">
-      <div className={`rounded-lg border-2 p-3 shadow-lg ${
-        error.severity === ErrorSeverity.HIGH || error.severity === ErrorSeverity.CRITICAL
-          ? 'border-red-400 bg-red-50 text-red-800'
-          : 'border-yellow-400 bg-yellow-50 text-yellow-800'
-      }`}>
+      <div
+        className={`rounded-lg border-2 p-3 shadow-lg ${
+          error.severity === ErrorSeverity.HIGH || error.severity === ErrorSeverity.CRITICAL
+            ? 'border-red-400 bg-red-50 text-red-800'
+            : 'border-yellow-400 bg-yellow-50 text-yellow-800'
+        }`}
+      >
         <div className="flex items-start space-x-2">
           <span className="text-lg flex-shrink-0">
-            {error.severity === ErrorSeverity.HIGH || error.severity === ErrorSeverity.CRITICAL ? '❌' : '⚠️'}
+            {error.severity === ErrorSeverity.HIGH || error.severity === ErrorSeverity.CRITICAL
+              ? '❌'
+              : '⚠️'}
           </span>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium">{getErrorMessage(error)}</p>
@@ -252,7 +291,12 @@ export const ErrorToast: React.FC<{
             className="text-gray-400 hover:text-gray-600 transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>

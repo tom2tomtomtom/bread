@@ -1,6 +1,6 @@
 /**
  * 🎬 Image-to-Video Generator Component
- * 
+ *
  * AI-powered video generation from static images with sophisticated
  * animation types and platform optimization.
  */
@@ -28,13 +28,8 @@ export const ImageToVideoGenerator: React.FC<ImageToVideoGeneratorProps> = ({
   onVideoGenerated,
   onClose,
 }) => {
-  const {
-    assets,
-    generateVideo,
-    isGeneratingVideo,
-    generationError,
-    clearGenerationError,
-  } = useAssetStore();
+  const { assets, generateVideo, isGeneratingVideo, generationError, clearGenerationError } =
+    useAssetStore();
 
   // Note: currentTerritory not available in app store - using fallback
   const currentTerritory: any = null; // TODO: Replace with proper territory selection
@@ -44,7 +39,8 @@ export const ImageToVideoGenerator: React.FC<ImageToVideoGeneratorProps> = ({
   const [animationType, setAnimationType] = useState<AnimationType>('subtle_float');
   const [duration, setDuration] = useState(5);
   const [outputFormat, setOutputFormat] = useState<VideoFormat>('mp4');
-  const [platformOptimization, setPlatformOptimization] = useState<PlatformOptimization>('instagram');
+  const [platformOptimization, setPlatformOptimization] =
+    useState<PlatformOptimization>('instagram');
   const [quality, setQuality] = useState<'standard' | 'hd' | 'ultra'>('standard');
   const [provider, setProvider] = useState<AIProvider>('runway');
   const [fps, setFps] = useState(30);
@@ -83,7 +79,7 @@ export const ImageToVideoGenerator: React.FC<ImageToVideoGeneratorProps> = ({
   useEffect(() => {
     const spec = platformSpecs[platformOptimization];
     setFps(spec.recommendedFps);
-    
+
     // Adjust duration if it exceeds platform maximum
     if (duration > spec.maxDuration) {
       setDuration(Math.min(spec.maxDuration, 60));
@@ -112,27 +108,27 @@ export const ImageToVideoGenerator: React.FC<ImageToVideoGeneratorProps> = ({
 
       const queueId = await generateVideo(request);
       onVideoGenerated?.(queueId);
-
     } catch (error) {
       console.error('Video generation failed:', error);
     }
   };
 
-  const isFormValid = selectedAsset && duration > 0 && duration <= platformSpecs[platformOptimization].maxDuration;
+  const isFormValid =
+    selectedAsset && duration > 0 && duration <= platformSpecs[platformOptimization].maxDuration;
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">
-          🎬 AI Video Generation
-        </h2>
+        <h2 className="text-2xl font-bold text-gray-900">🎬 AI Video Generation</h2>
         {onClose && (
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         )}
@@ -140,9 +136,7 @@ export const ImageToVideoGenerator: React.FC<ImageToVideoGeneratorProps> = ({
 
       {/* Source Image Selection */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Source Image
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Source Image</label>
         {imageAssets.length === 0 ? (
           <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
             <p className="text-yellow-800 text-sm">
@@ -152,13 +146,14 @@ export const ImageToVideoGenerator: React.FC<ImageToVideoGeneratorProps> = ({
         ) : (
           <select
             value={selectedAssetId}
-            onChange={(e) => setSelectedAssetId(e.target.value)}
+            onChange={e => setSelectedAssetId(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select an image...</option>
-            {imageAssets.map((asset) => (
+            {imageAssets.map(asset => (
               <option key={asset.id} value={asset.id}>
-                {asset.filename} ({asset.metadata.dimensions?.width}x{asset.metadata.dimensions?.height})
+                {asset.filename} ({asset.metadata.dimensions?.width}x
+                {asset.metadata.dimensions?.height})
               </option>
             ))}
           </select>
@@ -178,7 +173,8 @@ export const ImageToVideoGenerator: React.FC<ImageToVideoGeneratorProps> = ({
             <div>
               <p className="font-medium text-gray-900">{selectedAsset.filename}</p>
               <p className="text-sm text-gray-600">
-                {selectedAsset.metadata.dimensions?.width}x{selectedAsset.metadata.dimensions?.height}
+                {selectedAsset.metadata.dimensions?.width}x
+                {selectedAsset.metadata.dimensions?.height}
               </p>
               <p className="text-xs text-gray-500">
                 {(selectedAsset.metadata.size / 1024 / 1024).toFixed(2)} MB
@@ -190,12 +186,10 @@ export const ImageToVideoGenerator: React.FC<ImageToVideoGeneratorProps> = ({
 
       {/* Animation Type */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Animation Type
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Animation Type</label>
         <select
           value={animationType}
-          onChange={(e) => setAnimationType(e.target.value as AnimationType)}
+          onChange={e => setAnimationType(e.target.value as AnimationType)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
         >
           <option value="subtle_float">Subtle Float</option>
@@ -205,21 +199,17 @@ export const ImageToVideoGenerator: React.FC<ImageToVideoGeneratorProps> = ({
           <option value="fade">Fade</option>
           <option value="slide">Slide</option>
         </select>
-        <p className="text-xs text-gray-600">
-          {animationDescriptions[animationType]}
-        </p>
+        <p className="text-xs text-gray-600">{animationDescriptions[animationType]}</p>
       </div>
 
       {/* Duration and Platform */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Duration (seconds)
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Duration (seconds)</label>
           <input
             type="number"
             value={duration}
-            onChange={(e) => setDuration(Math.max(1, parseInt(e.target.value) || 1))}
+            onChange={e => setDuration(Math.max(1, parseInt(e.target.value) || 1))}
             min="1"
             max={platformSpecs[platformOptimization].maxDuration}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -235,7 +225,7 @@ export const ImageToVideoGenerator: React.FC<ImageToVideoGeneratorProps> = ({
           </label>
           <select
             value={platformOptimization}
-            onChange={(e) => setPlatformOptimization(e.target.value as PlatformOptimization)}
+            onChange={e => setPlatformOptimization(e.target.value as PlatformOptimization)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="instagram">Instagram</option>
@@ -246,7 +236,8 @@ export const ImageToVideoGenerator: React.FC<ImageToVideoGeneratorProps> = ({
             <option value="twitter">Twitter</option>
           </select>
           <p className="text-xs text-gray-500 mt-1">
-            {platformSpecs[platformOptimization].aspectRatio} • {platformSpecs[platformOptimization].recommendedFps}fps
+            {platformSpecs[platformOptimization].aspectRatio} •{' '}
+            {platformSpecs[platformOptimization].recommendedFps}fps
           </p>
         </div>
       </div>
@@ -254,12 +245,10 @@ export const ImageToVideoGenerator: React.FC<ImageToVideoGeneratorProps> = ({
       {/* Quality and Format */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Quality
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Quality</label>
           <select
             value={quality}
-            onChange={(e) => setQuality(e.target.value as 'standard' | 'hd' | 'ultra')}
+            onChange={e => setQuality(e.target.value as 'standard' | 'hd' | 'ultra')}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="standard">Standard</option>
@@ -269,12 +258,10 @@ export const ImageToVideoGenerator: React.FC<ImageToVideoGeneratorProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Format
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Format</label>
           <select
             value={outputFormat}
-            onChange={(e) => setOutputFormat(e.target.value as VideoFormat)}
+            onChange={e => setOutputFormat(e.target.value as VideoFormat)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="mp4">MP4</option>
@@ -285,12 +272,10 @@ export const ImageToVideoGenerator: React.FC<ImageToVideoGeneratorProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            AI Provider
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">AI Provider</label>
           <select
             value={provider}
-            onChange={(e) => setProvider(e.target.value as AIProvider)}
+            onChange={e => setProvider(e.target.value as AIProvider)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="runway">RunwayML</option>
@@ -306,7 +291,7 @@ export const ImageToVideoGenerator: React.FC<ImageToVideoGeneratorProps> = ({
         </label>
         <textarea
           value={customPrompt}
-          onChange={(e) => setCustomPrompt(e.target.value)}
+          onChange={e => setCustomPrompt(e.target.value)}
           placeholder="Describe specific animation details or style preferences..."
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           rows={2}
@@ -337,9 +322,25 @@ export const ImageToVideoGenerator: React.FC<ImageToVideoGeneratorProps> = ({
         >
           {isGeneratingVideo ? (
             <>
-              <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <svg
+                className="animate-spin -ml-1 mr-3 h-4 w-4 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
               Generating...
             </>

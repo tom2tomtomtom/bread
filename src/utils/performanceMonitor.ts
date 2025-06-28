@@ -1,6 +1,6 @@
 /**
  * Production Performance Monitoring System
- * 
+ *
  * Features:
  * - Web Vitals tracking (LCP, FID, CLS, TTFB)
  * - Component render performance
@@ -59,7 +59,11 @@ class PerformanceMonitor {
 
     // First Input Delay (FID)
     this.observeWebVital('first-input', (entry: any) => {
-      this.recordWebVital('FID', entry.processingStart - entry.startTime, this.getFIDRating(entry.processingStart - entry.startTime));
+      this.recordWebVital(
+        'FID',
+        entry.processingStart - entry.startTime,
+        this.getFIDRating(entry.processingStart - entry.startTime)
+      );
     });
 
     // Cumulative Layout Shift (CLS)
@@ -71,7 +75,9 @@ class PerformanceMonitor {
 
     // Time to First Byte (TTFB)
     if (performance.getEntriesByType) {
-      const navigationEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+      const navigationEntries = performance.getEntriesByType(
+        'navigation'
+      ) as PerformanceNavigationTiming[];
       if (navigationEntries.length > 0) {
         const ttfb = navigationEntries[0].responseStart - navigationEntries[0].requestStart;
         this.recordWebVital('TTFB', ttfb, this.getTTFBRating(ttfb));
@@ -81,7 +87,7 @@ class PerformanceMonitor {
 
   private observeWebVital(type: string, callback: (entry: any) => void) {
     try {
-      const observer = new PerformanceObserver((list) => {
+      const observer = new PerformanceObserver(list => {
         list.getEntries().forEach(callback);
       });
       observer.observe({ type, buffered: true });
@@ -91,17 +97,21 @@ class PerformanceMonitor {
     }
   }
 
-  private recordWebVital(name: string, value: number, rating: 'good' | 'needs-improvement' | 'poor') {
+  private recordWebVital(
+    name: string,
+    value: number,
+    rating: 'good' | 'needs-improvement' | 'poor'
+  ) {
     const metric: WebVitalsMetric = {
       name,
       value,
       timestamp: Date.now(),
       rating,
-      context: { userAgent: navigator.userAgent, url: window.location.href }
+      context: { userAgent: navigator.userAgent, url: window.location.href },
     };
-    
+
     this.addMetric(metric);
-    
+
     // Alert on poor performance
     if (rating === 'poor') {
       this.alertPoorPerformance(metric);
@@ -109,17 +119,13 @@ class PerformanceMonitor {
   }
 
   // Component Performance Monitoring
-  public measureComponentRender<T>(
-    componentName: string,
-    renderFn: () => T,
-    props?: any
-  ): T {
+  public measureComponentRender<T>(componentName: string, renderFn: () => T, props?: any): T {
     if (!this.isEnabled) return renderFn();
 
     const startTime = performance.now();
     const result = renderFn();
     const endTime = performance.now();
-    
+
     const metric: ComponentMetric = {
       name: 'component-render',
       componentName,
@@ -127,16 +133,17 @@ class PerformanceMonitor {
       renderTime: endTime - startTime,
       timestamp: Date.now(),
       propsSize: props ? JSON.stringify(props).length : undefined,
-      context: { componentName, props: props ? Object.keys(props) : [] }
+      context: { componentName, props: props ? Object.keys(props) : [] },
     };
-    
+
     this.addMetric(metric);
-    
+
     // Warn about slow renders
-    if (metric.renderTime > 16) { // 60fps threshold
+    if (metric.renderTime > 16) {
+      // 60fps threshold
       console.warn(`Slow render detected: ${componentName} took ${metric.renderTime.toFixed(2)}ms`);
     }
-    
+
     return result;
   }
 
@@ -151,7 +158,7 @@ class PerformanceMonitor {
     const startTime = performance.now();
     let status = 0;
     let error: Error | null = null;
-    
+
     try {
       const result = await apiCall();
       status = 200; // Assume success if no error
@@ -163,7 +170,7 @@ class PerformanceMonitor {
     } finally {
       const endTime = performance.now();
       const duration = endTime - startTime;
-      
+
       const metric: APIMetric = {
         name: 'api-call',
         endpoint,
@@ -172,13 +179,14 @@ class PerformanceMonitor {
         duration,
         status,
         timestamp: Date.now(),
-        context: { endpoint, method, status, error: error?.message }
+        context: { endpoint, method, status, error: error?.message },
       };
-      
+
       this.addMetric(metric);
-      
+
       // Alert on slow API calls
-      if (duration > 5000) { // 5 second threshold
+      if (duration > 5000) {
+        // 5 second threshold
         this.alertSlowAPI(metric);
       }
     }
@@ -197,12 +205,12 @@ class PerformanceMonitor {
         usedJSHeapSize: memory.usedJSHeapSize,
         totalJSHeapSize: memory.totalJSHeapSize,
         jsHeapSizeLimit: memory.jsHeapSizeLimit,
-        usagePercentage: (memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100
-      }
+        usagePercentage: (memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100,
+      },
     };
-    
+
     this.addMetric(metric);
-    
+
     // Alert on high memory usage
     const usagePercentage = (memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100;
     if (usagePercentage > 80) {
@@ -215,8 +223,8 @@ class PerformanceMonitor {
     if (typeof window === 'undefined') return;
 
     try {
-      const observer = new PerformanceObserver((list) => {
-        list.getEntries().forEach((entry) => {
+      const observer = new PerformanceObserver(list => {
+        list.getEntries().forEach(entry => {
           if (entry.entryType === 'resource') {
             const resourceEntry = entry as PerformanceResourceTiming;
             this.addMetric({
@@ -227,13 +235,13 @@ class PerformanceMonitor {
                 name: resourceEntry.name,
                 type: this.getResourceType(resourceEntry.name),
                 size: resourceEntry.transferSize,
-                cached: resourceEntry.transferSize === 0
-              }
+                cached: resourceEntry.transferSize === 0,
+              },
             });
           }
         });
       });
-      
+
       observer.observe({ entryTypes: ['resource'] });
       this.observers.push(observer);
     } catch (error) {
@@ -246,8 +254,8 @@ class PerformanceMonitor {
     if (typeof window === 'undefined') return;
 
     try {
-      const observer = new PerformanceObserver((list) => {
-        list.getEntries().forEach((entry) => {
+      const observer = new PerformanceObserver(list => {
+        list.getEntries().forEach(entry => {
           if (entry.entryType === 'navigation') {
             const navEntry = entry as PerformanceNavigationTiming;
             this.addMetric({
@@ -257,13 +265,13 @@ class PerformanceMonitor {
               context: {
                 domContentLoaded: navEntry.domContentLoadedEventEnd - navEntry.startTime,
                 loadComplete: navEntry.loadEventEnd - navEntry.startTime,
-                type: navEntry.type
-              }
+                type: navEntry.type,
+              },
             });
           }
         });
       });
-      
+
       observer.observe({ entryTypes: ['navigation'] });
       this.observers.push(observer);
     } catch (error) {
@@ -274,12 +282,12 @@ class PerformanceMonitor {
   // Utility Methods
   private addMetric(metric: PerformanceMetric) {
     this.metrics.push(metric);
-    
+
     // Keep only last 1000 metrics to prevent memory leaks
     if (this.metrics.length > 1000) {
       this.metrics = this.metrics.slice(-1000);
     }
-    
+
     // Send to analytics in production
     if (process.env.NODE_ENV === 'production') {
       this.sendToAnalytics(metric);
@@ -291,7 +299,7 @@ class PerformanceMonitor {
       await fetch('/api/analytics/performance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(metric)
+        body: JSON.stringify(metric),
       });
     } catch (error) {
       // Silently fail to avoid affecting user experience
@@ -373,7 +381,7 @@ export const performanceMonitor = new PerformanceMonitor();
 // React Hook for component performance monitoring
 export function usePerformanceMonitor(componentName: string) {
   return {
-    measureRender: <T>(renderFn: () => T, props?: any) => 
+    measureRender: <T>(renderFn: () => T, props?: any) =>
       performanceMonitor.measureComponentRender(componentName, renderFn, props),
     measureAPI: <T>(endpoint: string, method: string, apiCall: () => Promise<T>) =>
       performanceMonitor.measureAPICall(endpoint, method, apiCall),

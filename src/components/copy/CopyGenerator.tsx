@@ -26,10 +26,7 @@ const TONE_COLORS = {
   authoritative: 'border-gray-300 bg-gray-50',
 };
 
-export const CopyGenerator: React.FC<CopyGeneratorProps> = ({
-  onCopySelected,
-  onContinue,
-}) => {
+export const CopyGenerator: React.FC<CopyGeneratorProps> = ({ onCopySelected, onContinue }) => {
   const {
     generatedCopyVariations,
     selectedCopy,
@@ -41,18 +38,10 @@ export const CopyGenerator: React.FC<CopyGeneratorProps> = ({
     clearError,
   } = useCopyStore();
 
-  const {
-    generatedMotivations,
-    selectedMotivations,
-  } = useMotivationStore();
+  const { generatedMotivations, selectedMotivations } = useMotivationStore();
 
-  const {
-    selectedTemplate,
-    brief,
-    targetAudience,
-    campaignGoal,
-    markStepCompleted,
-  } = useTemplateWorkflowStore();
+  const { selectedTemplate, brief, targetAudience, campaignGoal, markStepCompleted } =
+    useTemplateWorkflowStore();
 
   const [hasGenerated, setHasGenerated] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -111,9 +100,7 @@ export const CopyGenerator: React.FC<CopyGeneratorProps> = ({
     <div className="max-w-6xl mx-auto p-8">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-white mb-4">
-          ✍️ Generate Copy Variations
-        </h1>
+        <h1 className="text-4xl font-bold text-white mb-4">✍️ Generate Copy Variations</h1>
         <p className="text-gray-400 text-lg">
           AI will create compelling headlines and copy based on your selected motivations
         </p>
@@ -122,9 +109,7 @@ export const CopyGenerator: React.FC<CopyGeneratorProps> = ({
       {/* Selected Motivations Summary */}
       <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6 mb-8">
         <h2 className="text-lg font-semibold text-white mb-4">🧠 Selected Motivations</h2>
-        <div className="text-orange-400 font-medium">
-          {getSelectedMotivationTitles()}
-        </div>
+        <div className="text-orange-400 font-medium">{getSelectedMotivationTitles()}</div>
         <div className="text-sm text-gray-400 mt-2">
           Copy will be generated to leverage these psychological triggers
         </div>
@@ -146,7 +131,12 @@ export const CopyGenerator: React.FC<CopyGeneratorProps> = ({
               className="text-red-300 hover:text-red-100 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -188,9 +178,7 @@ export const CopyGenerator: React.FC<CopyGeneratorProps> = ({
       {generatedCopyVariations.length > 0 && (
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white">
-              Choose Your Copy
-            </h2>
+            <h2 className="text-2xl font-bold text-white">Choose Your Copy</h2>
             {selectedCopy && (
               <button
                 onClick={() => setIsEditing(!isEditing)}
@@ -202,7 +190,7 @@ export const CopyGenerator: React.FC<CopyGeneratorProps> = ({
           </div>
 
           <div className="grid lg:grid-cols-2 gap-6">
-            {generatedCopyVariations.map((variation) => (
+            {generatedCopyVariations.map(variation => (
               <CopyVariationCard
                 key={variation.id}
                 variation={variation}
@@ -219,15 +207,13 @@ export const CopyGenerator: React.FC<CopyGeneratorProps> = ({
       {selectedCopy && isEditing && (
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6 mb-8">
           <h3 className="text-lg font-semibold text-white mb-4">✏️ Edit Your Copy</h3>
-          
+
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Headline
-              </label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Headline</label>
               <textarea
                 value={selectedCopy.headline}
-                onChange={(e) => updateSelectedCopy({ headline: e.target.value })}
+                onChange={e => updateSelectedCopy({ headline: e.target.value })}
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all resize-none"
                 rows={3}
                 placeholder="Your headline..."
@@ -235,25 +221,21 @@ export const CopyGenerator: React.FC<CopyGeneratorProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Call to Action
-              </label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Call to Action</label>
               <input
                 type="text"
                 value={selectedCopy.callToAction}
-                onChange={(e) => updateSelectedCopy({ callToAction: e.target.value })}
+                onChange={e => updateSelectedCopy({ callToAction: e.target.value })}
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
                 placeholder="Your call to action..."
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Body Text
-              </label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Body Text</label>
               <textarea
                 value={selectedCopy.bodyText}
-                onChange={(e) => updateSelectedCopy({ bodyText: e.target.value })}
+                onChange={e => updateSelectedCopy({ bodyText: e.target.value })}
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all resize-none"
                 rows={4}
                 placeholder="Your body text..."
@@ -262,13 +244,11 @@ export const CopyGenerator: React.FC<CopyGeneratorProps> = ({
 
             {selectedCopy.subheadline !== undefined && (
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Subheadline
-                </label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Subheadline</label>
                 <input
                   type="text"
                   value={selectedCopy.subheadline || ''}
-                  onChange={(e) => updateSelectedCopy({ subheadline: e.target.value })}
+                  onChange={e => updateSelectedCopy({ subheadline: e.target.value })}
                   className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400/50 transition-all"
                   placeholder="Your subheadline..."
                 />
@@ -328,8 +308,18 @@ const CopyVariationCard: React.FC<CopyVariationCardProps> = ({
       {isSelected && (
         <div className="absolute top-3 right-3">
           <div className="w-6 h-6 bg-orange-400 rounded-full flex items-center justify-center">
-            <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <svg
+              className="w-4 h-4 text-black"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
             </svg>
           </div>
         </div>
@@ -338,35 +328,27 @@ const CopyVariationCard: React.FC<CopyVariationCardProps> = ({
       {/* Tone Icon */}
       <div className="flex items-center gap-2 mb-4">
         <span className="text-2xl">{TONE_ICONS[variation.tone]}</span>
-        <span className="text-sm font-medium text-gray-600 capitalize">
-          {variation.tone} Tone
-        </span>
+        <span className="text-sm font-medium text-gray-600 capitalize">{variation.tone} Tone</span>
       </div>
 
       {/* Headline */}
       <div className="mb-4">
         <div className="text-xs font-medium text-gray-600 mb-2">HEADLINE</div>
-        <h3 className="text-lg font-bold text-gray-900 leading-tight">
-          "{variation.headline}"
-        </h3>
+        <h3 className="text-lg font-bold text-gray-900 leading-tight">"{variation.headline}"</h3>
       </div>
 
       {/* Subheadline */}
       {variation.subheadline && (
         <div className="mb-4">
           <div className="text-xs font-medium text-gray-600 mb-1">SUBHEADLINE</div>
-          <p className="text-sm font-medium text-gray-700">
-            {variation.subheadline}
-          </p>
+          <p className="text-sm font-medium text-gray-700">{variation.subheadline}</p>
         </div>
       )}
 
       {/* Body Text */}
       <div className="mb-4">
         <div className="text-xs font-medium text-gray-600 mb-1">BODY TEXT</div>
-        <p className="text-sm text-gray-700 leading-relaxed">
-          {variation.bodyText}
-        </p>
+        <p className="text-sm text-gray-700 leading-relaxed">{variation.bodyText}</p>
       </div>
 
       {/* Call to Action */}
@@ -379,7 +361,9 @@ const CopyVariationCard: React.FC<CopyVariationCardProps> = ({
 
       {/* Confidence Score */}
       <div className="flex items-center justify-between mb-4">
-        <div className={`px-2 py-1 rounded-full text-xs font-bold ${getConfidenceColor(variation.confidenceScore)}`}>
+        <div
+          className={`px-2 py-1 rounded-full text-xs font-bold ${getConfidenceColor(variation.confidenceScore)}`}
+        >
           {variation.confidenceScore}% Confidence
         </div>
       </div>
@@ -387,9 +371,7 @@ const CopyVariationCard: React.FC<CopyVariationCardProps> = ({
       {/* Reasoning */}
       <div className="pt-4 border-t border-gray-300">
         <div className="text-xs font-medium text-gray-600 mb-1">WHY THIS WORKS</div>
-        <p className="text-xs text-gray-700 italic">
-          {variation.reasoning}
-        </p>
+        <p className="text-xs text-gray-700 italic">{variation.reasoning}</p>
       </div>
     </div>
   );

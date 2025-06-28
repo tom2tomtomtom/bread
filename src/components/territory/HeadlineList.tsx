@@ -36,9 +36,12 @@ const HeadlineListComponent: React.FC<HeadlineListProps> = ({
   }, []);
 
   // Memoized headline toggle handler
-  const handleToggleHeadlineStarred = useCallback((headlineIndex: number) => {
-    onToggleHeadlineStarred(territoryId, headlineIndex);
-  }, [onToggleHeadlineStarred, territoryId]);
+  const handleToggleHeadlineStarred = useCallback(
+    (headlineIndex: number) => {
+      onToggleHeadlineStarred(territoryId, headlineIndex);
+    },
+    [onToggleHeadlineStarred, territoryId]
+  );
 
   return (
     <div>
@@ -46,7 +49,7 @@ const HeadlineListComponent: React.FC<HeadlineListProps> = ({
       <div className="space-y-3">
         {headlines.map((headline, headlineIndex) => {
           const isHeadlineStarred = starredHeadlines.includes(headlineIndex);
-          
+
           return (
             <div
               key={headlineIndex}
@@ -78,7 +81,9 @@ const HeadlineListComponent: React.FC<HeadlineListProps> = ({
 
                 {/* Confidence Score */}
                 {headline.confidence && (
-                  <div className={`px-2 py-1 rounded-full text-xs font-bold ${getHeadlineConfidenceColor(headline.confidence)}`}>
+                  <div
+                    className={`px-2 py-1 rounded-full text-xs font-bold ${getHeadlineConfidenceColor(headline.confidence)}`}
+                  >
                     {headline.confidence}%
                   </div>
                 )}
@@ -88,9 +93,7 @@ const HeadlineListComponent: React.FC<HeadlineListProps> = ({
               {headline.followUp && (
                 <div className="mb-2">
                   <div className="text-xs font-medium text-gray-600 mb-1">FOLLOW-UP</div>
-                  <p className="text-sm text-gray-700 font-body">
-                    {headline.followUp}
-                  </p>
+                  <p className="text-sm text-gray-700 font-body">{headline.followUp}</p>
                 </div>
               )}
 
@@ -98,18 +101,14 @@ const HeadlineListComponent: React.FC<HeadlineListProps> = ({
               {headline.reasoning && (
                 <div className="mb-2">
                   <div className="text-xs font-medium text-gray-600 mb-1">WHY THIS WORKS</div>
-                  <p className="text-sm text-gray-700 font-body italic">
-                    {headline.reasoning}
-                  </p>
+                  <p className="text-sm text-gray-700 font-body italic">{headline.reasoning}</p>
                 </div>
               )}
 
               {/* Additional Headline Metadata */}
               <div className="flex items-center gap-3 text-xs text-gray-500 mt-2">
                 <span>#{headlineIndex + 1}</span>
-                {headline.confidence && (
-                  <span>Confidence: {headline.confidence}%</span>
-                )}
+                {headline.confidence && <span>Confidence: {headline.confidence}%</span>}
                 {isHeadlineStarred && (
                   <span className="text-yellow-600 font-medium">⭐ Starred</span>
                 )}
@@ -123,7 +122,9 @@ const HeadlineListComponent: React.FC<HeadlineListProps> = ({
       {headlines.length > 0 && (
         <div className="mt-3 p-2 bg-black/5 rounded-lg">
           <div className="flex justify-between items-center text-xs text-gray-600">
-            <span>{headlines.length} headline{headlines.length !== 1 ? 's' : ''} generated</span>
+            <span>
+              {headlines.length} headline{headlines.length !== 1 ? 's' : ''} generated
+            </span>
             <span>{starredHeadlines.length} starred</span>
           </div>
         </div>
@@ -140,9 +141,10 @@ export const HeadlineList = memo(HeadlineListComponent, (prevProps, nextProps) =
     prevProps.headlines.length === nextProps.headlines.length &&
     prevProps.starredHeadlines.length === nextProps.starredHeadlines.length &&
     JSON.stringify(prevProps.starredHeadlines) === JSON.stringify(nextProps.starredHeadlines) &&
-    prevProps.headlines.every((headline, index) =>
-      headline.text === nextProps.headlines[index]?.text &&
-      headline.confidence === nextProps.headlines[index]?.confidence
+    prevProps.headlines.every(
+      (headline, index) =>
+        headline.text === nextProps.headlines[index]?.text &&
+        headline.confidence === nextProps.headlines[index]?.confidence
     )
   );
 });

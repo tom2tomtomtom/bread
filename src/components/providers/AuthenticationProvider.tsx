@@ -58,7 +58,7 @@ export const AuthenticationProvider: React.FC<AuthenticationProviderProps> = ({ 
   return (
     <>
       {/* Pass authentication handlers to children via React.cloneElement */}
-      {React.Children.map(children, (child) => {
+      {React.Children.map(children, child => {
         if (React.isValidElement(child)) {
           return React.cloneElement(child, {
             ...authContextValue,
@@ -80,7 +80,7 @@ export const AuthenticationProvider: React.FC<AuthenticationProviderProps> = ({ 
 // Hook for accessing authentication context in child components
 export const useAuthentication = () => {
   const { isAuthenticated, user } = useAuthStore();
-  
+
   return {
     isAuthenticated,
     user,

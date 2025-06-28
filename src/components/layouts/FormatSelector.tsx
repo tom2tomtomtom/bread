@@ -222,8 +222,8 @@ export const FormatSelector: React.FC<FormatSelectorProps> = ({
                 isSelected
                   ? 'border-blue-500 bg-blue-50'
                   : canSelect
-                  ? 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
-                  : 'border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed'
+                    ? 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                    : 'border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed'
               }`}
             >
               <div className="flex items-start justify-between">
@@ -233,37 +233,51 @@ export const FormatSelector: React.FC<FormatSelectorProps> = ({
                       {name}
                     </h4>
                     {isSelected && (
-                      <svg className="w-5 h-5 text-blue-500 ml-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      <svg
+                        className="w-5 h-5 text-blue-500 ml-2"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                     )}
                   </div>
-                  
+
                   <p className={`text-sm mb-3 ${isSelected ? 'text-blue-700' : 'text-gray-600'}`}>
                     {description}
                   </p>
-                  
+
                   <div className="space-y-1">
                     <div className="flex items-center text-xs">
-                      <span className={`font-medium ${isSelected ? 'text-blue-800' : 'text-gray-700'}`}>
+                      <span
+                        className={`font-medium ${isSelected ? 'text-blue-800' : 'text-gray-700'}`}
+                      >
                         Dimensions:
                       </span>
                       <span className={`ml-2 ${isSelected ? 'text-blue-600' : 'text-gray-500'}`}>
                         {formatDimensions(specs)}
                       </span>
                     </div>
-                    
+
                     <div className="flex items-center text-xs">
-                      <span className={`font-medium ${isSelected ? 'text-blue-800' : 'text-gray-700'}`}>
+                      <span
+                        className={`font-medium ${isSelected ? 'text-blue-800' : 'text-gray-700'}`}
+                      >
                         Ratio:
                       </span>
                       <span className={`ml-2 ${isSelected ? 'text-blue-600' : 'text-gray-500'}`}>
                         {formatAspectRatio(specs)}
                       </span>
                     </div>
-                    
+
                     <div className="flex items-center text-xs">
-                      <span className={`font-medium ${isSelected ? 'text-blue-800' : 'text-gray-700'}`}>
+                      <span
+                        className={`font-medium ${isSelected ? 'text-blue-800' : 'text-gray-700'}`}
+                      >
                         Format:
                       </span>
                       <span className={`ml-2 ${isSelected ? 'text-blue-600' : 'text-gray-500'}`}>
@@ -297,10 +311,10 @@ export const FormatSelector: React.FC<FormatSelectorProps> = ({
           <h4 className="font-medium text-blue-900 mb-2">Selected Formats</h4>
           <div className="flex flex-wrap gap-2">
             {selectedFormats.map(format => {
-              const formatInfo = FORMAT_CATEGORIES
-                .flatMap(cat => cat.formats)
-                .find(f => f.format === format);
-              
+              const formatInfo = FORMAT_CATEGORIES.flatMap(cat => cat.formats).find(
+                f => f.format === format
+              );
+
               return (
                 <span
                   key={format}
@@ -312,7 +326,12 @@ export const FormatSelector: React.FC<FormatSelectorProps> = ({
                     className="ml-2 text-blue-600 hover:text-blue-800"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </span>
@@ -332,14 +351,16 @@ export const FormatSelector: React.FC<FormatSelectorProps> = ({
           >
             📱 Social Media Pack
           </button>
-          
+
           <button
-            onClick={() => onFormatsChange(['banner_leaderboard', 'banner_rectangle', 'email_header'])}
+            onClick={() =>
+              onFormatsChange(['banner_leaderboard', 'banner_rectangle', 'email_header'])
+            }
             className="px-3 py-2 bg-green-100 text-green-700 text-sm rounded-lg hover:bg-green-200 transition-colors"
           >
             💻 Digital Ads Pack
           </button>
-          
+
           <button
             onClick={() => onFormatsChange(['print_a4', 'billboard_landscape', 'pos_display'])}
             className="px-3 py-2 bg-orange-100 text-orange-700 text-sm rounded-lg hover:bg-orange-200 transition-colors"

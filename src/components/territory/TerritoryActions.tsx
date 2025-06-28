@@ -8,7 +8,7 @@ interface TerritoryActionsProps {
 
 /**
  * TerritoryActions - Action buttons for territory operations
- * 
+ *
  * Responsibilities:
  * - Evolution button and handler
  * - Performance prediction button and handler

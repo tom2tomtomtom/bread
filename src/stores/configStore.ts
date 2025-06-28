@@ -6,14 +6,14 @@ import { APP_CONFIG } from '../config/app';
 
 /**
  * ConfigStore - Focused store for configuration management
- * 
+ *
  * Responsibilities:
  * - API keys management
  * - Prompts configuration
  * - Feature flags
  * - User preferences
  * - Application settings
- * 
+ *
  * Benefits:
  * - Centralized configuration management
  * - Secure API key handling
@@ -59,7 +59,7 @@ interface ConfigState {
 
   // Preference actions
   updatePreference: <K extends keyof ConfigState['preferences']>(
-    key: K, 
+    key: K,
     value: ConfigState['preferences'][K]
   ) => void;
 
@@ -104,13 +104,13 @@ export const useConfigStore = create<ConfigState>()(
 
       // Prompt actions
       updatePrompt: (key: keyof Prompts, value: string) =>
-        set((state) => ({
+        set(state => ({
           prompts: { ...state.prompts, [key]: value },
         })),
 
       // API key actions
       updateApiKey: (provider: keyof ApiKeys, key: string) =>
-        set((state) => ({
+        set(state => ({
           apiKeys: { ...state.apiKeys, [provider]: key },
           apiKeysSaved: false, // Reset saved status when keys change
         })),
@@ -120,48 +120,50 @@ export const useConfigStore = create<ConfigState>()(
 
       // Feature flag actions
       toggleFeature: (feature: keyof ConfigState['features']) =>
-        set((state) => ({
+        set(state => ({
           features: { ...state.features, [feature]: !state.features[feature] },
         })),
 
       setFeature: (feature: keyof ConfigState['features'], enabled: boolean) =>
-        set((state) => ({
+        set(state => ({
           features: { ...state.features, [feature]: enabled },
         })),
 
       // Preference actions
       updatePreference: <K extends keyof ConfigState['preferences']>(
-        key: K, 
+        key: K,
         value: ConfigState['preferences'][K]
       ) =>
-        set((state) => ({
+        set(state => ({
           preferences: { ...state.preferences, [key]: value },
         })),
 
       // Utility actions
       resetPrompts: () => set({ prompts: DEFAULT_PROMPTS }),
 
-      clearApiKeys: () => set({ 
-        apiKeys: { openai: '' }, 
-        apiKeysSaved: false 
-      }),
+      clearApiKeys: () =>
+        set({
+          apiKeys: { openai: '' },
+          apiKeysSaved: false,
+        }),
 
       resetPreferences: () => set({ preferences: DEFAULT_PREFERENCES }),
 
-      resetAll: () => set({
-        prompts: DEFAULT_PROMPTS,
-        apiKeys: { openai: '' },
-        apiKeysSaved: false,
-        generateImages: false,
-        features: DEFAULT_FEATURES,
-        preferences: DEFAULT_PREFERENCES,
-      }),
+      resetAll: () =>
+        set({
+          prompts: DEFAULT_PROMPTS,
+          apiKeys: { openai: '' },
+          apiKeysSaved: false,
+          generateImages: false,
+          features: DEFAULT_FEATURES,
+          preferences: DEFAULT_PREFERENCES,
+        }),
 
       // Validation
       validateApiKeys: () => {
         const { apiKeys } = get();
         const missing: string[] = [];
-        
+
         if (!apiKeys.openai?.trim()) {
           missing.push('OpenAI API Key');
         }
@@ -196,7 +198,7 @@ export const useConfigStore = create<ConfigState>()(
     }),
     {
       name: `${APP_CONFIG.storage.keys.appState}-config`,
-      partialize: (state) => ({
+      partialize: state => ({
         // Persist all configuration data
         prompts: state.prompts,
         apiKeys: state.apiKeys,

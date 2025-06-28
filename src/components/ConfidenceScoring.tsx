@@ -87,7 +87,8 @@ export const ConfidenceScoring: React.FC<ConfidenceScoringProps> = ({ confidence
 
       {/* Reasoning */}
       <div className="text-xs text-white/70 leading-relaxed">
-        {(confidence as any).reasoning || 'Confidence scoring based on market fit, compliance, and audience resonance.'}
+        {(confidence as any).reasoning ||
+          'Confidence scoring based on market fit, compliance, and audience resonance.'}
       </div>
 
       {/* Visual Score Bars */}

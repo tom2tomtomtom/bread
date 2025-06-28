@@ -344,14 +344,28 @@ export interface EvolutionNode {
 
 // Layout Generation Types
 export type ChannelFormat =
-  | 'instagram_post' | 'instagram_story' | 'instagram_reel'
-  | 'facebook_post' | 'facebook_story' | 'facebook_cover'
-  | 'linkedin_post' | 'linkedin_banner'
-  | 'tiktok_video' | 'youtube_thumbnail'
-  | 'print_a4' | 'print_a3' | 'billboard_landscape' | 'billboard_portrait'
-  | 'banner_leaderboard' | 'banner_rectangle' | 'banner_skyscraper'
-  | 'email_header' | 'email_signature'
-  | 'pos_display' | 'shelf_talker' | 'window_cling'
+  | 'instagram_post'
+  | 'instagram_story'
+  | 'instagram_reel'
+  | 'facebook_post'
+  | 'facebook_story'
+  | 'facebook_cover'
+  | 'linkedin_post'
+  | 'linkedin_banner'
+  | 'tiktok_video'
+  | 'youtube_thumbnail'
+  | 'print_a4'
+  | 'print_a3'
+  | 'billboard_landscape'
+  | 'billboard_portrait'
+  | 'banner_leaderboard'
+  | 'banner_rectangle'
+  | 'banner_skyscraper'
+  | 'email_header'
+  | 'email_signature'
+  | 'pos_display'
+  | 'shelf_talker'
+  | 'window_cling'
   | 'custom';
 
 export interface ChannelSpecs {
@@ -442,7 +456,18 @@ export interface TextPlacement {
   height: number;
   fontSize: number;
   fontFamily: string;
-  fontWeight: 'normal' | 'bold' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900';
+  fontWeight:
+    | 'normal'
+    | 'bold'
+    | '100'
+    | '200'
+    | '300'
+    | '400'
+    | '500'
+    | '600'
+    | '700'
+    | '800'
+    | '900';
   color: string;
   textAlign: 'left' | 'center' | 'right' | 'justify';
   lineHeight: number;
@@ -647,7 +672,11 @@ export interface LayoutTemplate {
 
 // ===== CAMPAIGN TEMPLATE SYSTEM TYPES =====
 
-export type CampaignTemplateType = 'launch' | 'promotional' | 'brand_building' | 'retention_loyalty';
+export type CampaignTemplateType =
+  | 'launch'
+  | 'promotional'
+  | 'brand_building'
+  | 'retention_loyalty';
 
 // EvolutionType is already defined above at line 290
 
@@ -1323,9 +1352,21 @@ export interface AssetUploadConfig {
 
 export type AIProvider = 'openai' | 'midjourney' | 'stable-diffusion' | 'runway' | 'stable-video';
 export type ImageType = 'product' | 'lifestyle' | 'background' | 'hero' | 'icon' | 'pattern';
-export type AnimationType = 'subtle_float' | 'gentle_rotation' | 'parallax' | 'zoom' | 'fade' | 'slide';
+export type AnimationType =
+  | 'subtle_float'
+  | 'gentle_rotation'
+  | 'parallax'
+  | 'zoom'
+  | 'fade'
+  | 'slide';
 export type VideoFormat = 'mp4' | 'mov' | 'webm' | 'gif';
-export type PlatformOptimization = 'instagram' | 'facebook' | 'tiktok' | 'youtube' | 'linkedin' | 'twitter';
+export type PlatformOptimization =
+  | 'instagram'
+  | 'facebook'
+  | 'tiktok'
+  | 'youtube'
+  | 'linkedin'
+  | 'twitter';
 export type GenerationStatus = 'queued' | 'processing' | 'complete' | 'error' | 'cancelled';
 export type CulturalContext = 'australian' | 'global' | 'regional';
 

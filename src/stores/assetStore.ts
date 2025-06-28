@@ -119,7 +119,10 @@ interface AssetState {
 
   // Actions - Layout Generation
   generateLayouts: (request: LayoutGenerationRequest) => Promise<LayoutVariation[]>;
-  analyzeVisualIntelligence: (assets: UploadedAsset[], territory: Territory) => Promise<VisualIntelligence>;
+  analyzeVisualIntelligence: (
+    assets: UploadedAsset[],
+    territory: Territory
+  ) => Promise<VisualIntelligence>;
   selectLayout: (layout: LayoutVariation) => void;
   updateLayout: (layoutId: string, updates: Partial<LayoutVariation>) => void;
   deleteLayout: (layoutId: string) => void;
@@ -131,8 +134,18 @@ interface AssetState {
   // Actions - Multimedia Generation
   generateImage: (request: TextToImageRequest) => Promise<string>; // Returns queue ID
   generateVideo: (request: ImageToVideoRequest) => Promise<string>; // Returns queue ID
-  enhancePrompt: (prompt: string, territory: Territory, brandGuidelines: BrandGuidelines, imageType: ImageType, culturalContext: CulturalContext) => Promise<PromptEnhancement>;
-  assessQuality: (assetId: string, territory: Territory, brandGuidelines: BrandGuidelines) => Promise<QualityAssessment>;
+  enhancePrompt: (
+    prompt: string,
+    territory: Territory,
+    brandGuidelines: BrandGuidelines,
+    imageType: ImageType,
+    culturalContext: CulturalContext
+  ) => Promise<PromptEnhancement>;
+  assessQuality: (
+    assetId: string,
+    territory: Territory,
+    brandGuidelines: BrandGuidelines
+  ) => Promise<QualityAssessment>;
   batchGenerate: (request: BatchGenerationRequest) => Promise<string>; // Returns batch ID
   getGenerationStatus: (queueId: string) => GenerationQueue | undefined;
   cancelGeneration: (queueId: string) => Promise<void>;
@@ -670,12 +683,12 @@ export const useAssetStore = create<AssetState>()(
 
           console.log(`✅ Generated ${layouts.length} layout variations`);
           return layouts;
-
         } catch (error) {
           console.error('Layout generation failed:', error);
           set({
             isGeneratingLayouts: false,
-            layoutGenerationError: error instanceof Error ? error.message : 'Layout generation failed',
+            layoutGenerationError:
+              error instanceof Error ? error.message : 'Layout generation failed',
           });
           throw error;
         }
@@ -685,7 +698,10 @@ export const useAssetStore = create<AssetState>()(
         set({ isAnalyzingVisuals: true, layoutGenerationError: null });
 
         try {
-          console.log('🧠 Analyzing visual intelligence...', { assets: assets.length, territory: territory.id });
+          console.log('🧠 Analyzing visual intelligence...', {
+            assets: assets.length,
+            territory: territory.id,
+          });
 
           const intelligence = await visualIntelligenceService.analyzeVisualIntelligence(
             assets,
@@ -699,12 +715,12 @@ export const useAssetStore = create<AssetState>()(
 
           console.log('✅ Visual intelligence analysis completed');
           return intelligence;
-
         } catch (error) {
           console.error('Visual intelligence analysis failed:', error);
           set({
             isAnalyzingVisuals: false,
-            layoutGenerationError: error instanceof Error ? error.message : 'Visual analysis failed',
+            layoutGenerationError:
+              error instanceof Error ? error.message : 'Visual analysis failed',
           });
           throw error;
         }
@@ -718,13 +734,12 @@ export const useAssetStore = create<AssetState>()(
       updateLayout: (layoutId: string, updates: Partial<LayoutVariation>) => {
         set(state => ({
           layouts: state.layouts.map(layout =>
-            layout.id === layoutId
-              ? { ...layout, ...updates, updatedAt: new Date() }
-              : layout
+            layout.id === layoutId ? { ...layout, ...updates, updatedAt: new Date() } : layout
           ),
-          currentLayout: state.currentLayout?.id === layoutId
-            ? { ...state.currentLayout, ...updates, updatedAt: new Date() }
-            : state.currentLayout,
+          currentLayout:
+            state.currentLayout?.id === layoutId
+              ? { ...state.currentLayout, ...updates, updatedAt: new Date() }
+              : state.currentLayout,
         }));
         console.log('📝 Updated layout:', layoutId);
       },
@@ -783,10 +798,11 @@ export const useAssetStore = create<AssetState>()(
 
           console.log('✅ Layout exported successfully');
           return exportUrl;
-
         } catch (error) {
           console.error('Layout export failed:', error);
-          throw new Error(`Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          throw new Error(
+            `Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+          );
         }
       },
 
@@ -812,26 +828,29 @@ export const useAssetStore = create<AssetState>()(
 
           // Use the simple API directly
           const { generateSimpleImage_API } = await import('../services/secureApiService');
-          
+
           const response = await generateSimpleImage_API(request.prompt, {
             territory: request.territory,
             imageType: request.imageType,
-            quality: request.quality === 'ultra' ? 'hd' : request.quality
+            quality: request.quality === 'ultra' ? 'hd' : request.quality,
           });
+
+          console.log('🎯 Direct API response:', response);
 
           if (response && response.length > 0) {
             const imageResult = response[0];
-            
+            console.log('🖼️ Processing image result:', imageResult);
+
             // Map ImageType to AssetType
             const assetTypeMap: Record<string, AssetType> = {
-              'product': 'product',
-              'lifestyle': 'lifestyle', 
-              'background': 'background',
-              'hero': 'background',
-              'icon': 'icon',
-              'pattern': 'texture'
+              product: 'product',
+              lifestyle: 'lifestyle',
+              background: 'background',
+              hero: 'background',
+              icon: 'icon',
+              pattern: 'texture',
             };
-            
+
             // Create asset directly and add to store
             const generatedAsset: UploadedAsset = {
               id: `asset_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -870,25 +889,30 @@ export const useAssetStore = create<AssetState>()(
             };
 
             // Add asset to the store immediately
+            console.log('🚀 About to add asset to store:', generatedAsset);
+
             set(state => {
+              const newAssets = [generatedAsset, ...state.assets];
               console.log('🎨 Adding generated asset to store:', {
                 newAsset: generatedAsset,
                 currentAssetsCount: state.assets.length,
-                newAssetsCount: state.assets.length + 1
+                newAssetsCount: newAssets.length,
+                assetId: generatedAsset.id,
+                assetUrl: generatedAsset.url,
               });
               return {
-                assets: [generatedAsset, ...state.assets], // Add to beginning for visibility
+                assets: newAssets,
                 isGeneratingImage: false,
                 generationProgress: 100,
               };
             });
 
-            console.log('✅ Generated image added to library:', generatedAsset.filename);
+            console.log('✅ Generated image added to library successfully!');
+            console.log('📊 Final asset count:', get().assets.length);
             return `asset_${generatedAsset.id}`;
           } else {
             throw new Error('No image data received from API');
           }
-
         } catch (error) {
           console.error('💥 Image generation failed in store:', error);
           const errorMessage = error instanceof Error ? error.message : 'Image generation failed';
@@ -920,7 +944,6 @@ export const useAssetStore = create<AssetState>()(
 
           console.log(`✅ Video generation queued: ${queueId}`);
           return queueId;
-
         } catch (error) {
           console.error('Video generation failed:', error);
           set({
@@ -955,14 +978,17 @@ export const useAssetStore = create<AssetState>()(
 
           console.log('✅ Prompt enhanced successfully');
           return enhancement;
-
         } catch (error) {
           console.error('Prompt enhancement failed:', error);
           throw error;
         }
       },
 
-      assessQuality: async (assetId: string, _territory: Territory, _brandGuidelines: BrandGuidelines) => {
+      assessQuality: async (
+        assetId: string,
+        _territory: Territory,
+        _brandGuidelines: BrandGuidelines
+      ) => {
         try {
           // Mock quality assessment (in production, this would use AI analysis)
           const assessment: QualityAssessment = {
@@ -984,7 +1010,6 @@ export const useAssetStore = create<AssetState>()(
           }));
 
           return assessment;
-
         } catch (error) {
           throw error;
         }
@@ -1011,7 +1036,6 @@ export const useAssetStore = create<AssetState>()(
 
           console.log(`✅ Batch generation started: ${batchResult.batchId}`);
           return batchResult.batchId;
-
         } catch (error) {
           console.error('Batch generation failed:', error);
           throw error;
@@ -1034,7 +1058,6 @@ export const useAssetStore = create<AssetState>()(
           }));
 
           console.log('✅ Generation cancelled');
-
         } catch (error) {
           console.error('Failed to cancel generation:', error);
           throw error;
@@ -1048,13 +1071,17 @@ export const useAssetStore = create<AssetState>()(
           set(state => ({
             generationQueue: state.generationQueue.map(item =>
               item.id === queueId
-                ? { ...item, status: 'queued', retryCount: item.retryCount + 1, updatedAt: new Date() }
+                ? {
+                    ...item,
+                    status: 'queued',
+                    retryCount: item.retryCount + 1,
+                    updatedAt: new Date(),
+                  }
                 : item
             ),
           }));
 
           console.log('✅ Generation retry queued');
-
         } catch (error) {
           console.error('Failed to retry generation:', error);
           throw error;

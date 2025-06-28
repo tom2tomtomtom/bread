@@ -160,16 +160,18 @@ export const EvolutionHistory: React.FC<EvolutionHistoryProps> = ({
                   {selectedEvolutions.length} evolution{selectedEvolutions.length !== 1 ? 's' : ''}{' '}
                   selected
                 </span>
-                {selectedEvolutions.length === 2 && selectedEvolutions[0] && selectedEvolutions[1] && (
-                  <button
-                    onClick={() =>
-                      onCompareEvolutions(selectedEvolutions[0]!, selectedEvolutions[1]!)
-                    }
-                    className="px-3 py-1 bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/30 rounded text-sm text-orange-400 transition-all"
-                  >
-                    Compare Selected
-                  </button>
-                )}
+                {selectedEvolutions.length === 2 &&
+                  selectedEvolutions[0] &&
+                  selectedEvolutions[1] && (
+                    <button
+                      onClick={() =>
+                        onCompareEvolutions(selectedEvolutions[0]!, selectedEvolutions[1]!)
+                      }
+                      className="px-3 py-1 bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/30 rounded text-sm text-orange-400 transition-all"
+                    >
+                      Compare Selected
+                    </button>
+                  )}
               </div>
             </div>
           )}

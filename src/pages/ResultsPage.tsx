@@ -4,7 +4,13 @@ import { MainLayout } from '../components/layout/MainLayout';
 import { TerritoryOutput } from '../components/territory/TerritoryOutput';
 import { TextToImageGenerator } from '../components/multimedia/TextToImageGenerator';
 import { ImageToVideoGenerator } from '../components/multimedia/ImageToVideoGenerator';
-import { useConfigStore, useUIStore, useGenerationStore, useStarredStore, useTerritoryStore } from '../stores';
+import {
+  useConfigStore,
+  useUIStore,
+  useGenerationStore,
+  useStarredStore,
+  useTerritoryStore,
+} from '../stores';
 
 export const ResultsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -13,12 +19,12 @@ export const ResultsPage: React.FC = () => {
   const { generatedOutput, showOutput } = useGenerationStore();
   const { starredItems } = useStarredStore();
   const territoryStore = useTerritoryStore();
-  
+
   const [activeTab, setActiveTab] = useState<'territories' | 'images' | 'videos'>('territories');
   const [selectedTerritory, setSelectedTerritory] = useState<string | null>(null);
 
   const handleAdminToggle = () => setShowAdmin(!showAdmin);
-  
+
   const handleBackToGenerate = () => {
     navigate('/generate');
   };
@@ -69,7 +75,9 @@ export const ResultsPage: React.FC = () => {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">Campaign Results</h1>
-            <p className="text-gray-400">Your generated creative territories and multimedia content</p>
+            <p className="text-gray-400">
+              Your generated creative territories and multimedia content
+            </p>
           </div>
           <div className="flex gap-3">
             <button
@@ -91,17 +99,23 @@ export const ResultsPage: React.FC = () => {
         <div className="mb-8">
           <div className="flex items-center justify-center space-x-4 mb-4">
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold">✓</div>
+              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold">
+                ✓
+              </div>
               <span className="ml-2 text-green-400 font-medium">Brief</span>
             </div>
             <div className="w-16 h-1 bg-green-500 rounded"></div>
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold">✓</div>
+              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold">
+                ✓
+              </div>
               <span className="ml-2 text-green-400 font-medium">Generate</span>
             </div>
             <div className="w-16 h-1 bg-orange-500 rounded"></div>
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-semibold">3</div>
+              <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-semibold">
+                3
+              </div>
               <span className="ml-2 text-orange-400 font-medium">Results</span>
             </div>
           </div>
@@ -122,9 +136,7 @@ export const ResultsPage: React.FC = () => {
           <button
             onClick={() => setActiveTab('images')}
             className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all duration-300 ${
-              activeTab === 'images'
-                ? 'bg-orange-500 text-black'
-                : 'text-gray-400 hover:text-white'
+              activeTab === 'images' ? 'bg-orange-500 text-black' : 'text-gray-400 hover:text-white'
             }`}
           >
             🎨 Images
@@ -132,9 +144,7 @@ export const ResultsPage: React.FC = () => {
           <button
             onClick={() => setActiveTab('videos')}
             className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all duration-300 ${
-              activeTab === 'videos'
-                ? 'bg-orange-500 text-black'
-                : 'text-gray-400 hover:text-white'
+              activeTab === 'videos' ? 'bg-orange-500 text-black' : 'text-gray-400 hover:text-white'
             }`}
           >
             🎬 Videos
@@ -153,7 +163,7 @@ export const ResultsPage: React.FC = () => {
                 onToggleHeadlineStarred={handleToggleHeadlineStarred}
                 starredItems={starredItems}
                 // Enhanced features (stubs for now)
-                onSelectTerritoryForEvolution={(id) => setSelectedTerritory(id)}
+                onSelectTerritoryForEvolution={id => setSelectedTerritory(id)}
                 onGenerateEvolutionSuggestions={() => {}}
                 onPredictTerritoryPerformance={() => {}}
                 territoryEvolutions={{}}
@@ -168,7 +178,7 @@ export const ResultsPage: React.FC = () => {
                 <h2 className="text-2xl font-bold text-white mb-2">Generate Images</h2>
                 <p className="text-gray-400">Create stunning visuals from your territories</p>
               </div>
-              
+
               {generatedOutput.territories && generatedOutput.territories.length > 0 ? (
                 <TextToImageGenerator />
               ) : (
@@ -186,7 +196,7 @@ export const ResultsPage: React.FC = () => {
                 <h2 className="text-2xl font-bold text-white mb-2">Generate Videos</h2>
                 <p className="text-gray-400">Bring your images to life with video content</p>
               </div>
-              
+
               <ImageToVideoGenerator />
             </div>
           )}
@@ -200,16 +210,20 @@ export const ResultsPage: React.FC = () => {
           >
             Start New Project
           </button>
-          
+
           <div className="flex gap-4">
             <button
-              onClick={() => {/* TODO: Implement export */}}
+              onClick={() => {
+                /* TODO: Implement export */
+              }}
               className="bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 text-purple-400 px-6 py-3 rounded-xl transition-all duration-300"
             >
               📤 Export All
             </button>
             <button
-              onClick={() => {/* TODO: Implement save */}}
+              onClick={() => {
+                /* TODO: Implement save */
+              }}
               className="bg-green-500/20 hover:bg-green-500/30 border border-green-500/30 text-green-400 px-6 py-3 rounded-xl transition-all duration-300"
             >
               💾 Save Project

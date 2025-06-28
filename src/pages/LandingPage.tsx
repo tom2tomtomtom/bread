@@ -6,7 +6,7 @@ import { useAuthStore } from '../stores/authStore';
 // Authenticated workflow interface component
 const AuthenticatedWorkflow: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   const { user } = useAuthStore();
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Header with user info and logout */}
@@ -16,15 +16,13 @@ const AuthenticatedWorkflow: React.FC<{ onComplete: () => void }> = ({ onComplet
             <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
               AIDEAS
             </h1>
-            <span className="ml-4 text-sm text-gray-400">
-              AI-Powered Ad Creation Platform
-            </span>
+            <span className="ml-4 text-sm text-gray-400">AI-Powered Ad Creation Platform</span>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-300">
               Welcome, {user?.name || user?.email || 'User'}
             </span>
-            <button 
+            <button
               onClick={() => useAuthStore.getState().logout()}
               className="text-sm text-gray-400 hover:text-white transition-colors"
             >
@@ -86,8 +84,9 @@ export const LandingPage: React.FC = () => {
             Complete AI-Powered Ad Creation Workflow
           </p>
           <p className="text-lg text-gray-400 mb-12 max-w-2xl mx-auto">
-            From template selection to final export - create professional advertisements using psychology-driven copy, 
-            compelling visuals, and proven templates. All powered by advanced AI technology.
+            From template selection to final export - create professional advertisements using
+            psychology-driven copy, compelling visuals, and proven templates. All powered by
+            advanced AI technology.
           </p>
 
           {/* CTA Buttons */}
@@ -120,9 +119,12 @@ export const LandingPage: React.FC = () => {
               { icon: '✍️', label: 'Create Copy', desc: 'AI-powered headlines' },
               { icon: '🖼️', label: 'Select Assets', desc: 'Choose visuals' },
               { icon: '🎨', label: 'Populate Template', desc: 'Combine everything' },
-              { icon: '📤', label: 'Export & Download', desc: 'Get final ads' }
+              { icon: '📤', label: 'Export & Download', desc: 'Get final ads' },
             ].map((step, index) => (
-              <div key={index} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 text-center">
+              <div
+                key={index}
+                className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 text-center"
+              >
                 <div className="text-3xl mb-2">{step.icon}</div>
                 <h3 className="text-sm font-semibold text-orange-400 mb-1">{step.label}</h3>
                 <p className="text-xs text-gray-400">{step.desc}</p>
@@ -136,25 +138,32 @@ export const LandingPage: React.FC = () => {
           <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6 text-center">
             <div className="text-4xl mb-4">🎯</div>
             <h3 className="text-xl font-semibold text-white mb-2">Strategic Territories</h3>
-            <p className="text-gray-400">Generate compelling creative territories from your brand briefs with AI-powered insights.</p>
+            <p className="text-gray-400">
+              Generate compelling creative territories from your brand briefs with AI-powered
+              insights.
+            </p>
           </div>
-          
+
           <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6 text-center">
             <div className="text-4xl mb-4">🎨</div>
             <h3 className="text-xl font-semibold text-white mb-2">Visual Creation</h3>
-            <p className="text-gray-400">Transform concepts into stunning images and engaging video content automatically.</p>
+            <p className="text-gray-400">
+              Transform concepts into stunning images and engaging video content automatically.
+            </p>
           </div>
-          
+
           <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6 text-center">
             <div className="text-4xl mb-4">⚡</div>
             <h3 className="text-xl font-semibold text-white mb-2">Lightning Fast</h3>
-            <p className="text-gray-400">Complete creative workflows in minutes, not hours. From brief to final assets.</p>
+            <p className="text-gray-400">
+              Complete creative workflows in minutes, not hours. From brief to final assets.
+            </p>
           </div>
         </div>
       </div>
 
       {/* Authentication Modal */}
-      <AuthModal 
+      <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         initialMode={authModalMode}

@@ -1,6 +1,6 @@
 /**
  * 📋 Generation Queue Component
- * 
+ *
  * Real-time monitoring and management of multimedia generation requests
  * with progress tracking, retry capabilities, and queue management.
  */
@@ -20,12 +20,8 @@ export const GenerationQueue: React.FC<GenerationQueueProps> = ({
   maxItems = 10,
   showCompleted = true,
 }) => {
-  const {
-    generationQueue,
-    cancelGeneration,
-    retryGeneration,
-    clearGenerationQueue,
-  } = useAssetStore();
+  const { generationQueue, cancelGeneration, retryGeneration, clearGenerationQueue } =
+    useAssetStore();
 
   const [filter, setFilter] = useState<'all' | 'active' | 'completed' | 'failed'>('all');
 
@@ -67,12 +63,12 @@ export const GenerationQueue: React.FC<GenerationQueueProps> = ({
   const formatTimeRemaining = (estimatedCompletion: Date) => {
     const now = new Date();
     const remaining = estimatedCompletion.getTime() - now.getTime();
-    
+
     if (remaining <= 0) return 'Completing...';
-    
+
     const minutes = Math.floor(remaining / 60000);
     const seconds = Math.floor((remaining % 60000) / 1000);
-    
+
     if (minutes > 0) {
       return `${minutes}m ${seconds}s`;
     }
@@ -125,13 +121,11 @@ export const GenerationQueue: React.FC<GenerationQueueProps> = ({
       {/* Header */}
       <div className="px-6 py-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-medium text-gray-900">
-            📋 Generation Queue
-          </h3>
+          <h3 className="text-lg font-medium text-gray-900">📋 Generation Queue</h3>
           <div className="flex items-center space-x-2">
             <select
               value={filter}
-              onChange={(e) => setFilter(e.target.value as any)}
+              onChange={e => setFilter(e.target.value as any)}
               className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All</option>
@@ -153,16 +147,24 @@ export const GenerationQueue: React.FC<GenerationQueueProps> = ({
         {/* Queue Statistics */}
         <div className="flex items-center space-x-4 mt-3 text-sm text-gray-600">
           <span>Total: {queueStats.total}</span>
-          {queueStats.queued > 0 && <span className="text-yellow-600">Queued: {queueStats.queued}</span>}
-          {queueStats.processing > 0 && <span className="text-blue-600">Processing: {queueStats.processing}</span>}
-          {queueStats.completed > 0 && <span className="text-green-600">Completed: {queueStats.completed}</span>}
-          {queueStats.failed > 0 && <span className="text-red-600">Failed: {queueStats.failed}</span>}
+          {queueStats.queued > 0 && (
+            <span className="text-yellow-600">Queued: {queueStats.queued}</span>
+          )}
+          {queueStats.processing > 0 && (
+            <span className="text-blue-600">Processing: {queueStats.processing}</span>
+          )}
+          {queueStats.completed > 0 && (
+            <span className="text-green-600">Completed: {queueStats.completed}</span>
+          )}
+          {queueStats.failed > 0 && (
+            <span className="text-red-600">Failed: {queueStats.failed}</span>
+          )}
         </div>
       </div>
 
       {/* Queue Items */}
       <div className="divide-y divide-gray-200">
-        {filteredQueue.map((item) => {
+        {filteredQueue.map(item => {
           const statusDisplay = getStatusDisplay(item.status);
           const isActive = item.status === 'queued' || item.status === 'processing';
           const canRetry = item.status === 'error' && item.retryCount < item.maxRetries;
@@ -179,7 +181,9 @@ export const GenerationQueue: React.FC<GenerationQueueProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3 flex-1">
                   {/* Status Icon */}
-                  <div className={`w-8 h-8 rounded-full ${statusDisplay.bg} flex items-center justify-center`}>
+                  <div
+                    className={`w-8 h-8 rounded-full ${statusDisplay.bg} flex items-center justify-center`}
+                  >
                     <span className="text-sm">{statusDisplay.icon}</span>
                   </div>
 
@@ -187,14 +191,15 @@ export const GenerationQueue: React.FC<GenerationQueueProps> = ({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2">
                       <span className="text-sm font-medium text-gray-900">
-                        {item.type === 'image' ? '🎨' : '🎬'} {item.type.charAt(0).toUpperCase() + item.type.slice(1)} Generation
+                        {item.type === 'image' ? '🎨' : '🎬'}{' '}
+                        {item.type.charAt(0).toUpperCase() + item.type.slice(1)} Generation
                       </span>
-                      <span className={`text-xs px-2 py-1 rounded-full ${statusDisplay.bg} ${statusDisplay.color}`}>
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full ${statusDisplay.bg} ${statusDisplay.color}`}
+                      >
                         {item.status}
                       </span>
-                      <span className="text-xs text-gray-500">
-                        Priority: {item.priority}
-                      </span>
+                      <span className="text-xs text-gray-500">Priority: {item.priority}</span>
                     </div>
 
                     {/* Request Details */}
@@ -202,7 +207,9 @@ export const GenerationQueue: React.FC<GenerationQueueProps> = ({
                       {'prompt' in item.request ? (
                         <span>Prompt: {item.request.prompt.substring(0, 60)}...</span>
                       ) : (
-                        <span>Animation: {item.request.animationType} • {item.request.duration}s</span>
+                        <span>
+                          Animation: {item.request.animationType} • {item.request.duration}s
+                        </span>
                       )}
                     </div>
 
@@ -224,9 +231,7 @@ export const GenerationQueue: React.FC<GenerationQueueProps> = ({
 
                     {/* Error Message */}
                     {item.status === 'error' && item.error && (
-                      <div className="mt-2 text-xs text-red-600">
-                        Error: {item.error}
-                      </div>
+                      <div className="mt-2 text-xs text-red-600">Error: {item.error}</div>
                     )}
 
                     {/* Retry Count */}
@@ -242,7 +247,7 @@ export const GenerationQueue: React.FC<GenerationQueueProps> = ({
                 <div className="flex items-center space-x-2 ml-4">
                   {canRetry && (
                     <button
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation();
                         handleRetry(item);
                       }}
@@ -253,7 +258,7 @@ export const GenerationQueue: React.FC<GenerationQueueProps> = ({
                   )}
                   {canCancel && (
                     <button
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation();
                         handleCancel(item);
                       }}

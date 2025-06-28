@@ -1,6 +1,6 @@
 /**
  * 🖼️ Media Preview Component
- * 
+ *
  * Advanced preview component for generated multimedia assets with
  * quality assessment, metadata display, and action controls.
  */
@@ -27,7 +27,7 @@ export const MediaPreview: React.FC<MediaPreviewProps> = ({
   onClose,
 }) => {
   const { qualityAssessments } = useAssetStore();
-  
+
   const [activeTab, setActiveTab] = useState<'preview' | 'metadata' | 'quality'>('preview');
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -41,7 +41,7 @@ export const MediaPreview: React.FC<MediaPreviewProps> = ({
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     if (bytes === 0) return '0 Bytes';
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+    return `${Math.round((bytes / Math.pow(1024, i)) * 100) / 100} ${sizes[i]}`;
   };
 
   // Format generation time
@@ -70,13 +70,13 @@ export const MediaPreview: React.FC<MediaPreviewProps> = ({
   };
 
   return (
-    <div className={`bg-white rounded-lg shadow-lg ${isFullscreen ? 'fixed inset-4 z-50' : 'max-w-4xl mx-auto'}`}>
+    <div
+      className={`bg-white rounded-lg shadow-lg ${isFullscreen ? 'fixed inset-4 z-50' : 'max-w-4xl mx-auto'}`}
+    >
       {/* Header */}
       <div className="flex items-center justify-between p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
-          <span className="text-2xl">
-            {asset.type === 'image' ? '🎨' : '🎬'}
-          </span>
+          <span className="text-2xl">{asset.type === 'image' ? '🎨' : '🎬'}</span>
           <div>
             <h2 className="text-xl font-bold text-gray-900">
               Generated {asset.type.charAt(0).toUpperCase() + asset.type.slice(1)}
@@ -95,9 +95,19 @@ export const MediaPreview: React.FC<MediaPreviewProps> = ({
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {isFullscreen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 9V4.5M9 9H4.5M9 9L3.5 3.5M15 9h4.5M15 9V4.5M15 9l5.5-5.5M9 15v4.5M9 15H4.5M9 15l-5.5 5.5M15 15h4.5M15 15v4.5m0-4.5l5.5 5.5" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 9V4.5M9 9H4.5M9 9L3.5 3.5M15 9h4.5M15 9V4.5M15 9l5.5-5.5M9 15v4.5M9 15H4.5M9 15l-5.5 5.5M15 15h4.5M15 15v4.5m0-4.5l5.5 5.5"
+                />
               ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                />
               )}
             </svg>
           </button>
@@ -107,7 +117,12 @@ export const MediaPreview: React.FC<MediaPreviewProps> = ({
               className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           )}
@@ -182,7 +197,9 @@ export const MediaPreview: React.FC<MediaPreviewProps> = ({
                 {asset.metadata.duration && ` • ${asset.metadata.duration}s`}
                 {asset.metadata.fps && ` • ${asset.metadata.fps}fps`}
               </p>
-              <p>{formatFileSize(asset.metadata.fileSize)} • {asset.quality} quality</p>
+              <p>
+                {formatFileSize(asset.metadata.fileSize)} • {asset.quality} quality
+              </p>
             </div>
           </div>
         )}
@@ -203,7 +220,9 @@ export const MediaPreview: React.FC<MediaPreviewProps> = ({
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">Generation Time:</span>
-                  <span className="ml-2 text-gray-600">{formatGenerationTime(asset.generationTime)}</span>
+                  <span className="ml-2 text-gray-600">
+                    {formatGenerationTime(asset.generationTime)}
+                  </span>
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">Quality:</span>
@@ -255,7 +274,9 @@ export const MediaPreview: React.FC<MediaPreviewProps> = ({
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">File Size:</span>
-                  <span className="ml-2 text-gray-600">{formatFileSize(asset.metadata.fileSize)}</span>
+                  <span className="ml-2 text-gray-600">
+                    {formatFileSize(asset.metadata.fileSize)}
+                  </span>
                 </div>
                 {asset.metadata.seed && (
                   <div>
@@ -293,25 +314,33 @@ export const MediaPreview: React.FC<MediaPreviewProps> = ({
             {/* Score Breakdown */}
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className={`text-2xl font-bold ${getQualityColor(qualityAssessment.brandCompliance)}`}>
+                <div
+                  className={`text-2xl font-bold ${getQualityColor(qualityAssessment.brandCompliance)}`}
+                >
                   {qualityAssessment.brandCompliance}
                 </div>
                 <p className="text-sm text-gray-600">Brand Compliance</p>
               </div>
               <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className={`text-2xl font-bold ${getQualityColor(qualityAssessment.technicalQuality)}`}>
+                <div
+                  className={`text-2xl font-bold ${getQualityColor(qualityAssessment.technicalQuality)}`}
+                >
                   {qualityAssessment.technicalQuality}
                 </div>
                 <p className="text-sm text-gray-600">Technical Quality</p>
               </div>
               <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className={`text-2xl font-bold ${getQualityColor(qualityAssessment.creativityScore)}`}>
+                <div
+                  className={`text-2xl font-bold ${getQualityColor(qualityAssessment.creativityScore)}`}
+                >
                   {qualityAssessment.creativityScore}
                 </div>
                 <p className="text-sm text-gray-600">Creativity</p>
               </div>
               <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className={`text-2xl font-bold ${getQualityColor(qualityAssessment.territoryAlignment)}`}>
+                <div
+                  className={`text-2xl font-bold ${getQualityColor(qualityAssessment.territoryAlignment)}`}
+                >
                   {qualityAssessment.territoryAlignment}
                 </div>
                 <p className="text-sm text-gray-600">Territory Alignment</p>
@@ -334,12 +363,14 @@ export const MediaPreview: React.FC<MediaPreviewProps> = ({
             )}
 
             {/* Approval Status */}
-            <div className={`p-4 rounded-lg ${qualityAssessment.approved ? 'bg-green-50' : 'bg-yellow-50'}`}>
+            <div
+              className={`p-4 rounded-lg ${qualityAssessment.approved ? 'bg-green-50' : 'bg-yellow-50'}`}
+            >
               <div className="flex items-center space-x-2">
-                <span className="text-lg">
-                  {qualityAssessment.approved ? '✅' : '⚠️'}
-                </span>
-                <span className={`font-medium ${qualityAssessment.approved ? 'text-green-800' : 'text-yellow-800'}`}>
+                <span className="text-lg">{qualityAssessment.approved ? '✅' : '⚠️'}</span>
+                <span
+                  className={`font-medium ${qualityAssessment.approved ? 'text-green-800' : 'text-yellow-800'}`}
+                >
                   {qualityAssessment.approved ? 'Approved for Use' : 'Requires Review'}
                 </span>
               </div>

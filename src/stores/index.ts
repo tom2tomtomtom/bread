@@ -1,9 +1,9 @@
 /**
  * Focused Store Architecture - Index
- * 
+ *
  * This file exports all the focused stores that replace the monolithic appStore.
  * Each store has a single responsibility and clear boundaries.
- * 
+ *
  * Migration Guide:
  * - useAppStore -> Use specific focused stores
  * - Generation state -> useGenerationStore
@@ -12,7 +12,7 @@
  * - Territory features -> useTerritoryStore
  * - Starred items -> useStarredStore
  * - Asset management -> useAssetStore (already exists)
- * 
+ *
  * Benefits:
  * - Better performance (smaller state updates)
  * - Easier testing (isolated concerns)
@@ -45,13 +45,7 @@ export { useAppStore } from './appStore';
 export { migrateFromAppStore, createStoreHooks } from './migration';
 
 // Types for the focused stores
-export type {
-  GenerationState,
-  UIState,
-  ConfigState,
-  TerritoryState,
-  StarredState,
-} from './types';
+export type { GenerationState, UIState, ConfigState, TerritoryState, StarredState } from './types';
 
 /**
  * Composite hook for components that need multiple stores
@@ -84,32 +78,32 @@ export const useStoreSelectors = () => {
   const isGenerating = useGenerationStore(state => state.isGenerating);
   const showOutput = useGenerationStore(state => state.showOutput);
   const generatedOutput = useGenerationStore(state => state.generatedOutput);
-  
+
   const showToast = useUIStore(state => state.showToast);
   const toastMessage = useUIStore(state => state.toastMessage);
   const toastType = useUIStore(state => state.toastType);
-  
+
   const apiKeys = useConfigStore(state => state.apiKeys);
   const generateImages = useConfigStore(state => state.generateImages);
-  
+
   const starredItems = useStarredStore(state => state.starredItems);
-  
+
   return {
     // Generation state
     brief,
     isGenerating,
     showOutput,
     generatedOutput,
-    
+
     // UI state
     showToast,
     toastMessage,
     toastType,
-    
+
     // Config state
     apiKeys,
     generateImages,
-    
+
     // Starred state
     starredItems,
   };
@@ -170,16 +164,18 @@ export const getStoreHealth = () => {
   const sizes = getStoreSizes();
   const generation = useGenerationStore.getState();
   const config = useConfigStore.getState();
-  
+
   const issues: string[] = [];
   const warnings: string[] = [];
 
   // Check for potential issues
-  if (sizes.total && sizes.total > 1000000) { // 1MB
+  if (sizes.total && sizes.total > 1000000) {
+    // 1MB
     issues.push('Total store size exceeds 1MB');
   }
 
-  if (sizes.generation && sizes.generation > 500000) { // 500KB
+  if (sizes.generation && sizes.generation > 500000) {
+    // 500KB
     warnings.push('Generation store is large - consider cleanup');
   }
 

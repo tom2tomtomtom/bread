@@ -113,23 +113,47 @@ export const handler: Handler = async (event, context) => {
       quality: quality === 'ultra' ? 'hd' : quality
     });
 
-    // Add timeout specifically for OpenAI API call
-    const openaiTimeout = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('OpenAI API timeout after 20 seconds')), 20000);
-    });
+    // Try DALL-E 3 first, fallback to DALL-E 2 if it fails
+    let response;
+    let attemptCount = 0;
+    const maxAttempts = 2;
 
-    const openaiCall = openai.images.generate({
-      model: "dall-e-3",
-      prompt: finalPrompt,
-      n: 1,
-      size: (sizeMap[imageType] || "1024x1792") as "1024x1024" | "1792x1024" | "1024x1792",
-      quality: quality === 'ultra' ? 'hd' : quality as 'standard' | 'hd',
-      style: "natural"
-    });
+    while (attemptCount < maxAttempts) {
+      attemptCount++;
+      const model = attemptCount === 1 ? "dall-e-3" : "dall-e-2";
+      
+      try {
+        console.log(`⏰ Attempt ${attemptCount}: Starting ${model} API call with 15s timeout...`);
+        
+        const openaiTimeout = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error(`${model} API timeout after 15 seconds`)), 15000);
+        });
 
-    console.log('⏰ Starting OpenAI API call with 20s timeout...');
-    const response = await Promise.race([openaiCall, openaiTimeout]);
-    console.log('✅ OpenAI API call completed');
+        const openaiCall = openai.images.generate({
+          model: model as "dall-e-3" | "dall-e-2",
+          prompt: finalPrompt,
+          n: 1,
+          size: model === "dall-e-3" 
+            ? (sizeMap[imageType] || "1024x1792") as "1024x1024" | "1792x1024" | "1024x1792"
+            : "1024x1024", // DALL-E 2 only supports 1024x1024
+          ...(model === "dall-e-3" ? {
+            quality: quality === 'ultra' ? 'hd' : quality as 'standard' | 'hd',
+            style: "natural"
+          } : {})
+        });
+
+        response = await Promise.race([openaiCall, openaiTimeout]);
+        console.log(`✅ ${model} API call completed successfully`);
+        break; // Success, exit retry loop
+        
+      } catch (error) {
+        console.log(`❌ ${model} failed:`, error.message);
+        if (attemptCount === maxAttempts) {
+          throw error; // Rethrow if this was the last attempt
+        }
+        console.log(`🔄 Retrying with ${attemptCount === 1 ? 'DALL-E 2' : 'different approach'}...`);
+      }
+    }
 
     const imageUrl = response.data?.[0]?.url;
     

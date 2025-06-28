@@ -23,7 +23,7 @@ export class AppErrorBoundary extends Component<Props, State> {
     this.state = {
       hasError: false,
       error: null,
-      errorInfo: null
+      errorInfo: null,
     };
   }
 
@@ -31,7 +31,7 @@ export class AppErrorBoundary extends Component<Props, State> {
     // Update state so the next render will show the fallback UI
     return {
       hasError: true,
-      error: handleError(error, { source: 'ErrorBoundary' })
+      error: handleError(error, { source: 'ErrorBoundary' }),
     };
   }
 
@@ -40,12 +40,12 @@ export class AppErrorBoundary extends Component<Props, State> {
     const enhancedError = handleError(error, {
       source: 'ErrorBoundary',
       componentStack: errorInfo.componentStack,
-      errorBoundary: true
+      errorBoundary: true,
     });
 
     this.setState({
       error: enhancedError,
-      errorInfo
+      errorInfo,
     });
 
     // Call custom error handler if provided
@@ -81,8 +81,8 @@ export class AppErrorBoundary extends Component<Props, State> {
           errorInfo,
           timestamp: new Date().toISOString(),
           userAgent: navigator.userAgent,
-          url: window.location.href
-        })
+          url: window.location.href,
+        }),
       });
     } catch (logError) {
       console.error('Failed to log error to service:', logError);
@@ -93,7 +93,7 @@ export class AppErrorBoundary extends Component<Props, State> {
     this.setState({
       hasError: false,
       error: null,
-      errorInfo: null
+      errorInfo: null,
     });
   };
 
@@ -114,15 +114,23 @@ export class AppErrorBoundary extends Component<Props, State> {
           <div className="max-w-md w-full bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 p-8 text-center">
             {/* Error Icon */}
             <div className="w-16 h-16 mx-auto mb-6 bg-red-500/20 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              <svg
+                className="w-8 h-8 text-red-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
               </svg>
             </div>
 
             {/* Error Title */}
-            <h1 className="text-2xl font-bold text-white mb-4">
-              Oops! Something went wrong
-            </h1>
+            <h1 className="text-2xl font-bold text-white mb-4">Oops! Something went wrong</h1>
 
             {/* Error Message */}
             <p className="text-gray-300 mb-6">
@@ -144,7 +152,7 @@ export class AppErrorBoundary extends Component<Props, State> {
               >
                 Try Again
               </button>
-              
+
               <button
                 onClick={this.handleReload}
                 className="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200"
@@ -172,13 +180,17 @@ export class AppErrorBoundary extends Component<Props, State> {
                   {this.state.error.technicalDetails && (
                     <div className="mb-2">
                       <strong>Details:</strong>
-                      <pre className="mt-1 whitespace-pre-wrap">{this.state.error.technicalDetails}</pre>
+                      <pre className="mt-1 whitespace-pre-wrap">
+                        {this.state.error.technicalDetails}
+                      </pre>
                     </div>
                   )}
                   {this.state.errorInfo?.componentStack && (
                     <div>
                       <strong>Component Stack:</strong>
-                      <pre className="mt-1 whitespace-pre-wrap">{this.state.errorInfo.componentStack}</pre>
+                      <pre className="mt-1 whitespace-pre-wrap">
+                        {this.state.errorInfo.componentStack}
+                      </pre>
                     </div>
                   )}
                 </div>
@@ -227,7 +239,7 @@ export function useErrorHandler() {
   const handleError = React.useCallback((error: Error | string, context?: any) => {
     const enhancedError = handleError(error, context);
     setError(enhancedError);
-    
+
     // Throw error to be caught by error boundary
     throw enhancedError;
   }, []);

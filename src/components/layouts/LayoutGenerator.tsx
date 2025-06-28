@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAssetStore } from '../../stores/assetStore';
 import { useAppStore } from '../../stores/appStore';
-import { 
-  LayoutGenerationRequest, 
-  ChannelFormat, 
-  TemplatePreference, 
+import {
+  LayoutGenerationRequest,
+  ChannelFormat,
+  TemplatePreference,
   BrandGuidelines,
   LayoutVariation,
 } from '../../types';
@@ -17,10 +17,7 @@ interface LayoutGeneratorProps {
   onClose?: () => void;
 }
 
-export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({
-  onLayoutGenerated,
-  onClose,
-}) => {
+export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({ onLayoutGenerated, onClose }) => {
   const {
     selectedAssets,
     assets,
@@ -50,9 +47,8 @@ export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Get selected assets or all assets if none selected
-  const assetsToUse = selectedAssets.length > 0 
-    ? assets.filter(asset => selectedAssets.includes(asset.id))
-    : assets;
+  const assetsToUse =
+    selectedAssets.length > 0 ? assets.filter(asset => selectedAssets.includes(asset.id)) : assets;
 
   // Default brand guidelines (in production, this would come from brand settings)
   const defaultBrandGuidelines: BrandGuidelines = {
@@ -122,7 +118,6 @@ export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({
 
       const generatedLayouts = await generateLayouts(request);
       onLayoutGenerated?.(generatedLayouts);
-
     } catch (error) {
       console.error('Layout generation failed:', error);
     }
@@ -152,12 +147,14 @@ export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({
           </p>
         </div>
         {onClose && (
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         )}
@@ -167,16 +164,28 @@ export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({
       {layoutGenerationError && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
           <div className="flex items-center">
-            <svg className="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-5 h-5 text-red-400 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             <span className="text-red-800">{layoutGenerationError}</span>
-            <button
-              onClick={clearLayoutError}
-              className="ml-auto text-red-400 hover:text-red-600"
-            >
+            <button onClick={clearLayoutError} className="ml-auto text-red-400 hover:text-red-600">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -229,12 +238,10 @@ export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({
             <h3 className="font-semibold text-gray-900 mb-3">🎨 Style Preferences</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Style
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Style</label>
                 <select
                   value={templatePreferences.style}
-                  onChange={(e) => handleTemplatePreferenceChange('style', e.target.value)}
+                  onChange={e => handleTemplatePreferenceChange('style', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="minimal">Minimal</option>
@@ -247,12 +254,10 @@ export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Layout
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Layout</label>
                 <select
                   value={templatePreferences.layout}
-                  onChange={(e) => handleTemplatePreferenceChange('layout', e.target.value)}
+                  onChange={e => handleTemplatePreferenceChange('layout', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="hero">Hero</option>
@@ -265,12 +270,10 @@ export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Text Balance
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Text Balance</label>
                 <select
                   value={templatePreferences.textDominance}
-                  onChange={(e) => handleTemplatePreferenceChange('textDominance', e.target.value)}
+                  onChange={e => handleTemplatePreferenceChange('textDominance', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="text-heavy">Text Heavy</option>
@@ -280,12 +283,10 @@ export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Color Scheme
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Color Scheme</label>
                 <select
                   value={templatePreferences.colorScheme}
-                  onChange={(e) => handleTemplatePreferenceChange('colorScheme', e.target.value)}
+                  onChange={e => handleTemplatePreferenceChange('colorScheme', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="brand">Brand Colors</option>
@@ -310,7 +311,12 @@ export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
               Advanced Options
             </button>
@@ -322,7 +328,7 @@ export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({
                 </label>
                 <textarea
                   value={customRequirements}
-                  onChange={(e) => setCustomRequirements(e.target.value)}
+                  onChange={e => setCustomRequirements(e.target.value)}
                   placeholder="Describe any specific requirements or preferences..."
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   rows={3}
@@ -343,17 +349,47 @@ export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({
           >
             {isAnalyzingVisuals ? (
               <span className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 Analyzing Assets...
               </span>
             ) : isGeneratingLayouts ? (
               <span className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 Generating Layouts...
               </span>
@@ -366,7 +402,7 @@ export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({
         {/* Preview Panel */}
         <div>
           <h3 className="font-semibold text-gray-900 mb-3">👁️ Layout Preview</h3>
-          
+
           {currentLayout ? (
             <div className="space-y-4">
               <LayoutPreview layout={currentLayout} />
@@ -392,12 +428,20 @@ export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({
             </div>
           ) : (
             <div className="bg-gray-50 rounded-lg p-8 text-center">
-              <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <svg
+                className="w-16 h-16 text-gray-300 mx-auto mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1}
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
               </svg>
-              <p className="text-gray-500">
-                Generate layouts to see AI-powered compositions
-              </p>
+              <p className="text-gray-500">Generate layouts to see AI-powered compositions</p>
             </div>
           )}
         </div>
@@ -412,13 +456,16 @@ export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({
               <h4 className="font-medium text-gray-900 mb-2">Asset-Territory Match</h4>
               <div className="text-2xl font-bold text-purple-600 mb-1">
                 {Math.round(
-                  visualIntelligence.assetTerritoryMatch.reduce((sum, match) => sum + match.matchScore, 0) /
-                  visualIntelligence.assetTerritoryMatch.length
-                )}%
+                  visualIntelligence.assetTerritoryMatch.reduce(
+                    (sum, match) => sum + match.matchScore,
+                    0
+                  ) / visualIntelligence.assetTerritoryMatch.length
+                )}
+                %
               </div>
               <p className="text-sm text-gray-600">Average match score</p>
             </div>
-            
+
             <div className="bg-white rounded-lg p-4">
               <h4 className="font-medium text-gray-900 mb-2">Color Harmony</h4>
               <div className="text-2xl font-bold text-purple-600 mb-1">
@@ -426,7 +473,7 @@ export const LayoutGenerator: React.FC<LayoutGeneratorProps> = ({
               </div>
               <p className="text-sm text-gray-600">Harmony score</p>
             </div>
-            
+
             <div className="bg-white rounded-lg p-4">
               <h4 className="font-medium text-gray-900 mb-2">Style Consistency</h4>
               <div className="text-2xl font-bold text-purple-600 mb-1">

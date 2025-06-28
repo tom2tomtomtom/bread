@@ -27,7 +27,9 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
 
   // Note: currentTerritory not available in app store, using current layout instead
 
-  const [activeTab, setActiveTab] = useState<'generate' | 'preview' | 'export' | 'manage'>('generate');
+  const [activeTab, setActiveTab] = useState<'generate' | 'preview' | 'export' | 'manage'>(
+    'generate'
+  );
   const [selectedLayouts, setSelectedLayouts] = useState<string[]>([]);
   const [showExportManager, setShowExportManager] = useState(false);
 
@@ -81,9 +83,7 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
 
   const toggleLayoutSelection = (layoutId: string) => {
     setSelectedLayouts(prev =>
-      prev.includes(layoutId)
-        ? prev.filter(id => id !== layoutId)
-        : [...prev, layoutId]
+      prev.includes(layoutId) ? prev.filter(id => id !== layoutId) : [...prev, layoutId]
     );
   };
 
@@ -113,7 +113,7 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
                 {layouts.length} layout{layouts.length !== 1 ? 's' : ''}
               </span>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               {layouts.length > 0 && (
                 <button
@@ -123,7 +123,7 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
                   📤 Export
                 </button>
               )}
-              
+
               {layouts.length > 0 && (
                 <button
                   onClick={() => {
@@ -137,14 +137,19 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
                   🗑️ Clear All
                 </button>
               )}
-              
+
               {onClose && (
                 <button
                   onClick={onClose}
                   className="text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               )}
@@ -187,11 +192,7 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Generate Tab */}
-        {activeTab === 'generate' && (
-          <LayoutGenerator
-            onLayoutGenerated={handleLayoutGenerated}
-          />
-        )}
+        {activeTab === 'generate' && <LayoutGenerator onLayoutGenerated={handleLayoutGenerated} />}
 
         {/* Preview Tab */}
         {activeTab === 'preview' && currentLayout && (
@@ -201,7 +202,7 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
                 layout={currentLayout}
                 interactive={true}
                 showControls={true}
-                onLayoutUpdate={(updates) => handleLayoutUpdate(currentLayout.id, updates)}
+                onLayoutUpdate={updates => handleLayoutUpdate(currentLayout.id, updates)}
               />
             </div>
             <div>
@@ -221,7 +222,8 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <span className="text-blue-800 font-medium">
-                    {selectedLayouts.length} layout{selectedLayouts.length !== 1 ? 's' : ''} selected
+                    {selectedLayouts.length} layout{selectedLayouts.length !== 1 ? 's' : ''}{' '}
+                    selected
                   </span>
                   <div className="space-x-2">
                     <button
@@ -256,8 +258,8 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
                     currentLayout?.id === layout.id
                       ? 'border-blue-500 ring-2 ring-blue-200'
                       : selectedLayouts.includes(layout.id)
-                      ? 'border-green-500 ring-2 ring-green-200'
-                      : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-green-500 ring-2 ring-green-200'
+                        : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
                   {/* Selection Checkbox */}
@@ -275,10 +277,7 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
 
                   {/* Layout Preview */}
                   <div className="p-4">
-                    <div
-                      className="cursor-pointer"
-                      onClick={() => handleLayoutSelect(layout)}
-                    >
+                    <div className="cursor-pointer" onClick={() => handleLayoutSelect(layout)}>
                       <LayoutPreview
                         layout={layout}
                         width={250}
@@ -291,17 +290,15 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
                     {/* Layout Info */}
                     <div className="mt-4 space-y-2">
                       <div className="flex items-center justify-between">
-                        <h3 className="font-medium text-gray-900 truncate">
-                          {layout.name}
-                        </h3>
-                        <span className={`px-2 py-1 text-xs rounded-full ${getPerformanceBadge(layout.performancePrediction)}`}>
+                        <h3 className="font-medium text-gray-900 truncate">{layout.name}</h3>
+                        <span
+                          className={`px-2 py-1 text-xs rounded-full ${getPerformanceBadge(layout.performancePrediction)}`}
+                        >
                           {layout.performancePrediction}%
                         </span>
                       </div>
 
-                      <p className="text-sm text-gray-600 line-clamp-2">
-                        {layout.description}
-                      </p>
+                      <p className="text-sm text-gray-600 line-clamp-2">{layout.description}</p>
 
                       <div className="flex items-center justify-between text-xs text-gray-500">
                         <span>{layout.channelOptimization[0]}</span>
@@ -337,11 +334,23 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
 
             {layouts.length === 0 && (
               <div className="text-center py-12">
-                <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <svg
+                  className="w-16 h-16 text-gray-300 mx-auto mb-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
                 </svg>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No layouts yet</h3>
-                <p className="text-gray-600 mb-4">Generate your first AI-powered layout to get started</p>
+                <p className="text-gray-600 mb-4">
+                  Generate your first AI-powered layout to get started
+                </p>
                 <button
                   onClick={() => setActiveTab('generate')}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
@@ -358,7 +367,7 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
           <ExportManager
             layout={currentLayout || undefined}
             layouts={layouts}
-            onExportComplete={(results) => {
+            onExportComplete={results => {
               console.log('Export completed:', results);
             }}
           />
@@ -371,11 +380,12 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
           <div className="max-w-4xl w-full max-h-screen overflow-y-auto">
             <ExportManager
               layout={currentLayout || undefined}
-              layouts={selectedLayouts.length > 0 
-                ? layouts.filter(l => selectedLayouts.includes(l.id))
-                : layouts
+              layouts={
+                selectedLayouts.length > 0
+                  ? layouts.filter(l => selectedLayouts.includes(l.id))
+                  : layouts
               }
-              onExportComplete={(results) => {
+              onExportComplete={results => {
                 console.log('Export completed:', results);
                 setShowExportManager(false);
               }}

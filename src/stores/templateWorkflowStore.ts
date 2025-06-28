@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type WorkflowStep = 
+export type WorkflowStep =
   | 'template-selection'
   | 'brief-input'
   | 'motivation-generation'
@@ -46,22 +46,22 @@ interface TemplateWorkflowState {
   // Workflow progress
   currentStep: WorkflowStep;
   completedSteps: WorkflowStep[];
-  
+
   // Template selection
   selectedTemplate: SelectedTemplate | null;
-  
+
   // Brief data (comprehensive parsed fields)
   briefText: string; // Raw brief text
   parsedBrief: ParsedBrief | null; // AI-parsed structured brief
-  
+
   // Legacy fields for backward compatibility
   brief: string;
   targetAudience: string;
   campaignGoal: string;
-  
+
   // Workflow validation
   errors: { [key in WorkflowStep]?: string };
-  
+
   // Actions
   setCurrentStep: (step: WorkflowStep) => void;
   markStepCompleted: (step: WorkflowStep) => void;
@@ -73,7 +73,7 @@ interface TemplateWorkflowState {
   resetWorkflow: () => void;
   setError: (step: WorkflowStep, error: string) => void;
   clearError: (step: WorkflowStep) => void;
-  
+
   // Navigation helpers
   nextStep: () => void;
   previousStep: () => void;
@@ -87,7 +87,7 @@ const WORKFLOW_STEPS: WorkflowStep[] = [
   'copy-generation',
   'asset-selection',
   'template-population',
-  'export'
+  'export',
 ];
 
 export const useTemplateWorkflowStore = create<TemplateWorkflowState>()(
@@ -131,13 +131,13 @@ export const useTemplateWorkflowStore = create<TemplateWorkflowState>()(
 
       // Set parsed brief data (new comprehensive method)
       setParsedBrief: (briefText: string, parsedBrief: ParsedBrief) => {
-        set({ 
-          briefText, 
+        set({
+          briefText,
           parsedBrief,
           // Update legacy fields for backward compatibility
           brief: briefText,
           targetAudience: parsedBrief.targetAudience,
-          campaignGoal: parsedBrief.goal
+          campaignGoal: parsedBrief.goal,
         });
         get().markStepCompleted('brief-input');
       },
@@ -145,14 +145,18 @@ export const useTemplateWorkflowStore = create<TemplateWorkflowState>()(
       // Validate step completion
       validateStep: (step: WorkflowStep) => {
         const state = get();
-        
+
         switch (step) {
           case 'template-selection':
             return !!state.selectedTemplate;
           case 'brief-input':
             // Check if we have parsed brief or legacy fields
             if (state.parsedBrief) {
-              return !!(state.briefText && state.parsedBrief.goal && state.parsedBrief.targetAudience);
+              return !!(
+                state.briefText &&
+                state.parsedBrief.goal &&
+                state.parsedBrief.targetAudience
+              );
             }
             return !!(state.brief && state.targetAudience && state.campaignGoal);
           case 'motivation-generation':
@@ -178,13 +182,13 @@ export const useTemplateWorkflowStore = create<TemplateWorkflowState>()(
       canProceedToStep: (targetStep: WorkflowStep) => {
         const state = get();
         const targetIndex = WORKFLOW_STEPS.indexOf(targetStep);
-        
+
         // Can't proceed to invalid step
         if (targetIndex === -1) return false;
-        
+
         // Always allow going to first step
         if (targetIndex === 0) return true;
-        
+
         // Check if all previous steps are completed
         for (let i = 0; i < targetIndex; i++) {
           const previousStep = WORKFLOW_STEPS[i];
@@ -192,7 +196,7 @@ export const useTemplateWorkflowStore = create<TemplateWorkflowState>()(
             return false;
           }
         }
-        
+
         return true;
       },
 
@@ -229,7 +233,7 @@ export const useTemplateWorkflowStore = create<TemplateWorkflowState>()(
       nextStep: () => {
         const { currentStep } = get();
         const currentIndex = WORKFLOW_STEPS.indexOf(currentStep);
-        
+
         if (currentIndex < WORKFLOW_STEPS.length - 1) {
           const nextStep = WORKFLOW_STEPS[currentIndex + 1];
           if (get().canProceedToStep(nextStep)) {
@@ -241,7 +245,7 @@ export const useTemplateWorkflowStore = create<TemplateWorkflowState>()(
       previousStep: () => {
         const { currentStep } = get();
         const currentIndex = WORKFLOW_STEPS.indexOf(currentStep);
-        
+
         if (currentIndex > 0) {
           const previousStep = WORKFLOW_STEPS[currentIndex - 1];
           set({ currentStep: previousStep });
@@ -256,7 +260,7 @@ export const useTemplateWorkflowStore = create<TemplateWorkflowState>()(
     }),
     {
       name: 'template-workflow-storage',
-      partialize: (state) => ({
+      partialize: state => ({
         currentStep: state.currentStep,
         completedSteps: state.completedSteps,
         selectedTemplate: state.selectedTemplate,

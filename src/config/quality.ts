@@ -1,6 +1,6 @@
 /**
  * A+ Code Quality Configuration
- * 
+ *
  * Comprehensive quality gates and standards for production-ready code
  */
 
@@ -54,22 +54,10 @@ export const QUALITY_STANDARDS = {
 
 export const QUALITY_GATES = {
   // Pre-commit checks
-  preCommit: [
-    'lint',
-    'typecheck',
-    'test:unit',
-    'format',
-    'security-scan',
-  ],
+  preCommit: ['lint', 'typecheck', 'test:unit', 'format', 'security-scan'],
 
   // Pre-push checks
-  prePush: [
-    'test:integration',
-    'test:e2e',
-    'build',
-    'bundle-analysis',
-    'performance-audit',
-  ],
+  prePush: ['test:integration', 'test:e2e', 'build', 'bundle-analysis', 'performance-audit'],
 
   // Pre-deployment checks
   preDeployment: [
@@ -103,7 +91,7 @@ export const CODE_REVIEW_CHECKLIST = {
     'Input validation implemented',
     'Output sanitization applied',
     'Authentication/authorization checked',
-    'Error messages don\'t leak information',
+    "Error messages don't leak information",
   ],
 
   testing: [
@@ -212,31 +200,31 @@ export const PRODUCTION_READINESS_CHECKLIST = [
   '✅ Bundle size < 1.5MB',
   '✅ Load time < 3 seconds',
   '✅ Memory usage < 80%',
-  
+
   // Quality
   '✅ Test coverage ≥ 90%',
   '✅ No TypeScript errors',
   '✅ No ESLint errors',
   '✅ No security vulnerabilities',
-  
+
   // Accessibility
   '✅ WCAG AA compliance',
   '✅ Keyboard navigation',
   '✅ Screen reader support',
   '✅ Color contrast ≥ 4.5:1',
-  
+
   // Monitoring
   '✅ Error tracking configured',
   '✅ Performance monitoring active',
   '✅ Analytics implemented',
   '✅ Health checks working',
-  
+
   // Security
   '✅ HTTPS enforced',
   '✅ Security headers configured',
   '✅ No hardcoded secrets',
   '✅ Input validation implemented',
-  
+
   // Documentation
   '✅ API documentation complete',
   '✅ Deployment guide updated',

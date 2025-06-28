@@ -1,6 +1,6 @@
 /**
  * Store Migration Utilities
- * 
+ *
  * Utilities to help migrate from the monolithic appStore to focused stores.
  * This ensures a smooth transition without data loss.
  */
@@ -20,7 +20,7 @@ export const migrateFromAppStore = () => {
     // Check if old appStore data exists in localStorage
     const oldStoreKey = 'bread-app-storage';
     const oldStoreData = localStorage.getItem(oldStoreKey);
-    
+
     if (!oldStoreData) {
       console.log('No legacy store data found - skipping migration');
       return;
@@ -39,7 +39,7 @@ export const migrateFromAppStore = () => {
     // Migrate generation data
     if (oldState.brief || oldState.generatedOutput || oldState.briefAnalysis) {
       const generationStore = useGenerationStore.getState();
-      
+
       // Only migrate if the new store is empty (first migration)
       if (!generationStore.brief && !generationStore.generatedOutput) {
         useGenerationStore.setState({
@@ -55,7 +55,7 @@ export const migrateFromAppStore = () => {
     // Migrate UI preferences
     if (oldState.showAdmin !== undefined || oldState.showAssets !== undefined) {
       const uiStore = useUIStore.getState();
-      
+
       // Only migrate if the new store has default values
       if (!uiStore.showAdmin && !uiStore.showAssets) {
         useUIStore.setState({
@@ -71,7 +71,7 @@ export const migrateFromAppStore = () => {
     // Migrate configuration
     if (oldState.prompts || oldState.apiKeys) {
       const configStore = useConfigStore.getState();
-      
+
       // Only migrate if the new store has default values
       if (!configStore.apiKeys.openai && oldState.apiKeys?.openai) {
         useConfigStore.setState({
@@ -87,7 +87,7 @@ export const migrateFromAppStore = () => {
     // Migrate territory data
     if (oldState.territoryEvolutions || oldState.performancePredictions) {
       const territoryStore = useTerritoryStore.getState();
-      
+
       // Only migrate if the new store is empty
       if (Object.keys(territoryStore.territoryEvolutions).length === 0) {
         useTerritoryStore.setState({
@@ -104,7 +104,7 @@ export const migrateFromAppStore = () => {
     // Migrate starred items
     if (oldState.starredItems) {
       const starredStore = useStarredStore.getState();
-      
+
       // Only migrate if the new store is empty
       if (starredStore.starredItems.territories.length === 0) {
         useStarredStore.setState({
@@ -121,7 +121,6 @@ export const migrateFromAppStore = () => {
     // Optionally remove old store data after successful migration
     // Uncomment the next line if you want to clean up old data immediately
     // localStorage.removeItem(oldStoreKey);
-
   } catch (error) {
     console.error('❌ Store migration failed:', error);
     // Don't throw - let the app continue with default state
@@ -143,7 +142,7 @@ export const resetMigration = () => {
     console.warn('resetMigration is only available in development mode');
     return;
   }
-  
+
   localStorage.removeItem('bread-store-migration-complete');
   console.log('Migration reset - will run again on next app load');
 };
@@ -233,7 +232,6 @@ export const validateMigration = () => {
     if (!isMigrationComplete()) {
       warnings.push('Migration has not been marked as complete');
     }
-
   } catch (error) {
     issues.push(`Store validation failed: ${error}`);
   }
@@ -261,7 +259,7 @@ export const compareStoreData = () => {
     }
 
     const oldState = JSON.parse(oldStoreData).state;
-    
+
     const newStores = {
       generation: useGenerationStore.getState(),
       ui: useUIStore.getState(),
@@ -276,7 +274,8 @@ export const compareStoreData = () => {
       comparison: {
         briefMatches: oldState.brief === newStores.generation.brief,
         apiKeysMatch: JSON.stringify(oldState.apiKeys) === JSON.stringify(newStores.config.apiKeys),
-        starredItemsMatch: JSON.stringify(oldState.starredItems) === JSON.stringify(newStores.starred.starredItems),
+        starredItemsMatch:
+          JSON.stringify(oldState.starredItems) === JSON.stringify(newStores.starred.starredItems),
       },
     };
   } catch (error) {
