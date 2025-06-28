@@ -870,13 +870,20 @@ export const useAssetStore = create<AssetState>()(
             };
 
             // Add asset to the store immediately
-            set(state => ({
-              assets: [generatedAsset, ...state.assets], // Add to beginning for visibility
-              isGeneratingImage: false,
-              generationProgress: 100,
-            }));
+            set(state => {
+              console.log('🎨 Adding generated asset to store:', {
+                newAsset: generatedAsset,
+                currentAssetsCount: state.assets.length,
+                newAssetsCount: state.assets.length + 1
+              });
+              return {
+                assets: [generatedAsset, ...state.assets], // Add to beginning for visibility
+                isGeneratingImage: false,
+                generationProgress: 100,
+              };
+            });
 
-            // Image successfully added to library
+            console.log('✅ Generated image added to library:', generatedAsset.filename);
             return `asset_${generatedAsset.id}`;
           } else {
             throw new Error('No image data received from API');

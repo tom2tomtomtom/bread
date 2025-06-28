@@ -42,7 +42,14 @@ const AssetLibraryComponent: React.FC<AssetLibraryProps> = ({
 
   // Apply filters and sorting
   const filteredAndSortedAssets = useMemo(() => {
+    console.log('🔍 AssetLibrary Debug:', {
+      totalAssets: assets.length,
+      assets: assets.map(a => ({ id: a.id, filename: a.filename, type: a.type, format: a.format, tags: a.tags })),
+      activeFilters: filters
+    });
+    
     const filtered = applyFilters();
+    console.log('📋 Filtered assets:', filtered.length, filtered.map(a => ({ id: a.id, filename: a.filename })));
 
     // Apply sorting
     filtered.sort((a, b) => {
