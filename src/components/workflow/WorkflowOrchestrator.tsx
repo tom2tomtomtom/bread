@@ -321,34 +321,91 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
       let extractedAudience = '';
       let extractedBrief = text;
 
+      // Enhanced parsing patterns
+      const goalKeywords = ['goal', 'objective', 'purpose', 'aim', 'mission', 'campaign goal', 'business objective', 'marketing goal'];
+      const audienceKeywords = ['audience', 'target', 'demographic', 'customer', 'consumer', 'user', 'segment', 'market'];
+
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i].toLowerCase();
+        const nextLine = lines[i + 1] || '';
         
-        // Look for goal/objective indicators
-        if ((line.includes('goal') || line.includes('objective') || line.includes('purpose')) && !extractedGoal) {
-          extractedGoal = lines[i + 1] || lines[i];
-          if (extractedGoal.toLowerCase().includes('goal') || extractedGoal.toLowerCase().includes('objective')) {
-            extractedGoal = extractedGoal.split(':').slice(1).join(':').trim() || extractedGoal;
+        // Look for goal/objective indicators with more patterns
+        if (!extractedGoal) {
+          for (const keyword of goalKeywords) {
+            if (line.includes(keyword)) {
+              // Check if the goal is on the same line after a colon
+              if (line.includes(':')) {
+                const parts = lines[i].split(':');
+                if (parts.length > 1) {
+                  extractedGoal = parts.slice(1).join(':').trim();
+                  break;
+                }
+              }
+              // Check if the goal is on the next line
+              else if (nextLine && nextLine.length > 10) {
+                extractedGoal = nextLine;
+                break;
+              }
+              // Check if it's a formatted line like "Goal: Increase brand awareness"
+              else if (line.includes(keyword) && lines[i].length > keyword.length + 5) {
+                extractedGoal = lines[i].substring(lines[i].toLowerCase().indexOf(keyword) + keyword.length).replace(/[:\-\s]*/, '').trim();
+                break;
+              }
+            }
           }
         }
         
-        // Look for audience/target indicators
-        if ((line.includes('audience') || line.includes('target') || line.includes('demographic')) && !extractedAudience) {
-          extractedAudience = lines[i + 1] || lines[i];
-          if (extractedAudience.toLowerCase().includes('audience') || extractedAudience.toLowerCase().includes('target')) {
-            extractedAudience = extractedAudience.split(':').slice(1).join(':').trim() || extractedAudience;
+        // Look for audience/target indicators with more patterns
+        if (!extractedAudience) {
+          for (const keyword of audienceKeywords) {
+            if (line.includes(keyword)) {
+              // Check if the audience is on the same line after a colon
+              if (line.includes(':')) {
+                const parts = lines[i].split(':');
+                if (parts.length > 1) {
+                  extractedAudience = parts.slice(1).join(':').trim();
+                  break;
+                }
+              }
+              // Check if the audience is on the next line
+              else if (nextLine && nextLine.length > 10) {
+                extractedAudience = nextLine;
+                break;
+              }
+              // Check if it's a formatted line like "Target Audience: Young professionals"
+              else if (line.includes(keyword) && lines[i].length > keyword.length + 5) {
+                extractedAudience = lines[i].substring(lines[i].toLowerCase().indexOf(keyword) + keyword.length).replace(/[:\-\s]*/, '').trim();
+                break;
+              }
+            }
           }
         }
       }
 
-      // Clean up extracted fields
-      if (extractedGoal && extractedGoal.length > 200) extractedGoal = '';
-      if (extractedAudience && extractedAudience.length > 200) extractedAudience = '';
+      // Clean up extracted fields and validate
+      if (extractedGoal) {
+        extractedGoal = extractedGoal.replace(/^[:\-\s]+/, '').trim();
+        if (extractedGoal.length > 300 || extractedGoal.length < 5) extractedGoal = '';
+      }
+      
+      if (extractedAudience) {
+        extractedAudience = extractedAudience.replace(/^[:\-\s]+/, '').trim();
+        if (extractedAudience.length > 300 || extractedAudience.length < 5) extractedAudience = '';
+      }
 
       // Update the form fields
       setBriefText(text);
       if (extractedGoal) setGoal(extractedGoal);
       if (extractedAudience) setAudience(extractedAudience);
+
+      // Show success message if parsing was successful
+      if (extractedGoal || extractedAudience) {
+        // You could add a toast notification here in the future
+        console.log('✅ Successfully parsed brief:', { 
+          goal: extractedGoal ? 'Found' : 'Not found', 
+          audience: extractedAudience ? 'Found' : 'Not found' 
+        });
+      }
 
     } catch (error) {
       setBriefText(`Error reading file "${file.name}". Please copy and paste the content manually.`);
