@@ -732,22 +732,60 @@ const AssetSelectionStep: React.FC<{ onContinue: () => void; onBack: () => void 
       imagePrompt;
 
     try {
+      // Create a mock territory for image generation
+      const mockTerritory = {
+        id: 'temp-territory',
+        title: parsedBrief?.goal || 'Campaign Territory',
+        positioning: parsedBrief?.productDetails || 'Product positioning',
+        tone: parsedBrief?.toneMood || 'professional',
+        headlines: []
+      };
+
+      const defaultBrandGuidelines = {
+        colors: {
+          primary: '#FF6B35',
+          secondary: ['#F7931E', '#FFD23F'],
+          accent: ['#007BFF', '#28A745'],
+          neutral: ['#6C757D', '#E9ECEF'],
+          background: '#FFFFFF',
+          text: '#212529'
+        },
+        fonts: {
+          primary: 'Inter',
+          secondary: 'Space Grotesk',
+          fallbacks: ['Arial', 'sans-serif']
+        },
+        logoUsage: {
+          minSize: 32,
+          clearSpace: 16,
+          placement: 'top-left' as const,
+          variations: ['primary', 'monochrome', 'reversed']
+        },
+        spacing: {
+          grid: 8,
+          margins: 24,
+          padding: 16
+        },
+        imagery: {
+          style: parsedBrief?.brandPersonality ? [parsedBrief.brandPersonality] : ['modern'],
+          filters: ['vibrant', 'high-contrast'],
+          overlayOpacity: 0.3
+        },
+        compliance: {
+          requiredElements: ['logo', 'tagline'],
+          prohibitedElements: ['competitor-references'],
+          legalText: ['Terms apply', 'See website for details']
+        }
+      };
+
       await generateImage({
         prompt: enhancedPrompt,
+        territory: mockTerritory,
+        brandGuidelines: defaultBrandGuidelines,
         imageType: 'hero',
         culturalContext: 'global',
         quality: 'hd',
-        styleConsistency: true,
-        brandGuidelines: parsedBrief ? {
-          colors: {
-            primary: '#FF6B35',
-            secondary: ['#F7931E', '#FFD23F'],
-            accent: ['#007BFF', '#28A745'],
-            neutral: ['#6C757D', '#E9ECEF']
-          },
-          style: parsedBrief.brandPersonality ? [parsedBrief.brandPersonality] : ['modern'],
-          tone: parsedBrief.toneMood || 'professional'
-        } : undefined
+        styleConsistency: true
       });
       setImagePrompt('');
     } catch (error) {
