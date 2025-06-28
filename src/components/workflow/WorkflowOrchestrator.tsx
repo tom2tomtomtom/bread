@@ -275,6 +275,8 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
   const [goal, setGoal] = React.useState('');
   const [isDragOver, setIsDragOver] = React.useState(false);
   const [isProcessing, setIsProcessing] = React.useState(false);
+  const [processingStatus, setProcessingStatus] = React.useState<'idle' | 'processing' | 'success' | 'error'>('idle');
+  const [statusMessage, setStatusMessage] = React.useState('');
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleContinue = () => {
@@ -283,38 +285,67 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
   };
 
   const extractTextFromFile = async (file: File): Promise<string> => {
+    console.log('🔍 Extracting text from file:', { 
+      name: file.name, 
+      type: file.type, 
+      size: file.size 
+    });
+
     const fileType = file.type;
     const fileName = file.name.toLowerCase();
 
     if (fileType === 'text/plain' || fileName.endsWith('.txt')) {
-      return await file.text();
-    }
-
-    if (fileType === 'application/pdf' || fileName.endsWith('.pdf')) {
-      // For now, return a helpful message about PDF support
-      return `PDF file "${file.name}" detected. Please copy and paste the text content from your PDF into the text area below.`;
+      console.log('📄 Processing as text file');
+      const text = await file.text();
+      console.log('✅ Text extracted, length:', text.length);
+      return text;
     }
 
     if (fileType.includes('word') || fileName.endsWith('.docx') || fileName.endsWith('.doc')) {
-      // For now, return a helpful message about Word support
-      return `Word document "${file.name}" detected. Please copy and paste the text content from your document into the text area below.`;
+      console.log('📘 Word document detected - attempting extraction');
+      try {
+        // Import mammoth dynamically to avoid bundle issues
+        const mammoth = await import('mammoth');
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        console.log('✅ Word document text extracted, length:', result.value.length);
+        return result.value;
+      } catch (error) {
+        console.log('❌ Word document extraction failed:', error);
+        return `Word document "${file.name}" detected. Please copy and paste the text content from your document into the text area below.`;
+      }
+    }
+
+    if (fileType === 'application/pdf' || fileName.endsWith('.pdf')) {
+      console.log('📕 PDF file detected - showing help message');
+      return `PDF file "${file.name}" detected. Please copy and paste the text content from your PDF into the text area below.`;
     }
 
     // Try to read as text anyway
+    console.log('🔄 Attempting to read as generic text file');
     try {
-      return await file.text();
-    } catch {
+      const text = await file.text();
+      console.log('✅ Generic text extraction successful, length:', text.length);
+      return text;
+    } catch (error) {
+      console.log('❌ Text extraction failed:', error);
       return `File "${file.name}" uploaded. Please copy and paste the text content into the text area below.`;
     }
   };
 
   const processFile = async (file: File) => {
+    console.log('🚀 Starting file processing:', file.name);
     setIsProcessing(true);
+    setProcessingStatus('processing');
+    setStatusMessage(`Processing ${file.name}...`);
+    
     try {
       const text = await extractTextFromFile(file);
+      console.log('📝 Text content preview:', text.substring(0, 200) + '...');
       
       // Try to intelligently parse the content
       const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+      console.log('📋 Parsed into', lines.length, 'lines');
       
       // Look for common patterns in briefs
       let extractedGoal = '';
@@ -394,33 +425,57 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
       }
 
       // Update the form fields
+      console.log('📝 Updating form fields with extracted content');
       setBriefText(text);
-      if (extractedGoal) setGoal(extractedGoal);
-      if (extractedAudience) setAudience(extractedAudience);
+      if (extractedGoal) {
+        console.log('🎯 Setting goal:', extractedGoal);
+        setGoal(extractedGoal);
+      }
+      if (extractedAudience) {
+        console.log('👥 Setting audience:', extractedAudience);
+        setAudience(extractedAudience);
+      }
 
       // Show success message if parsing was successful
       if (extractedGoal || extractedAudience) {
-        // You could add a toast notification here in the future
         console.log('✅ Successfully parsed brief:', { 
           goal: extractedGoal ? 'Found' : 'Not found', 
           audience: extractedAudience ? 'Found' : 'Not found' 
         });
+        setProcessingStatus('success');
+        setStatusMessage(`✅ File processed! ${extractedGoal ? 'Goal' : ''}${extractedGoal && extractedAudience ? ' and ' : ''}${extractedAudience ? 'Audience' : ''} automatically detected.`);
+      } else {
+        console.log('⚠️ No goal or audience automatically detected - user can fill manually');
+        setProcessingStatus('success');
+        setStatusMessage(`✅ File content loaded. Please fill goal and audience fields manually.`);
       }
 
     } catch (error) {
+      console.log('❌ File processing error:', error);
       setBriefText(`Error reading file "${file.name}". Please copy and paste the content manually.`);
+      setProcessingStatus('error');
+      setStatusMessage(`❌ Error processing ${file.name}. Please try again or paste content manually.`);
     } finally {
       setIsProcessing(false);
+      // Clear status message after 5 seconds
+      setTimeout(() => {
+        setProcessingStatus('idle');
+        setStatusMessage('');
+      }, 5000);
     }
   };
 
   const handleDrop = (e: React.DragEvent) => {
+    console.log('📂 File dropped!');
     e.preventDefault();
     setIsDragOver(false);
     
     const files = Array.from(e.dataTransfer.files);
+    console.log('📁 Files detected:', files.length, files.map(f => f.name));
     if (files.length > 0) {
       processFile(files[0]); // Process the first file
+    } else {
+      console.log('❌ No files in drop event');
     }
   };
 
@@ -435,9 +490,13 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('📁 File input changed');
     const files = e.target.files;
     if (files && files.length > 0) {
+      console.log('📄 Selected file:', files[0].name);
       processFile(files[0]);
+    } else {
+      console.log('❌ No files selected');
     }
   };
 
@@ -455,9 +514,10 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
       {/* Drag & Drop Zone */}
       <div 
         className={`mb-6 p-6 border-2 border-dashed rounded-xl transition-all duration-300 cursor-pointer ${
-          isDragOver 
-            ? 'border-orange-400 bg-orange-400/10' 
-            : 'border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10'
+          processingStatus === 'success' ? 'border-green-400 bg-green-400/10' :
+          processingStatus === 'error' ? 'border-red-400 bg-red-400/10' :
+          isDragOver ? 'border-orange-400 bg-orange-400/10' : 
+          'border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10'
         }`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
@@ -469,6 +529,19 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
             <div className="text-orange-400">
               <div className="animate-spin w-8 h-8 border-2 border-orange-400 border-t-transparent rounded-full mx-auto mb-4"></div>
               <p>Processing file...</p>
+              {statusMessage && <p className="text-sm mt-2">{statusMessage}</p>}
+            </div>
+          ) : processingStatus === 'success' ? (
+            <div className="text-green-400">
+              <div className="text-4xl mb-4">✅</div>
+              <p className="font-medium mb-2">{statusMessage}</p>
+              <p className="text-gray-400 text-sm">Drop another file to replace</p>
+            </div>
+          ) : processingStatus === 'error' ? (
+            <div className="text-red-400">
+              <div className="text-4xl mb-4">❌</div>
+              <p className="font-medium mb-2">{statusMessage}</p>
+              <p className="text-gray-400 text-sm">Try again or paste content manually</p>
             </div>
           ) : (
             <>
