@@ -1,9 +1,49 @@
 import React, { useState } from 'react';
 import { AuthModal } from '../components/auth/AuthModal';
+import { WorkflowOrchestrator } from '../components/workflow/WorkflowOrchestrator';
+import { useAuthStore } from '../stores/authStore';
+
+// Authenticated workflow interface component
+const AuthenticatedWorkflow: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
+  const { user } = useAuthStore();
+  
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* Header with user info and logout */}
+      <div className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
+              AIDEAS
+            </h1>
+            <span className="ml-4 text-sm text-gray-400">
+              AI-Powered Ad Creation Platform
+            </span>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-300">
+              Welcome, {user?.name || user?.email || 'User'}
+            </span>
+            <button 
+              onClick={() => useAuthStore.getState().logout()}
+              className="text-sm text-gray-400 hover:text-white transition-colors"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Integrated Workflow */}
+      <WorkflowOrchestrator onComplete={onComplete} />
+    </div>
+  );
+};
 
 export const LandingPage: React.FC = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
+  const { isAuthenticated } = useAuthStore();
 
   const handleShowLogin = () => {
     setAuthModalMode('login');
@@ -15,6 +55,17 @@ export const LandingPage: React.FC = () => {
     setShowAuthModal(true);
   };
 
+  const handleWorkflowComplete = () => {
+    // Handle workflow completion - could show success message or reset
+    // Workflow completed successfully
+  };
+
+  // If user is authenticated, show the integrated workflow
+  if (isAuthenticated) {
+    return <AuthenticatedWorkflow onComplete={handleWorkflowComplete} />;
+  }
+
+  // Show landing/marketing page for non-authenticated users
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
       {/* Animated Background Elements */}
@@ -53,6 +104,30 @@ export const LandingPage: React.FC = () => {
             >
               Sign In
             </button>
+          </div>
+        </div>
+
+        {/* Features Preview - Show workflow steps */}
+        <div className="max-w-6xl mx-auto mb-16">
+          <h2 className="text-3xl font-bold text-center text-white mb-12">
+            Complete 7-Step Ad Creation Process
+          </h2>
+          <div className="grid md:grid-cols-4 lg:grid-cols-7 gap-4">
+            {[
+              { icon: '🎯', label: 'Select Template', desc: 'Choose perfect format' },
+              { icon: '📝', label: 'Input Brief', desc: 'Define your campaign' },
+              { icon: '🧠', label: 'Generate Motivations', desc: 'AI psychology insights' },
+              { icon: '✍️', label: 'Create Copy', desc: 'AI-powered headlines' },
+              { icon: '🖼️', label: 'Select Assets', desc: 'Choose visuals' },
+              { icon: '🎨', label: 'Populate Template', desc: 'Combine everything' },
+              { icon: '📤', label: 'Export & Download', desc: 'Get final ads' }
+            ].map((step, index) => (
+              <div key={index} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 text-center">
+                <div className="text-3xl mb-2">{step.icon}</div>
+                <h3 className="text-sm font-semibold text-orange-400 mb-1">{step.label}</h3>
+                <p className="text-xs text-gray-400">{step.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
 

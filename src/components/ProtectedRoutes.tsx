@@ -1,25 +1,13 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { ProtectedRoute } from './auth';
-import { useAuthStore } from '../stores/authStore';
 import { DashboardPage, BriefPage, GeneratePage, ResultsPage } from '../pages';
-import { WorkflowPage } from '../pages/WorkflowPage';
+import { LandingPage } from '../pages/LandingPage';
 
 export const ProtectedRoutes: React.FC = () => {
-  const { isAuthenticated } = useAuthStore();
 
   return (
     <Routes>
-      {/* New workflow route - primary path for ad creation */}
-      <Route
-        path="/workflow"
-        element={
-          <ProtectedRoute>
-            <WorkflowPage />
-          </ProtectedRoute>
-        }
-      />
-
       {/* Legacy routes - keep for backward compatibility */}
       <Route
         path="/dashboard"
@@ -54,10 +42,10 @@ export const ProtectedRoutes: React.FC = () => {
         }
       />
 
-      {/* Default redirect to new workflow */}
+      {/* All other routes redirect to main integrated experience */}
       <Route
         path="*"
-        element={<Navigate to={isAuthenticated ? '/workflow' : '/'} replace />}
+        element={<LandingPage />}
       />
     </Routes>
   );

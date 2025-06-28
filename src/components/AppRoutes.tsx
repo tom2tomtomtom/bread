@@ -1,14 +1,12 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { PublicRoutes } from './PublicRoutes';
-import { ProtectedRoutes } from './ProtectedRoutes';
-import { WorkflowPage } from '../pages/WorkflowPage';
+import { LandingPage } from '../pages/LandingPage';
 
 export const AppRoutes: React.FC = () => (
   <Routes>
-    <Route path="/" element={<PublicRoutes />} />
-    {/* Public workflow route for testing */}
-    <Route path="/workflow" element={<WorkflowPage />} />
-    <Route path="/*" element={<ProtectedRoutes />} />
+    {/* Main route - integrated workflow experience */}
+    <Route path="/" element={<LandingPage />} />
+    {/* All other routes redirect to main */}
+    <Route path="/*" element={<LandingPage />} />
   </Routes>
 );
