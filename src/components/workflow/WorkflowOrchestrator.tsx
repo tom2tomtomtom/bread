@@ -273,18 +273,168 @@ const BriefInputStep: React.FC<{ onContinue: () => void; onBack: () => void }> =
   const [briefText, setBriefText] = React.useState('');
   const [audience, setAudience] = React.useState('');
   const [goal, setGoal] = React.useState('');
+  const [isDragOver, setIsDragOver] = React.useState(false);
+  const [isProcessing, setIsProcessing] = React.useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleContinue = () => {
     setBrief(briefText, audience, goal);
     onContinue();
   };
 
+  const extractTextFromFile = async (file: File): Promise<string> => {
+    const fileType = file.type;
+    const fileName = file.name.toLowerCase();
+
+    if (fileType === 'text/plain' || fileName.endsWith('.txt')) {
+      return await file.text();
+    }
+
+    if (fileType === 'application/pdf' || fileName.endsWith('.pdf')) {
+      // For now, return a helpful message about PDF support
+      return `PDF file "${file.name}" detected. Please copy and paste the text content from your PDF into the text area below.`;
+    }
+
+    if (fileType.includes('word') || fileName.endsWith('.docx') || fileName.endsWith('.doc')) {
+      // For now, return a helpful message about Word support
+      return `Word document "${file.name}" detected. Please copy and paste the text content from your document into the text area below.`;
+    }
+
+    // Try to read as text anyway
+    try {
+      return await file.text();
+    } catch {
+      return `File "${file.name}" uploaded. Please copy and paste the text content into the text area below.`;
+    }
+  };
+
+  const processFile = async (file: File) => {
+    setIsProcessing(true);
+    try {
+      const text = await extractTextFromFile(file);
+      
+      // Try to intelligently parse the content
+      const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+      
+      // Look for common patterns in briefs
+      let extractedGoal = '';
+      let extractedAudience = '';
+      let extractedBrief = text;
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].toLowerCase();
+        
+        // Look for goal/objective indicators
+        if ((line.includes('goal') || line.includes('objective') || line.includes('purpose')) && !extractedGoal) {
+          extractedGoal = lines[i + 1] || lines[i];
+          if (extractedGoal.toLowerCase().includes('goal') || extractedGoal.toLowerCase().includes('objective')) {
+            extractedGoal = extractedGoal.split(':').slice(1).join(':').trim() || extractedGoal;
+          }
+        }
+        
+        // Look for audience/target indicators
+        if ((line.includes('audience') || line.includes('target') || line.includes('demographic')) && !extractedAudience) {
+          extractedAudience = lines[i + 1] || lines[i];
+          if (extractedAudience.toLowerCase().includes('audience') || extractedAudience.toLowerCase().includes('target')) {
+            extractedAudience = extractedAudience.split(':').slice(1).join(':').trim() || extractedAudience;
+          }
+        }
+      }
+
+      // Clean up extracted fields
+      if (extractedGoal && extractedGoal.length > 200) extractedGoal = '';
+      if (extractedAudience && extractedAudience.length > 200) extractedAudience = '';
+
+      // Update the form fields
+      setBriefText(text);
+      if (extractedGoal) setGoal(extractedGoal);
+      if (extractedAudience) setAudience(extractedAudience);
+
+    } catch (error) {
+      setBriefText(`Error reading file "${file.name}". Please copy and paste the content manually.`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      processFile(files[0]); // Process the first file
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      processFile(files[0]);
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-8">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-white mb-4">📝 Input Your Brief</h1>
-        <p className="text-gray-400 text-lg">Provide details about your campaign</p>
+        <p className="text-gray-400 text-lg">Provide details about your campaign or drag & drop a file</p>
       </div>
+
+      {/* Drag & Drop Zone */}
+      <div 
+        className={`mb-6 p-6 border-2 border-dashed rounded-xl transition-all duration-300 cursor-pointer ${
+          isDragOver 
+            ? 'border-orange-400 bg-orange-400/10' 
+            : 'border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10'
+        }`}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onClick={triggerFileInput}
+      >
+        <div className="text-center">
+          {isProcessing ? (
+            <div className="text-orange-400">
+              <div className="animate-spin w-8 h-8 border-2 border-orange-400 border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p>Processing file...</p>
+            </div>
+          ) : (
+            <>
+              <div className="text-4xl mb-4">📄</div>
+              <p className="text-white font-medium mb-2">
+                Drag & drop your brief file here
+              </p>
+              <p className="text-gray-400 text-sm">
+                Supports .txt, .pdf, .doc, .docx files or click to browse
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".txt,.pdf,.doc,.docx"
+        onChange={handleFileInputChange}
+        className="hidden"
+      />
 
       <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6 space-y-6">
         <div>
