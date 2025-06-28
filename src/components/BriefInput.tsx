@@ -10,7 +10,8 @@ interface BriefInputProps {
   error: string;
   isGenerating: boolean;
   onGenerate: () => void;
-  onMomentSelect: (moment: { name: string; date: string }) => void;
+  onMomentSelect: (moment: { name: string; date: string; brief: string }) => void;
+  hideGenerateButton?: boolean;
 }
 
 export const BriefInput: React.FC<BriefInputProps> = ({
@@ -21,6 +22,7 @@ export const BriefInput: React.FC<BriefInputProps> = ({
   isGenerating,
   onGenerate,
   onMomentSelect,
+  hideGenerateButton = false,
 }) => {
   const [inputMode, setInputMode] = useState<'text' | 'builder'>('text');
   return (
@@ -124,23 +126,25 @@ export const BriefInput: React.FC<BriefInputProps> = ({
         </div>
       )}
 
-      <button
-        onClick={onGenerate}
-        disabled={!brief || isGenerating}
-        className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 disabled:from-gray-600 disabled:to-gray-700 text-white px-10 py-5 rounded-2xl font-subheading text-lg transition-all duration-300 shadow-lg shadow-orange-500/25 hover:shadow-orange-400/30 hover:scale-105 disabled:hover:scale-100 w-full"
-      >
-        {isGenerating ? (
-          <div className="flex items-center justify-center gap-2">
-            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-            <span>GENERATING...</span>
-          </div>
-        ) : (
-          <div className="flex items-center justify-center gap-2">
-            <span>🚀 GENERATE TERRITORIES</span>
-            <div className="ml-2 bg-white/20 rounded-full px-2 py-1 text-xs">Ctrl+Enter</div>
-          </div>
-        )}
-      </button>
+      {!hideGenerateButton && (
+        <button
+          onClick={onGenerate}
+          disabled={!brief || isGenerating}
+          className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 disabled:from-gray-600 disabled:to-gray-700 text-white px-10 py-5 rounded-2xl font-subheading text-lg transition-all duration-300 shadow-lg shadow-orange-500/25 hover:shadow-orange-400/30 hover:scale-105 disabled:hover:scale-100 w-full"
+        >
+          {isGenerating ? (
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <span>GENERATING...</span>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-2">
+              <span>🚀 GENERATE TERRITORIES</span>
+              <div className="ml-2 bg-white/20 rounded-full px-2 py-1 text-xs">Ctrl+Enter</div>
+            </div>
+          )}
+        </button>
+      )}
 
       {/* Keyboard Shortcut Listener */}
       <div

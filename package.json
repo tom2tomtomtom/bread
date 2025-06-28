@@ -9,13 +9,15 @@
     "@tailwindcss/forms": "^0.5.7",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/react-router-dom": "^5.3.3",
     "bcryptjs": "^3.0.2",
     "html2canvas": "^1.4.1",
-    "jspdf": "^2.5.1",
     "jsonwebtoken": "^9.0.2",
+    "jspdf": "^2.5.1",
     "openai": "^4.104.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-router-dom": "^7.6.3",
     "react-scripts": "5.0.1",
     "zustand": "^5.0.5"
   },
@@ -26,7 +28,6 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
-
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^4.6.0",
@@ -52,7 +53,7 @@
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest --watch",
+    "test:watch": "vitest",
     "test:legacy": "react-scripts test",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
@@ -69,8 +70,6 @@
     "prepare": "husky install",
     "generate-secrets": "node scripts/generate-secrets.js",
     "security-audit": "node scripts/generate-secrets.js && echo 'Security audit completed'",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
     "test:integration": "vitest run src/tests/integration",
     "test:security": "vitest run src/tests/security",
     "test:performance": "artillery run tests/performance/load-test.yml",
@@ -128,9 +127,18 @@
       "prefer-template": "error",
       "no-duplicate-imports": "error",
       "no-unused-expressions": "error",
-      "complexity": ["error", 10],
-      "max-lines-per-function": ["error", 50],
-      "max-params": ["error", 5]
+      "complexity": [
+        "error",
+        10
+      ],
+      "max-lines-per-function": [
+        "error",
+        50
+      ],
+      "max-params": [
+        "error",
+        5
+      ]
     },
     "overrides": [
       {

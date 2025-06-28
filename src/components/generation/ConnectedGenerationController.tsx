@@ -35,13 +35,14 @@ export const ConnectedGenerationController: React.FC = () => {
     enhancedBriefAnalysis,
     isAnalyzingBrief,
     showEnhancedAnalysis,
+    generate,
     setShowBriefAnalysis,
     analyzeEnhancedBrief,
     setShowEnhancedAnalysis,
   } = useGenerationStore();
   
   // Create wrapper functions for the component interface
-  const onGenerate = () => {};
+  const onGenerate = generate;
   const onNewBrief = () => setBrief('');
   const onRegenerateUnstarred = () => {};
   const onBriefAnalysisToggle = () => setShowBriefAnalysis(!showBriefAnalysis);

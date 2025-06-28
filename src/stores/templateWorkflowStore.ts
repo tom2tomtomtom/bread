@@ -1,0 +1,230 @@
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+export type WorkflowStep = 
+  | 'template-selection'
+  | 'brief-input'
+  | 'motivation-generation'
+  | 'copy-generation'
+  | 'asset-selection'
+  | 'template-population'
+  | 'export';
+
+export interface WorkflowProgress {
+  currentStep: WorkflowStep;
+  completedSteps: WorkflowStep[];
+  canProceed: boolean;
+}
+
+export interface SelectedTemplate {
+  id: string;
+  name: string;
+  type: string;
+  format: string;
+  requirements: {
+    headlineMaxLength?: number;
+    bodyTextMaxLength?: number;
+    requiredAssets: string[];
+    optionalAssets: string[];
+  };
+}
+
+interface TemplateWorkflowState {
+  // Workflow progress
+  currentStep: WorkflowStep;
+  completedSteps: WorkflowStep[];
+  
+  // Template selection
+  selectedTemplate: SelectedTemplate | null;
+  
+  // Brief data
+  brief: string;
+  targetAudience: string;
+  campaignGoal: string;
+  
+  // Workflow validation
+  errors: { [key in WorkflowStep]?: string };
+  
+  // Actions
+  setCurrentStep: (step: WorkflowStep) => void;
+  markStepCompleted: (step: WorkflowStep) => void;
+  selectTemplate: (template: SelectedTemplate) => void;
+  setBrief: (brief: string, targetAudience: string, campaignGoal: string) => void;
+  validateStep: (step: WorkflowStep) => boolean;
+  canProceedToStep: (step: WorkflowStep) => boolean;
+  resetWorkflow: () => void;
+  setError: (step: WorkflowStep, error: string) => void;
+  clearError: (step: WorkflowStep) => void;
+  
+  // Navigation helpers
+  nextStep: () => void;
+  previousStep: () => void;
+  goToStep: (step: WorkflowStep) => void;
+}
+
+const WORKFLOW_STEPS: WorkflowStep[] = [
+  'template-selection',
+  'brief-input',
+  'motivation-generation',
+  'copy-generation',
+  'asset-selection',
+  'template-population',
+  'export'
+];
+
+export const useTemplateWorkflowStore = create<TemplateWorkflowState>()(
+  persist(
+    (set, get) => ({
+      // Initial state
+      currentStep: 'template-selection',
+      completedSteps: [],
+      selectedTemplate: null,
+      brief: '',
+      targetAudience: '',
+      campaignGoal: '',
+      errors: {},
+
+      // Set current step
+      setCurrentStep: (step: WorkflowStep) => {
+        set({ currentStep: step });
+      },
+
+      // Mark step as completed
+      markStepCompleted: (step: WorkflowStep) => {
+        const { completedSteps } = get();
+        if (!completedSteps.includes(step)) {
+          set({ completedSteps: [...completedSteps, step] });
+        }
+      },
+
+      // Select template
+      selectTemplate: (template: SelectedTemplate) => {
+        set({ selectedTemplate: template });
+        get().markStepCompleted('template-selection');
+      },
+
+      // Set brief data
+      setBrief: (brief: string, targetAudience: string, campaignGoal: string) => {
+        set({ brief, targetAudience, campaignGoal });
+        get().markStepCompleted('brief-input');
+      },
+
+      // Validate step completion
+      validateStep: (step: WorkflowStep) => {
+        const state = get();
+        
+        switch (step) {
+          case 'template-selection':
+            return !!state.selectedTemplate;
+          case 'brief-input':
+            return !!(state.brief && state.targetAudience && state.campaignGoal);
+          case 'motivation-generation':
+            // Check if motivations are generated and selected (would integrate with motivationStore)
+            return true; // Placeholder
+          case 'copy-generation':
+            // Check if copy is generated and selected (would integrate with copyStore)
+            return true; // Placeholder
+          case 'asset-selection':
+            // Check if required assets are selected
+            return true; // Placeholder
+          case 'template-population':
+            // Check if template is populated with copy and assets
+            return true; // Placeholder
+          case 'export':
+            return true; // Always allow export as final step
+          default:
+            return false;
+        }
+      },
+
+      // Check if can proceed to specific step
+      canProceedToStep: (targetStep: WorkflowStep) => {
+        const state = get();
+        const targetIndex = WORKFLOW_STEPS.indexOf(targetStep);
+        
+        // Can't proceed to invalid step
+        if (targetIndex === -1) return false;
+        
+        // Always allow going to first step
+        if (targetIndex === 0) return true;
+        
+        // Check if all previous steps are completed
+        for (let i = 0; i < targetIndex; i++) {
+          const previousStep = WORKFLOW_STEPS[i];
+          if (!state.completedSteps.includes(previousStep) && !state.validateStep(previousStep)) {
+            return false;
+          }
+        }
+        
+        return true;
+      },
+
+      // Reset workflow
+      resetWorkflow: () => {
+        set({
+          currentStep: 'template-selection',
+          completedSteps: [],
+          selectedTemplate: null,
+          brief: '',
+          targetAudience: '',
+          campaignGoal: '',
+          errors: {},
+        });
+      },
+
+      // Set error for step
+      setError: (step: WorkflowStep, error: string) => {
+        const { errors } = get();
+        set({ errors: { ...errors, [step]: error } });
+      },
+
+      // Clear error for step
+      clearError: (step: WorkflowStep) => {
+        const { errors } = get();
+        const newErrors = { ...errors };
+        delete newErrors[step];
+        set({ errors: newErrors });
+      },
+
+      // Navigation helpers
+      nextStep: () => {
+        const { currentStep } = get();
+        const currentIndex = WORKFLOW_STEPS.indexOf(currentStep);
+        
+        if (currentIndex < WORKFLOW_STEPS.length - 1) {
+          const nextStep = WORKFLOW_STEPS[currentIndex + 1];
+          if (get().canProceedToStep(nextStep)) {
+            set({ currentStep: nextStep });
+          }
+        }
+      },
+
+      previousStep: () => {
+        const { currentStep } = get();
+        const currentIndex = WORKFLOW_STEPS.indexOf(currentStep);
+        
+        if (currentIndex > 0) {
+          const previousStep = WORKFLOW_STEPS[currentIndex - 1];
+          set({ currentStep: previousStep });
+        }
+      },
+
+      goToStep: (step: WorkflowStep) => {
+        if (get().canProceedToStep(step)) {
+          set({ currentStep: step });
+        }
+      },
+    }),
+    {
+      name: 'template-workflow-storage',
+      partialize: (state) => ({
+        currentStep: state.currentStep,
+        completedSteps: state.completedSteps,
+        selectedTemplate: state.selectedTemplate,
+        brief: state.brief,
+        targetAudience: state.targetAudience,
+        campaignGoal: state.campaignGoal,
+      }),
+    }
+  )
+);

@@ -55,7 +55,7 @@ interface GenerationControllerProps {
 
   // Event handlers
   onGenerate: () => void;
-  onMomentSelect: (moment: { name: string; date: string }) => void;
+  onMomentSelect: (moment: { name: string; date: string; brief: string }) => void;
   onNewBrief: () => void;
   onRegenerateUnstarred: () => void;
   onToggleTerritoryStarred: (territoryId: string) => void;

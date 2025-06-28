@@ -24,3 +24,9 @@
 
 [build.processing.html]
   pretty_urls = true
+
+# Client-side routing redirects for React Router
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

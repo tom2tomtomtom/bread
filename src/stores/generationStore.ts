@@ -50,6 +50,9 @@ interface GenerationState {
   setGeneratedOutput: (output: EnhancedGeneratedOutput | null) => void;
   setError: (error: string) => void;
   
+  // Core generation function
+  generate: () => Promise<void>;
+  
   // Basic brief analysis actions
   setShowBriefAnalysis: (show: boolean) => void;
   setBriefAnalysis: (analysis: BriefAnalysis | null) => void;
@@ -92,6 +95,58 @@ export const useGenerationStore = create<GenerationState>()(
       setGeneratedOutput: (generatedOutput: EnhancedGeneratedOutput | null) => 
         set({ generatedOutput }),
       setError: (error: string) => set({ error }),
+
+      // Core generation function
+      generate: async () => {
+        const { brief } = get();
+        if (!brief.trim()) {
+          set({ error: 'Please enter a brief before generating' });
+          return;
+        }
+
+        set({ isGenerating: true, error: '', showOutput: false });
+
+        try {
+          // Import the API service
+          const { generateWithOpenAI } = await import('../services/secureApiService');
+          
+          // Generate territories using the secure API
+          const result = await generateWithOpenAI(brief);
+          
+          // Convert GeneratedOutput to EnhancedGeneratedOutput
+          const enhancedResult: EnhancedGeneratedOutput = {
+            ...result,
+            overallConfidence: 85, // Default confidence score
+            territories: result.territories.map(territory => ({
+              ...territory,
+              confidence: {
+                marketFit: 80,
+                complianceConfidence: 85,
+                audienceResonance: 82,
+                riskLevel: 'LOW' as const,
+              },
+            })),
+            metadata: {
+              generatedAt: new Date(),
+              model: 'OpenAI GPT-4',
+              processingTime: 0,
+            },
+          };
+          
+          set({ 
+            generatedOutput: enhancedResult,
+            showOutput: true,
+            isGenerating: false 
+          });
+          
+        } catch (error) {
+          console.error('Generation failed:', error);
+          set({ 
+            error: error instanceof Error ? error.message : 'Generation failed. Please try again.',
+            isGenerating: false 
+          });
+        }
+      },
 
       // Basic brief analysis actions
       setShowBriefAnalysis: (showBriefAnalysis: boolean) => set({ showBriefAnalysis }),
