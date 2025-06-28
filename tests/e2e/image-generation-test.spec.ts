@@ -63,7 +63,7 @@ test.describe('Image Generation Functionality', () => {
     // Test API endpoint accessibility
     const apiResponse = await page.evaluate(async () => {
       try {
-        const response = await fetch('/.netlify/functions/generate-images', {
+        const response = await fetch('/.netlify/functions/generate-images-simple', {
           method: 'OPTIONS',
         });
         return {

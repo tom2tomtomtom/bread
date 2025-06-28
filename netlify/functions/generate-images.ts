@@ -346,6 +346,20 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
   let requestBody: ImageRequest | undefined;
 
   try {
+    // Handle CORS preflight requests
+    if (event.httpMethod === 'OPTIONS') {
+      return {
+        statusCode: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Request-ID',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Max-Age': '86400',
+        },
+        body: '',
+      };
+    }
+
     // Validate HTTP method
     const methodValidation = validateMethod(event.httpMethod, ['POST']);
     if (methodValidation) return methodValidation;

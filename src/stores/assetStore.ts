@@ -13,7 +13,6 @@ import {
   SortOrder,
   LayoutVariation,
   LayoutTemplate,
-  ChannelFormat,
   ExportConfiguration,
   VisualIntelligence,
   BrandGuidelines,
@@ -28,12 +27,8 @@ import {
   QualityAssessment,
   BatchGenerationRequest,
   BatchGenerationResult,
-  AIProvider,
   ImageType,
   CulturalContext,
-  AnimationType,
-  VideoFormat,
-  PlatformOptimization,
 } from '../types';
 import { APP_CONFIG } from '../config/app';
 import { assetService } from '../services/assetService';
@@ -144,6 +139,7 @@ interface AssetState {
   retryGeneration: (queueId: string) => Promise<void>;
   clearGenerationQueue: () => void;
   clearGenerationError: () => void;
+  startGenerationPolling: () => void;
 
   // Utility actions
   getAssetById: (id: string) => UploadedAsset | undefined;
@@ -812,24 +808,60 @@ export const useAssetStore = create<AssetState>()(
         set({ isGeneratingImage: true, generationError: null, generationProgress: 0 });
 
         try {
-          console.log('🎨 Starting image generation...', request);
+          // Starting image generation
 
-          // Queue the generation request
-          const queueId = await multimediaGenerationService.queueGeneration(request, 'normal');
+          // Use the simple API directly
+          const { generateSimpleImage_API } = await import('../services/secureApiService');
+          
+          const response = await generateSimpleImage_API({
+            prompt: request.prompt,
+            territory: request.territory,
+            imageType: request.imageType,
+            quality: request.quality === 'ultra' ? 'hd' : request.quality
+          });
 
-          const queueItem = multimediaGenerationService.getQueueStatus(queueId);
-          if (queueItem) {
+          if (response.success && response.data && response.data.length > 0) {
+            const imageResult = response.data[0];
+            
+            // Create asset directly and add to store
+            const generatedAsset = {
+              id: `asset_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+              filename: `generated-image-${Date.now()}.png`,
+              type: 'image' as const,
+              format: 'png',
+              url: imageResult.imageUrl,
+              thumbnailUrl: imageResult.imageUrl,
+              uploadedAt: new Date(),
+              metadata: {
+                size: 1024000, // Estimated size
+                width: 1024,
+                height: 1024,
+                aiGenerated: true,
+                prompt: imageResult.prompt,
+              },
+              tags: ['ai-generated', 'dalle-3'],
+              collections: [],
+              isPublic: false,
+              isFavorite: false,
+              description: `AI generated image: ${request.prompt}`,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
+
+            // Add asset to the store immediately
             set(state => ({
-              generationQueue: [...state.generationQueue, queueItem],
-              currentGeneration: queueItem,
+              assets: [generatedAsset, ...state.assets], // Add to beginning for visibility
+              isGeneratingImage: false,
+              generationProgress: 100,
             }));
+
+            // Image successfully added to library
+            return `asset_${generatedAsset.id}`;
+          } else {
+            throw new Error('No image data received from API');
           }
 
-          console.log(`✅ Image generation queued: ${queueId}`);
-          return queueId;
-
         } catch (error) {
-          console.error('Image generation failed:', error);
           set({
             isGeneratingImage: false,
             generationError: error instanceof Error ? error.message : 'Image generation failed',
@@ -899,10 +931,8 @@ export const useAssetStore = create<AssetState>()(
         }
       },
 
-      assessQuality: async (assetId: string, territory: Territory, brandGuidelines: BrandGuidelines) => {
+      assessQuality: async (assetId: string, _territory: Territory, _brandGuidelines: BrandGuidelines) => {
         try {
-          console.log('🔍 Assessing asset quality...', assetId);
-
           // Mock quality assessment (in production, this would use AI analysis)
           const assessment: QualityAssessment = {
             score: 85,
@@ -922,11 +952,9 @@ export const useAssetStore = create<AssetState>()(
             qualityAssessments: [...state.qualityAssessments, assessment],
           }));
 
-          console.log('✅ Quality assessment completed');
           return assessment;
 
         } catch (error) {
-          console.error('Quality assessment failed:', error);
           throw error;
         }
       },
@@ -1013,6 +1041,11 @@ export const useAssetStore = create<AssetState>()(
 
       clearGenerationError: () => {
         set({ generationError: null });
+      },
+
+      // Simplified polling for legacy compatibility (not used with direct API integration)
+      startGenerationPolling: () => {
+        // Polling not needed - using direct API integration
       },
     }),
     {
