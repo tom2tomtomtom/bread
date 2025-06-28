@@ -813,39 +813,60 @@ export const useAssetStore = create<AssetState>()(
           // Use the simple API directly
           const { generateSimpleImage_API } = await import('../services/secureApiService');
           
-          const response = await generateSimpleImage_API({
-            prompt: request.prompt,
+          const response = await generateSimpleImage_API(request.prompt, {
             territory: request.territory,
             imageType: request.imageType,
             quality: request.quality === 'ultra' ? 'hd' : request.quality
           });
 
-          if (response.success && response.data && response.data.length > 0) {
-            const imageResult = response.data[0];
+          if (response && response.length > 0) {
+            const imageResult = response[0];
+            
+            // Map ImageType to AssetType
+            const assetTypeMap: Record<string, AssetType> = {
+              'product': 'product',
+              'lifestyle': 'lifestyle', 
+              'background': 'background',
+              'hero': 'background',
+              'icon': 'icon',
+              'pattern': 'texture'
+            };
             
             // Create asset directly and add to store
-            const generatedAsset = {
+            const generatedAsset: UploadedAsset = {
               id: `asset_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
               filename: `generated-image-${Date.now()}.png`,
-              type: 'image' as const,
-              format: 'png',
+              type: assetTypeMap[request.imageType || 'background'] || 'background',
+              format: 'image',
+              status: 'ready',
               url: imageResult.imageUrl,
               thumbnailUrl: imageResult.imageUrl,
               uploadedAt: new Date(),
+              updatedAt: new Date(),
               metadata: {
+                filename: `generated-image-${Date.now()}.png`,
+                originalName: `generated-image-${Date.now()}.png`,
                 size: 1024000, // Estimated size
-                width: 1024,
-                height: 1024,
-                aiGenerated: true,
-                prompt: imageResult.prompt,
+                mimeType: 'image/png',
+                dimensions: {
+                  width: 1024,
+                  height: 1024,
+                },
+                fileHash: `hash_${Date.now()}`,
+              },
+              usageRights: {
+                license: 'proprietary',
+                usage_rights: ['commercial_use', 'modification_allowed'],
+                attribution_required: false,
+                commercial_use: true,
+                modification_allowed: true,
               },
               tags: ['ai-generated', 'dalle-3'],
               collections: [],
               isPublic: false,
               isFavorite: false,
+              usageCount: 0,
               description: `AI generated image: ${request.prompt}`,
-              createdAt: new Date(),
-              updatedAt: new Date(),
             };
 
             // Add asset to the store immediately
