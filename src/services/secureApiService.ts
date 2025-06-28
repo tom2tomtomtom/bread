@@ -348,6 +348,54 @@ export const mergeWithStarredContent = (
 // ===== MULTIMEDIA GENERATION API FUNCTIONS =====
 
 // Enhanced image generation via secure server-side function
+// Simple image generation API for asset management workflow
+export const generateSimpleImage_API = async (
+  prompt: string,
+  options: {
+    imageType?: string;
+    quality?: string;
+    territory?: any;
+  } = {}
+): Promise<any[]> => {
+  console.log('🎨 Starting simple image generation...');
+
+  const makeRequest = async (): Promise<Response> => {
+    const apiUrl = `${getApiBaseUrl()}/generate-images-simple`;
+    return fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        prompt,
+        territory: options.territory,
+        imageType: options.imageType,
+        quality: options.quality,
+      }),
+    });
+  };
+
+  try {
+    const response = await makeRequest();
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const result: ApiResponse = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || 'Unknown error from simple image API');
+    }
+
+    console.log('✅ Simple image generation completed');
+    return (result.data as any[]) || [];
+  } catch (error: any) {
+    console.error('❌ Simple image generation error:', error);
+    throw error;
+  }
+};
+
 export const generateEnhancedImages_API = async (
   territories: any[],
   brief: string,

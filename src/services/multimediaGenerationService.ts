@@ -29,6 +29,7 @@ import {
 import {
   generateWithOpenAI,
   generateEnhancedImages_API,
+  generateSimpleImage_API,
   generateVideo_API,
   batchGenerateMultimedia_API
 } from './secureApiService';
@@ -895,23 +896,13 @@ class MultimediaGenerationService {
     }, 1000);
 
     try {
-      // Call actual API
-      const apiResults = await generateEnhancedImages_API(
-        [{
-          id: request.territory.id,
-          title: request.territory.title,
-          tone: request.territory.tone,
-          positioning: request.territory.positioning,
-          headlines: [{ text: request.prompt, followUp: '' }]
-        }],
+      // Call simple API for better reliability
+      const apiResults = await generateSimpleImage_API(
         request.prompt,
         {
           imageType: request.imageType,
-          culturalContext: request.culturalContext,
-          styleConsistency: request.styleConsistency,
           quality: request.quality,
-          provider: request.provider,
-          brandGuidelines: request.brandGuidelines,
+          territory: request.territory,
         }
       );
 
