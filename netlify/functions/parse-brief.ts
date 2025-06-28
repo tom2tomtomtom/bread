@@ -129,6 +129,10 @@ Return ONLY a valid JSON object with this exact structure:
 
 Do not include any explanatory text, just the JSON object.`;
 
+      // Create AbortController for timeout handling
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
+      
       const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -136,7 +140,7 @@ Do not include any explanatory text, just the JSON object.`;
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4',
+          model: 'gpt-3.5-turbo', // Use faster model for parsing
           messages: [
             {
               role: 'system',
@@ -147,10 +151,13 @@ Do not include any explanatory text, just the JSON object.`;
               content: prompt
             }
           ],
-          max_tokens: 1000,
-          temperature: 0.3, // Lower temperature for more consistent parsing
+          max_tokens: 800, // Reduced for faster processing
+          temperature: 0.2, // Lower temperature for more consistent parsing
         }),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
 
       if (!openaiResponse.ok) {
         throw new Error(`OpenAI API error: ${openaiResponse.status}`);
@@ -201,18 +208,21 @@ Do not include any explanatory text, just the JSON object.`;
     } catch (apiError) {
       console.error('OpenAI API error:', apiError);
       
-      // Fallback to basic parsing on API error
+      // Enhanced fallback parsing with better extraction
+      const text = request.briefText;
+      const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+      
       const fallbackParsed: ParsedBrief = {
-        goal: extractBasicField(request.briefText, ['goal', 'objective', 'purpose', 'aim']) || 'Goal extraction failed - please fill manually',
-        targetAudience: extractBasicField(request.briefText, ['audience', 'target', 'demographic', 'customer']) || 'Audience extraction failed - please fill manually',
-        keyBenefits: extractListItems(request.briefText, ['benefit', 'advantage', 'feature']) || [],
-        brandPersonality: extractBasicField(request.briefText, ['personality', 'tone', 'voice', 'brand']) || '',
-        productDetails: extractBasicField(request.briefText, ['product', 'service', 'offering']) || '',
-        campaignRequirements: extractBasicField(request.briefText, ['requirement', 'specification', 'constraint']) || '',
-        toneMood: extractBasicField(request.briefText, ['tone', 'mood', 'feeling', 'emotion']) || '',
-        callToAction: extractBasicField(request.briefText, ['cta', 'call to action', 'action', 'button']) || '',
-        competitiveContext: extractBasicField(request.briefText, ['competitor', 'competition', 'market']) || '',
-        constraints: extractBasicField(request.briefText, ['constraint', 'limitation', 'restriction']) || ''
+        goal: extractAdvancedField(text, ['objective', 'goal', 'purpose', 'aim', 'launch']) || 'Please specify campaign goal',
+        targetAudience: extractAdvancedField(text, ['audience', 'target', 'demographic', 'customer', 'user']) || 'Please specify target audience',
+        keyBenefits: extractAdvancedBenefits(text) || [],
+        brandPersonality: extractAdvancedField(text, ['personality', 'brand', 'voice', 'tone', 'positioning']) || '',
+        productDetails: extractAdvancedField(text, ['product', 'service', 'tool', 'platform', 'solution']) || '',
+        campaignRequirements: extractAdvancedField(text, ['requirement', 'deliverable', 'channel', 'format']) || '',
+        toneMood: extractAdvancedField(text, ['tone', 'mood', 'feeling', 'style', 'emotion']) || '',
+        callToAction: extractAdvancedField(text, ['cta', 'action', 'button', 'call to action']) || '',
+        competitiveContext: extractAdvancedField(text, ['competitor', 'competition', 'market', 'landscape']) || '',
+        constraints: extractAdvancedField(text, ['constraint', 'limitation', 'budget', 'timeline', 'restriction']) || ''
       };
 
       return {
@@ -224,8 +234,8 @@ Do not include any explanatory text, just the JSON object.`;
           metadata: {
             generated_at: new Date().toISOString(),
             request_id: Math.random().toString(36).substring(7),
-            source: 'fallback_parsing',
-            api_error: 'OpenAI call failed',
+            source: 'enhanced_fallback_parsing',
+            api_error: apiError.name === 'AbortError' ? 'Request timeout' : 'OpenAI call failed',
             fileName: request.fileName
           },
         }),
@@ -246,24 +256,51 @@ Do not include any explanatory text, just the JSON object.`;
   }
 };
 
-// Helper functions for basic parsing
-function extractBasicField(text: string, keywords: string[]): string | null {
+// Enhanced helper functions for better parsing
+function extractAdvancedField(text: string, keywords: string[]): string | null {
   const lines = text.split('\n').map(line => line.trim());
   
+  // First pass: Look for explicit labels
   for (const line of lines) {
     const lowerLine = line.toLowerCase();
     for (const keyword of keywords) {
-      if (lowerLine.includes(keyword.toLowerCase())) {
-        // Look for content after a colon
-        if (line.includes(':')) {
-          const parts = line.split(':');
-          if (parts.length > 1) {
-            return parts.slice(1).join(':').trim();
+      if (lowerLine.includes(keyword.toLowerCase() + ':')) {
+        const parts = line.split(':');
+        if (parts.length > 1) {
+          const content = parts.slice(1).join(':').trim();
+          if (content && content.length > 3) {
+            return content;
           }
         }
-        // If no colon, return the whole line if it's substantial
-        if (line.length > keyword.length + 10) {
-          return line.replace(new RegExp(keyword, 'gi'), '').trim();
+      }
+    }
+  }
+  
+  // Second pass: Look for headings followed by content
+  for (let i = 0; i < lines.length - 1; i++) {
+    const line = lines[i].toLowerCase();
+    const nextLine = lines[i + 1];
+    
+    for (const keyword of keywords) {
+      if (line.includes(keyword.toLowerCase()) && line.length < 50) {
+        if (nextLine && nextLine.length > 10 && !nextLine.includes(':')) {
+          return nextLine;
+        }
+      }
+    }
+  }
+  
+  // Third pass: Look for keywords in context
+  for (const line of lines) {
+    const lowerLine = line.toLowerCase();
+    for (const keyword of keywords) {
+      if (lowerLine.includes(keyword.toLowerCase()) && line.length > 20) {
+        // Extract sentence containing the keyword
+        const sentences = line.split(/[.!?]+/);
+        for (const sentence of sentences) {
+          if (sentence.toLowerCase().includes(keyword.toLowerCase()) && sentence.trim().length > 15) {
+            return sentence.trim();
+          }
         }
       }
     }
@@ -272,46 +309,73 @@ function extractBasicField(text: string, keywords: string[]): string | null {
   return null;
 }
 
-function extractListItems(text: string, keywords: string[]): string[] {
+function extractAdvancedBenefits(text: string): string[] {
   const lines = text.split('\n').map(line => line.trim());
   const items: string[] = [];
+  const benefitKeywords = ['benefit', 'advantage', 'feature', 'value', 'strength'];
   
   let inListMode = false;
+  let listStartIndex = -1;
   
-  for (const line of lines) {
+  // Look for sections with benefits
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     const lowerLine = line.toLowerCase();
     
-    // Check if this line mentions one of our keywords
-    const hasKeyword = keywords.some(keyword => lowerLine.includes(keyword.toLowerCase()));
+    // Check if this line mentions benefits
+    const hasBenefitKeyword = benefitKeywords.some(keyword => 
+      lowerLine.includes(keyword) && lowerLine.includes(':')
+    );
     
-    if (hasKeyword) {
+    if (hasBenefitKeyword) {
       inListMode = true;
+      listStartIndex = i;
+      
       // Extract content after colon if present
       if (line.includes(':')) {
         const parts = line.split(':');
         if (parts.length > 1) {
           const content = parts.slice(1).join(':').trim();
-          if (content) items.push(content);
+          if (content && content.length > 5) {
+            items.push(content);
+          }
         }
       }
       continue;
     }
     
-    if (inListMode) {
+    if (inListMode && i - listStartIndex < 10) { // Look within 10 lines
       // Look for list indicators
-      if (line.match(/^[-•*]\s+/) || line.match(/^\d+\.\s+/) || line.startsWith('- ')) {
-        const cleaned = line.replace(/^[-•*]\s+/, '').replace(/^\d+\.\s+/, '').trim();
-        if (cleaned) items.push(cleaned);
+      if (line.match(/^[-•*◦]\s+/) || line.match(/^\d+[\.)]\s+/) || line.startsWith('- ')) {
+        const cleaned = line.replace(/^[-•*◦]\s+/, '').replace(/^\d+[\.)]\s+/, '').trim();
+        if (cleaned && cleaned.length > 5) {
+          items.push(cleaned);
+        }
       } else if (line.length === 0) {
         // Empty line might end the list
-        inListMode = false;
-      } else if (line.length > 10 && !line.includes(':')) {
+        if (items.length > 0) inListMode = false;
+      } else if (line.length > 15 && !line.includes(':') && !line.match(/^[A-Z][a-z]+:/)) {
         // Substantial line without colon might be a benefit
         items.push(line);
-      } else {
-        // Non-matching line ends list mode
+      } else if (line.match(/^[A-Z][a-z]+:/) && items.length > 0) {
+        // New section starts, end list mode
         inListMode = false;
       }
+    }
+  }
+  
+  // If no explicit benefits found, look for compelling value statements
+  if (items.length === 0) {
+    const valueKeywords = ['scale', 'unleash', 'transform', 'enhance', 'boost', 'improve', 'increase'];
+    for (const line of lines) {
+      const lowerLine = line.toLowerCase();
+      for (const keyword of valueKeywords) {
+        if (lowerLine.includes(keyword) && line.length > 20 && line.length < 200) {
+          items.push(line);
+          break;
+        }
+      }
+      if (items.length >= 3) break;
     }
   }
   
