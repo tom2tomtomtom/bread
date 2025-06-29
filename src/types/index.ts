@@ -1,5 +1,8 @@
 // Core application types and interfaces
 
+// Video Templates
+export * from './videoTemplates';
+
 export interface Headline {
   text: string;
   followUp: string;

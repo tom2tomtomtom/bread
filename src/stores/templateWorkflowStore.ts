@@ -4,8 +4,10 @@ import { persist } from 'zustand/middleware';
 export type WorkflowStep =
   | 'template-selection'
   | 'brief-input'
+  | 'territory-generation'
   | 'motivation-generation'
   | 'copy-generation'
+  | 'video-template'
   | 'asset-selection'
   | 'template-population'
   | 'export';
@@ -83,8 +85,10 @@ interface TemplateWorkflowState {
 const WORKFLOW_STEPS: WorkflowStep[] = [
   'template-selection',
   'brief-input',
+  'territory-generation',
   'motivation-generation',
   'copy-generation',
+  'video-template',
   'asset-selection',
   'template-population',
   'export',
@@ -159,12 +163,18 @@ export const useTemplateWorkflowStore = create<TemplateWorkflowState>()(
               );
             }
             return !!(state.brief && state.targetAudience && state.campaignGoal);
+          case 'territory-generation':
+            // Check if territories are generated (would integrate with generationStore)
+            return true; // Placeholder - will be replaced with actual territory validation
           case 'motivation-generation':
             // Check if motivations are generated and selected (would integrate with motivationStore)
             return true; // Placeholder
           case 'copy-generation':
             // Check if copy is generated and selected (would integrate with copyStore)
             return true; // Placeholder
+          case 'video-template':
+            // Check if video template is selected and configured
+            return true; // Placeholder - will be replaced with actual video template validation
           case 'asset-selection':
             // Check if required assets are selected
             return true; // Placeholder

@@ -23,7 +23,13 @@ import type {
  * This component bridges the new store architecture with the existing
  * GenerationController component, providing all required props from stores.
  */
-export const ConnectedGenerationController: React.FC = () => {
+interface ConnectedGenerationControllerProps {
+  onTerritoryGenerated?: () => void;
+}
+
+export const ConnectedGenerationController: React.FC<ConnectedGenerationControllerProps> = ({
+  onTerritoryGenerated,
+}) => {
   // Local state for image generation modal
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedTerritory, setSelectedTerritory] = useState<EnhancedTerritory | null>(null);
@@ -48,7 +54,12 @@ export const ConnectedGenerationController: React.FC = () => {
   } = useGenerationStore();
 
   // Create wrapper functions for the component interface
-  const onGenerate = generate;
+  const onGenerate = async () => {
+    await generate();
+    if (onTerritoryGenerated) {
+      onTerritoryGenerated();
+    }
+  };
   const onNewBrief = () => setBrief('');
   const onRegenerateUnstarred = () => {};
   const onBriefAnalysisToggle = () => setShowBriefAnalysis(!showBriefAnalysis);
