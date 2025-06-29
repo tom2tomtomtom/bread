@@ -119,10 +119,10 @@ export const useTemplateWorkflowStore = create<TemplateWorkflowState>()(
         }
       },
 
-      // Select template
+      // Select template (legacy - no longer used in workflow)
       selectTemplate: (template: SelectedTemplate) => {
         set({ selectedTemplate: template });
-        get().markStepCompleted('template-selection');
+        // Note: template-selection step no longer exists in workflow
       },
 
       // Set brief data (legacy method)
