@@ -4,6 +4,7 @@ interface TerritoryActionsProps {
   territoryId: string;
   onSelectTerritoryForEvolution?: (territoryId: string | null) => void;
   onPredictTerritoryPerformance?: (territoryId: string) => void;
+  onGenerateImage?: (territoryId: string) => void;
 }
 
 /**
@@ -18,9 +19,22 @@ export const TerritoryActions: React.FC<TerritoryActionsProps> = ({
   territoryId,
   onSelectTerritoryForEvolution,
   onPredictTerritoryPerformance,
+  onGenerateImage,
 }) => {
   return (
     <>
+      {/* Image Generation Button */}
+      {onGenerateImage && (
+        <button
+          onClick={() => onGenerateImage(territoryId)}
+          className="text-sm bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/30 px-2 py-1 rounded-lg text-orange-600 transition-all flex items-center gap-1"
+          title="Generate image for this territory"
+        >
+          <span>🎨</span>
+          Image
+        </button>
+      )}
+
       {/* Evolution Button */}
       {onSelectTerritoryForEvolution && (
         <button

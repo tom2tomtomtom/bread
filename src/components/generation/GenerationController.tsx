@@ -62,6 +62,7 @@ interface GenerationControllerProps {
   onToggleHeadlineStarred: (territoryId: string, headlineIndex: number) => void;
   onBriefAnalysisToggle: () => void;
   onAssetsChange: (assets: UploadedAsset[]) => void;
+  onGenerateImage?: (territoryId: string) => void;
 
   // Enhanced Brief Intelligence handlers
   onAnalyzeEnhancedBrief: () => void;
@@ -104,6 +105,7 @@ export const GenerationController: React.FC<GenerationControllerProps> = ({
   onToggleTerritoryStarred,
   onToggleHeadlineStarred,
   onAssetsChange,
+  onGenerateImage,
   onAnalyzeEnhancedBrief,
   onToggleEnhancedAnalysis,
   onApplyBriefSuggestion,
@@ -195,6 +197,7 @@ export const GenerationController: React.FC<GenerationControllerProps> = ({
             onSelectTerritoryForEvolution={onSelectTerritoryForEvolution}
             onGenerateEvolutionSuggestions={onGenerateEvolutionSuggestions}
             onPredictTerritoryPerformance={onPredictTerritoryPerformance}
+            onGenerateImage={onGenerateImage}
             territoryEvolutions={territoryEvolutions}
             performancePredictions={performancePredictions}
           />

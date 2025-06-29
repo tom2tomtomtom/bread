@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { GenerationController } from './GenerationController';
+import { ImageGenerationModal } from '../territory/ImageGenerationModal';
 import {
   useGenerationStore,
   useConfigStore,
@@ -13,6 +14,7 @@ import type {
   EvolutionSuggestion,
   PerformancePrediction,
   UploadedAsset,
+  EnhancedTerritory,
 } from '../../types';
 
 /**
@@ -22,6 +24,10 @@ import type {
  * GenerationController component, providing all required props from stores.
  */
 export const ConnectedGenerationController: React.FC = () => {
+  // Local state for image generation modal
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedTerritory, setSelectedTerritory] = useState<EnhancedTerritory | null>(null);
+
   // Get state from stores
   const {
     brief,
@@ -49,6 +55,21 @@ export const ConnectedGenerationController: React.FC = () => {
   const onAnalyzeEnhancedBrief = analyzeEnhancedBrief;
   const onToggleEnhancedAnalysis = () => setShowEnhancedAnalysis(!showEnhancedAnalysis);
   const onApplyBriefSuggestion = (suggestion: string) => {};
+
+  // Image generation handler
+  const onGenerateImage = (territoryId: string) => {
+    console.log('🎨 Opening image generation modal for territory:', territoryId);
+
+    // Find the territory
+    const territory = generatedOutput?.territories?.find(t => t.id === territoryId);
+    if (!territory) {
+      console.error('Territory not found:', territoryId);
+      return;
+    }
+
+    setSelectedTerritory(territory);
+    setShowImageModal(true);
+  };
 
   const { apiKeys } = useConfigStore();
 
@@ -86,54 +107,70 @@ export const ConnectedGenerationController: React.FC = () => {
   };
 
   return (
-    <GenerationController
-      // Brief state
-      brief={brief}
-      setBrief={setBrief}
-      // Generation state
-      isGenerating={isGenerating}
-      error={error || ''}
-      showOutput={showOutput}
-      generatedOutput={generatedOutput}
-      // Brief analysis
-      showBriefAnalysis={showBriefAnalysis}
-      briefAnalysis={briefAnalysis}
-      // Enhanced Brief Intelligence
-      enhancedBriefAnalysis={enhancedBriefAnalysis}
-      isAnalyzingBrief={isAnalyzingBrief}
-      showEnhancedAnalysis={showEnhancedAnalysis}
-      // Territory Evolution
-      territoryEvolutions={territoryEvolutions}
-      evolutionSuggestions={evolutionSuggestions}
-      performancePredictions={performancePredictions}
-      isEvolvingTerritory={isEvolvingTerritory}
-      showEvolutionPanel={showEvolutionPanel}
-      selectedTerritoryForEvolution={selectedTerritoryForEvolution}
-      // Starred items
-      starredItems={starredItems}
-      // Selected assets
-      selectedAssets={selectedAssets}
-      // API configuration
-      apiKeys={apiKeys}
-      // Event handlers
-      onGenerate={onGenerate}
-      onMomentSelect={handleMomentSelect}
-      onNewBrief={onNewBrief}
-      onRegenerateUnstarred={onRegenerateUnstarred}
-      onToggleTerritoryStarred={onToggleTerritoryStarred}
-      onToggleHeadlineStarred={onToggleHeadlineStarred}
-      onBriefAnalysisToggle={onBriefAnalysisToggle}
-      onAssetsChange={onAssetsChange}
-      // Enhanced Brief Intelligence handlers
-      onAnalyzeEnhancedBrief={onAnalyzeEnhancedBrief}
-      onToggleEnhancedAnalysis={onToggleEnhancedAnalysis}
-      onApplyBriefSuggestion={onApplyBriefSuggestion}
-      // Territory Evolution handlers
-      onGenerateEvolutionSuggestions={onGenerateEvolutionSuggestions}
-      onEvolveTerritoryWithAI={onEvolveTerritoryWithAI}
-      onPredictTerritoryPerformance={onPredictTerritoryPerformance}
-      onToggleEvolutionPanel={onToggleEvolutionPanel}
-      onSelectTerritoryForEvolution={onSelectTerritoryForEvolution}
-    />
+    <>
+      <GenerationController
+        // Brief state
+        brief={brief}
+        setBrief={setBrief}
+        // Generation state
+        isGenerating={isGenerating}
+        error={error || ''}
+        showOutput={showOutput}
+        generatedOutput={generatedOutput}
+        // Brief analysis
+        showBriefAnalysis={showBriefAnalysis}
+        briefAnalysis={briefAnalysis}
+        // Enhanced Brief Intelligence
+        enhancedBriefAnalysis={enhancedBriefAnalysis}
+        isAnalyzingBrief={isAnalyzingBrief}
+        showEnhancedAnalysis={showEnhancedAnalysis}
+        // Territory Evolution
+        territoryEvolutions={territoryEvolutions}
+        evolutionSuggestions={evolutionSuggestions}
+        performancePredictions={performancePredictions}
+        isEvolvingTerritory={isEvolvingTerritory}
+        showEvolutionPanel={showEvolutionPanel}
+        selectedTerritoryForEvolution={selectedTerritoryForEvolution}
+        // Starred items
+        starredItems={starredItems}
+        // Selected assets
+        selectedAssets={selectedAssets}
+        // API configuration
+        apiKeys={apiKeys}
+        // Event handlers
+        onGenerate={onGenerate}
+        onMomentSelect={handleMomentSelect}
+        onNewBrief={onNewBrief}
+        onRegenerateUnstarred={onRegenerateUnstarred}
+        onToggleTerritoryStarred={onToggleTerritoryStarred}
+        onToggleHeadlineStarred={onToggleHeadlineStarred}
+        onBriefAnalysisToggle={onBriefAnalysisToggle}
+        onAssetsChange={onAssetsChange}
+        onGenerateImage={onGenerateImage}
+        // Enhanced Brief Intelligence handlers
+        onAnalyzeEnhancedBrief={onAnalyzeEnhancedBrief}
+        onToggleEnhancedAnalysis={onToggleEnhancedAnalysis}
+        onApplyBriefSuggestion={onApplyBriefSuggestion}
+        // Territory Evolution handlers
+        onGenerateEvolutionSuggestions={onGenerateEvolutionSuggestions}
+        onEvolveTerritoryWithAI={onEvolveTerritoryWithAI}
+        onPredictTerritoryPerformance={onPredictTerritoryPerformance}
+        onToggleEvolutionPanel={onToggleEvolutionPanel}
+        onSelectTerritoryForEvolution={onSelectTerritoryForEvolution}
+      />
+
+      {/* Image Generation Modal */}
+      {selectedTerritory && (
+        <ImageGenerationModal
+          territory={selectedTerritory}
+          brief={brief}
+          isOpen={showImageModal}
+          onClose={() => {
+            setShowImageModal(false);
+            setSelectedTerritory(null);
+          }}
+        />
+      )}
+    </>
   );
 };

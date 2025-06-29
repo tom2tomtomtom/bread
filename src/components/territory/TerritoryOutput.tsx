@@ -17,6 +17,7 @@ interface TerritoryOutputProps {
   onSelectTerritoryForEvolution?: (territoryId: string | null) => void;
   onGenerateEvolutionSuggestions?: (territoryId: string) => void;
   onPredictTerritoryPerformance?: (territoryId: string) => void;
+  onGenerateImage?: (territoryId: string) => void;
   territoryEvolutions?: { [territoryId: string]: TerritoryEvolution[] };
   performancePredictions?: { [territoryId: string]: PerformancePrediction };
 
@@ -46,6 +47,7 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
   starredItems,
   onSelectTerritoryForEvolution,
   onPredictTerritoryPerformance,
+  onGenerateImage,
   territoryEvolutions,
   performancePredictions,
   onShowToast,
@@ -140,6 +142,7 @@ export const TerritoryOutput: React.FC<TerritoryOutputProps> = ({
             onToggleHeadlineStarred={onToggleHeadlineStarred}
             onSelectTerritoryForEvolution={onSelectTerritoryForEvolution}
             onPredictTerritoryPerformance={onPredictTerritoryPerformance}
+            onGenerateImage={onGenerateImage}
             territoryEvolutions={territoryEvolutions?.[territory.id]}
             performancePrediction={performancePredictions?.[territory.id]}
           />
