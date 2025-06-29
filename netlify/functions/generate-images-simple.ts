@@ -120,22 +120,22 @@ export const handler: Handler = async (event, context) => {
 
     while (attemptCount < maxAttempts) {
       attemptCount++;
-      const model = attemptCount === 1 ? "dall-e-3" : "dall-e-2";
+      const model = attemptCount === 1 ? "dall-e-2" : "dall-e-3";  // Start with faster DALL-E 2
       
       try {
-        console.log(`⏰ Attempt ${attemptCount}: Starting ${model} API call with 15s timeout...`);
+        console.log(`⏰ Attempt ${attemptCount}: Starting ${model} API call with 20s timeout...`);
         
         const openaiTimeout = new Promise<never>((_, reject) => {
-          setTimeout(() => reject(new Error(`${model} API timeout after 15 seconds`)), 15000);
+          setTimeout(() => reject(new Error(`${model} API timeout after 20 seconds`)), 20000);
         });
 
         const openaiCall = openai.images.generate({
           model: model as "dall-e-3" | "dall-e-2",
           prompt: finalPrompt,
           n: 1,
-          size: model === "dall-e-3" 
-            ? (sizeMap[imageType] || "1024x1792") as "1024x1024" | "1792x1024" | "1024x1792"
-            : "1024x1024", // DALL-E 2 only supports 1024x1024
+          size: model === "dall-e-2" 
+            ? "1024x1024" // DALL-E 2 only supports 1024x1024
+            : (sizeMap[imageType] || "1024x1792") as "1024x1024" | "1792x1024" | "1024x1792",
           ...(model === "dall-e-3" ? {
             quality: quality === 'ultra' ? 'hd' : quality as 'standard' | 'hd',
             style: "natural"

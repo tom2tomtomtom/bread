@@ -29,6 +29,16 @@
 [functions]
   node_bundler = "esbuild"
 
+# Individual function timeout (if on Enterprise plan)
+[functions."generate-images-simple"]
+  timeout = 300
+
+[functions."test-openai-minimal"]  
+  timeout = 300
+
+[functions."test-timeout"]
+  timeout = 300
+
 # Client-side routing redirects for React Router
 [[redirects]]
   from = "/*"
