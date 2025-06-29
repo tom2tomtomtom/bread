@@ -154,6 +154,16 @@ interface AssetState {
   clearGenerationError: () => void;
   startGenerationPolling: () => void;
 
+  // Copy/Text asset management
+  saveCopyAsAsset: (copy: {
+    headline: string;
+    bodyText: string;
+    callToAction: string;
+    subheadline?: string;
+    motivationId?: string;
+    variationId?: string;
+  }) => UploadedAsset;
+
   // Utility actions
   getAssetById: (id: string) => UploadedAsset | undefined;
   getAssetsByType: (type: AssetType) => UploadedAsset[];
@@ -623,6 +633,59 @@ export const useAssetStore = create<AssetState>()(
         set(state => ({
           uploadConfig: { ...state.uploadConfig, ...config },
         }));
+      },
+
+      // Copy/Text Asset Management
+      saveCopyAsAsset: (copy: {
+        headline: string;
+        bodyText: string;
+        callToAction: string;
+        subheadline?: string;
+        motivationId?: string;
+        variationId?: string;
+      }) => {
+        const copyAsset: UploadedAsset = {
+          id: `copy_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          filename: `copy-${copy.headline.substring(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}.txt`,
+          type: 'other', // Using 'other' type for copy content
+          format: 'document',
+          status: 'ready',
+          url: `data:text/plain;charset=utf-8,${encodeURIComponent(
+            `HEADLINE: ${copy.headline}\n\n${copy.subheadline ? `SUBHEADLINE: ${copy.subheadline}\n\n` : ''}BODY: ${copy.bodyText}\n\nCALL TO ACTION: ${copy.callToAction}`
+          )}`,
+          thumbnailUrl: '',
+          uploadedAt: new Date(),
+          updatedAt: new Date(),
+          metadata: {
+            filename: `copy-${copy.headline.substring(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}.txt`,
+            originalName: `copy-${copy.headline.substring(0, 30).replace(/[^a-zA-Z0-9]/g, '-')}.txt`,
+            size: (copy.headline + copy.bodyText + copy.callToAction + (copy.subheadline || ''))
+              .length,
+            mimeType: 'text/plain',
+            fileHash: `copy_hash_${Date.now()}`,
+          },
+          usageRights: {
+            license: 'proprietary',
+            usage_rights: ['commercial_use', 'modification_allowed'],
+            attribution_required: false,
+            commercial_use: true,
+            modification_allowed: true,
+          },
+          tags: ['ai-generated', 'copy', 'text', copy.motivationId || ''].filter(Boolean),
+          collections: [],
+          isPublic: false,
+          isFavorite: false,
+          usageCount: 0,
+          description: `Generated copy: ${copy.headline}`,
+        };
+
+        // Add asset to the store
+        set(state => ({
+          assets: [copyAsset, ...state.assets],
+        }));
+
+        console.log('📝 Copy saved to asset library:', copyAsset.id);
+        return copyAsset;
       },
 
       // Utility Actions

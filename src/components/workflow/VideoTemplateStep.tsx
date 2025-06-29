@@ -89,7 +89,7 @@ export const VideoTemplateStep: React.FC<VideoTemplateStepProps> = ({ onContinue
                   disabled={!selectedTemplate || !videoContent}
                   className="bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-300 hover:to-orange-500 text-black font-semibold px-8 py-3 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Continue to Assets →
+                  Continue to Template Population →
                 </button>
               </div>
             </div>

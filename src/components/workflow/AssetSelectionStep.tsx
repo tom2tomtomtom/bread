@@ -36,7 +36,7 @@ export const AssetSelectionStep: React.FC<AssetSelectionStepProps> = ({ onContin
             onClick={onContinue}
             className="bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-300 hover:to-orange-500 text-black font-semibold px-6 py-3 rounded-lg transition-all"
           >
-            Continue to Template Population →
+            Continue to Video Template →
           </button>
         </div>
       </div>

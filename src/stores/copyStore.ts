@@ -153,6 +153,22 @@ export const useCopyStore = create<CopyState>()(
               request.selectedMotivations.includes(variation.motivationId)
             );
 
+            // Auto-save all generated copy variations to asset library
+            const { saveCopyAsAsset } = await import('./assetStore').then(m =>
+              m.useAssetStore.getState()
+            );
+
+            filteredVariations.forEach(variation => {
+              saveCopyAsAsset({
+                headline: variation.headline,
+                bodyText: variation.bodyText,
+                callToAction: variation.callToAction,
+                subheadline: variation.subheadline,
+                motivationId: variation.motivationId,
+                variationId: variation.id,
+              });
+            });
+
             set({
               generatedCopyVariations: filteredVariations,
               isGenerating: false,
@@ -179,6 +195,22 @@ export const useCopyStore = create<CopyState>()(
           if (!data.success) {
             throw new Error(data.error || 'Failed to generate copy');
           }
+
+          // Auto-save all generated copy variations to asset library
+          const { saveCopyAsAsset } = await import('./assetStore').then(m =>
+            m.useAssetStore.getState()
+          );
+
+          data.copyVariations.forEach((variation: CopyVariation) => {
+            saveCopyAsAsset({
+              headline: variation.headline,
+              bodyText: variation.bodyText,
+              callToAction: variation.callToAction,
+              subheadline: variation.subheadline,
+              motivationId: variation.motivationId,
+              variationId: variation.id,
+            });
+          });
 
           set({
             generatedCopyVariations: data.copyVariations,

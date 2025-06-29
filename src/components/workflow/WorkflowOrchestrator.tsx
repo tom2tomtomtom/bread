@@ -21,25 +21,23 @@ interface WorkflowOrchestratorProps {
 }
 
 const STEP_LABELS: Record<WorkflowStep, string> = {
-  'template-selection': 'Select Template',
   'brief-input': 'Input Brief',
   'territory-generation': 'Generate Territories',
   'motivation-generation': 'Generate Motivations',
   'copy-generation': 'Generate Copy',
-  'video-template': 'Video Template',
   'asset-selection': 'Select Assets',
+  'video-template': 'Video Template',
   'template-population': 'Populate Template',
   export: 'Export & Download',
 };
 
 const STEP_ICONS: Record<WorkflowStep, string> = {
-  'template-selection': '🎯',
   'brief-input': '📝',
   'territory-generation': '🗺️',
   'motivation-generation': '🧠',
   'copy-generation': '✍️',
-  'video-template': '🎬',
   'asset-selection': '🖼️',
+  'video-template': '🎬',
   'template-population': '🎨',
   export: '📤',
 };
@@ -64,8 +62,6 @@ export const WorkflowOrchestrator: React.FC<WorkflowOrchestratorProps> = ({ onCo
 
   const renderCurrentStep = () => {
     switch (currentStep) {
-      case 'template-selection':
-        return <TemplateSelectionStep onContinue={handleContinue} />;
       case 'brief-input':
         return <BriefInputStep onContinue={handleContinue} onBack={handleBack} />;
       case 'territory-generation':
@@ -74,10 +70,10 @@ export const WorkflowOrchestrator: React.FC<WorkflowOrchestratorProps> = ({ onCo
         return <MotivationGenerator onContinue={handleContinue} />;
       case 'copy-generation':
         return <CopyGenerator onContinue={handleContinue} />;
-      case 'video-template':
-        return <VideoTemplateStep onContinue={handleContinue} onBack={handleBack} />;
       case 'asset-selection':
         return <AssetSelectionStep onContinue={handleContinue} onBack={handleBack} />;
+      case 'video-template':
+        return <VideoTemplateStep onContinue={handleContinue} onBack={handleBack} />;
       case 'template-population':
         return <TemplatePopulationStep onContinue={handleContinue} onBack={handleBack} />;
       case 'export':
@@ -117,13 +113,12 @@ const WorkflowProgressBar: React.FC<WorkflowProgressBarProps> = ({
   canProceedToStep,
 }) => {
   const workflowSteps: WorkflowStep[] = [
-    'template-selection',
     'brief-input',
     'territory-generation',
     'motivation-generation',
     'copy-generation',
-    'video-template',
     'asset-selection',
+    'video-template',
     'template-population',
     'export',
   ];

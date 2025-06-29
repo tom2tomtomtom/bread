@@ -2,13 +2,12 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export type WorkflowStep =
-  | 'template-selection'
   | 'brief-input'
   | 'territory-generation'
   | 'motivation-generation'
   | 'copy-generation'
-  | 'video-template'
   | 'asset-selection'
+  | 'video-template'
   | 'template-population'
   | 'export';
 
@@ -83,13 +82,12 @@ interface TemplateWorkflowState {
 }
 
 const WORKFLOW_STEPS: WorkflowStep[] = [
-  'template-selection',
   'brief-input',
   'territory-generation',
   'motivation-generation',
   'copy-generation',
-  'video-template',
   'asset-selection',
+  'video-template',
   'template-population',
   'export',
 ];
@@ -98,7 +96,7 @@ export const useTemplateWorkflowStore = create<TemplateWorkflowState>()(
   persist(
     (set, get) => ({
       // Initial state
-      currentStep: 'template-selection',
+      currentStep: 'brief-input',
       completedSteps: [],
       selectedTemplate: null,
       briefText: '',
@@ -151,8 +149,6 @@ export const useTemplateWorkflowStore = create<TemplateWorkflowState>()(
         const state = get();
 
         switch (step) {
-          case 'template-selection':
-            return !!state.selectedTemplate;
           case 'brief-input':
             // Check if we have parsed brief or legacy fields
             if (state.parsedBrief) {
@@ -213,7 +209,7 @@ export const useTemplateWorkflowStore = create<TemplateWorkflowState>()(
       // Reset workflow
       resetWorkflow: () => {
         set({
-          currentStep: 'template-selection',
+          currentStep: 'brief-input',
           completedSteps: [],
           selectedTemplate: null,
           briefText: '',

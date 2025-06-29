@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { VideoTemplate, VideoContent, VideoFrame } from '../../types/videoTemplates';
-import { EnhancedGeneratedOutput } from '../../types';
+import { EnhancedGeneratedOutput, UploadedAsset } from '../../types';
+import { useAssetStore } from '../../stores/assetStore';
 
 interface VideoFrameEditorProps {
   template: VideoTemplate;
@@ -15,6 +16,7 @@ export const VideoFrameEditor: React.FC<VideoFrameEditorProps> = ({
   onContentUpdate,
   className = '',
 }) => {
+  const { assets } = useAssetStore();
   const [content, setContent] = useState<VideoContent>({
     templateId: template.templateId,
     frame1Content: {},
@@ -28,6 +30,8 @@ export const VideoFrameEditor: React.FC<VideoFrameEditorProps> = ({
   });
 
   const [activeFrame, setActiveFrame] = useState<1 | 2 | 3>(1);
+  const [showAssetLibrary, setShowAssetLibrary] = useState(false);
+  const [assetSelectionType, setAssetSelectionType] = useState<'image' | 'text' | null>(null);
 
   // Auto-populate content from generated territories and copy
   useEffect(() => {
@@ -67,6 +71,37 @@ export const VideoFrameEditor: React.FC<VideoFrameEditorProps> = ({
         [key]: value,
       },
     }));
+  };
+
+  // Get available assets by type
+  const getImageAssets = () => assets.filter(asset => asset.format === 'image');
+  const getCopyAssets = () =>
+    assets.filter(asset => asset.format === 'document' && asset.tags.includes('copy'));
+
+  // Handle asset selection from library
+  const handleAssetSelection = (asset: UploadedAsset, elementKey: string) => {
+    if (asset.format === 'image') {
+      updateFrameContent(activeFrame, elementKey, asset.url);
+    } else if (asset.format === 'document' && asset.tags.includes('copy')) {
+      // Parse copy content from data URL
+      try {
+        const copyContent = decodeURIComponent(asset.url.split(',')[1]);
+        const headlineMatch = copyContent.match(/HEADLINE: (.*?)(?:\n|$)/);
+        const bodyMatch = copyContent.match(/BODY: (.*?)(?:\n|$)/);
+        const ctaMatch = copyContent.match(/CALL TO ACTION: (.*?)(?:\n|$)/);
+
+        if (elementKey.includes('headline') && headlineMatch) {
+          updateFrameContent(activeFrame, elementKey, headlineMatch[1]);
+        } else if (elementKey.includes('body') && bodyMatch) {
+          updateFrameContent(activeFrame, elementKey, bodyMatch[1]);
+        } else if (elementKey.includes('cta') && ctaMatch) {
+          updateFrameContent(activeFrame, elementKey, ctaMatch[1]);
+        }
+      } catch (error) {
+        console.error('Error parsing copy content:', error);
+      }
+    }
+    setShowAssetLibrary(false);
   };
 
   const renderFramePreview = (frame: VideoFrame, frameNumber: 1 | 2 | 3) => {
@@ -218,19 +253,46 @@ export const VideoFrameEditor: React.FC<VideoFrameEditorProps> = ({
               }
 
               if (element.slot === 'image' || element.slot === 'background') {
+                const currentImageUrl = frameContent?.[key];
                 return (
                   <div key={key} className="space-y-2">
                     <label className="block text-sm font-medium text-gray-300 capitalize">
                       {key.replace(/([A-Z])/g, ' $1').trim()}
                       {element.required && <span className="text-red-400 ml-1">*</span>}
                     </label>
-                    <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-white/40 transition-colors cursor-pointer">
-                      <div className="text-4xl mb-2">🖼️</div>
-                      <p className="text-gray-400 text-sm">Click to upload image</p>
-                      <p className="text-gray-500 text-xs mt-1">
-                        Recommended: {element.position.w}x{element.position.h}px
-                      </p>
-                    </div>
+
+                    {currentImageUrl ? (
+                      <div className="relative">
+                        <img
+                          src={currentImageUrl}
+                          alt={key}
+                          className="w-full h-32 object-cover rounded-xl border border-white/20"
+                        />
+                        <button
+                          onClick={() => {
+                            setAssetSelectionType('image');
+                            setShowAssetLibrary(true);
+                          }}
+                          className="absolute inset-0 bg-black/50 text-white rounded-xl opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center"
+                        >
+                          Change Image
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setAssetSelectionType('image');
+                          setShowAssetLibrary(true);
+                        }}
+                        className="w-full border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-white/40 transition-colors cursor-pointer"
+                      >
+                        <div className="text-4xl mb-2">🖼️</div>
+                        <p className="text-gray-400 text-sm">Select from Asset Library</p>
+                        <p className="text-gray-500 text-xs mt-1">
+                          Recommended: {element.position.w}x{element.position.h}px
+                        </p>
+                      </button>
+                    )}
                   </div>
                 );
               }
@@ -256,6 +318,15 @@ export const VideoFrameEditor: React.FC<VideoFrameEditorProps> = ({
                   className="px-3 py-1 bg-blue-500/20 border border-blue-500/30 text-blue-300 rounded-lg text-sm hover:bg-blue-500/30 transition-colors"
                 >
                   Use Territory Content
+                </button>
+                <button
+                  onClick={() => {
+                    setAssetSelectionType('text');
+                    setShowAssetLibrary(true);
+                  }}
+                  className="px-3 py-1 bg-green-500/20 border border-green-500/30 text-green-300 rounded-lg text-sm hover:bg-green-500/30 transition-colors"
+                >
+                  Select Copy from Library
                 </button>
                 <button
                   onClick={() => {
@@ -365,6 +436,73 @@ export const VideoFrameEditor: React.FC<VideoFrameEditorProps> = ({
       <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-8">
         {renderFrameEditor()}
       </div>
+
+      {/* Asset Library Modal */}
+      {showAssetLibrary && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
+            <div className="p-6 border-b border-white/20">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold text-white">
+                  Select {assetSelectionType === 'image' ? 'Image' : 'Copy'} from Asset Library
+                </h3>
+                <button
+                  onClick={() => setShowAssetLibrary(false)}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 overflow-y-auto max-h-[60vh]">
+              {assetSelectionType === 'image' ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {getImageAssets().map(asset => (
+                    <button
+                      key={asset.id}
+                      onClick={() => handleAssetSelection(asset, 'backgroundImage')}
+                      className="group relative aspect-square rounded-lg overflow-hidden border border-white/20 hover:border-orange-500 transition-colors"
+                    >
+                      <img
+                        src={asset.url}
+                        alt={asset.filename}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span className="text-white text-sm font-medium">Select</span>
+                      </div>
+                    </button>
+                  ))}
+                  {getImageAssets().length === 0 && (
+                    <div className="col-span-full text-center py-8 text-gray-400">
+                      No images available in asset library. Generate or upload some images first.
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {getCopyAssets().map(asset => (
+                    <button
+                      key={asset.id}
+                      onClick={() => handleAssetSelection(asset, 'headline')}
+                      className="w-full p-4 bg-white/5 border border-white/20 rounded-lg hover:border-orange-500 transition-colors text-left"
+                    >
+                      <div className="font-medium text-white mb-1">{asset.filename}</div>
+                      <div className="text-sm text-gray-400 truncate">{asset.description}</div>
+                    </button>
+                  ))}
+                  {getCopyAssets().length === 0 && (
+                    <div className="text-center py-8 text-gray-400">
+                      No copy assets available in library. Generate some copy first.
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

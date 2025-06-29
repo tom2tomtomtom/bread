@@ -109,17 +109,16 @@ export const LandingPage: React.FC = () => {
         {/* Features Preview - Show workflow steps */}
         <div className="max-w-6xl mx-auto mb-16">
           <h2 className="text-3xl font-bold text-center text-white mb-12">
-            Complete 9-Step Ad Creation Process
+            Complete 8-Step Ad Creation Process
           </h2>
-          <div className="grid md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4">
             {[
-              { icon: '🎯', label: 'Select Template', desc: 'Choose perfect format' },
               { icon: '📝', label: 'Input Brief', desc: 'Define your campaign' },
               { icon: '🗺️', label: 'Generate Territories', desc: 'Strategic positioning' },
               { icon: '🧠', label: 'Generate Motivations', desc: 'AI psychology insights' },
               { icon: '✍️', label: 'Create Copy', desc: 'AI-powered headlines' },
+              { icon: '🖼️', label: 'Select Assets', desc: 'Review generated content' },
               { icon: '🎬', label: 'Video Template', desc: '3-frame video ads' },
-              { icon: '🖼️', label: 'Select Assets', desc: 'Choose visuals' },
               { icon: '🎨', label: 'Populate Template', desc: 'Combine everything' },
               { icon: '📤', label: 'Export & Download', desc: 'Get final ads' },
             ].map((step, index) => (

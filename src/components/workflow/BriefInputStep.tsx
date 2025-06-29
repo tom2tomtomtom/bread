@@ -113,13 +113,7 @@ export const BriefInputStep: React.FC<BriefInputStepProps> = ({ onContinue, onBa
             </div>
           </div>
 
-          <div className="flex justify-between">
-            <button
-              onClick={onBack}
-              className="bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 text-white px-6 py-3 rounded-xl transition-all duration-300"
-            >
-              ← Back
-            </button>
+          <div className="flex justify-end">
             <button
               onClick={handleContinue}
               disabled={!briefText || !parsedFields.goal || !parsedFields.targetAudience}
