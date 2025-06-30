@@ -5,6 +5,7 @@ interface TerritoryActionsProps {
   onSelectTerritoryForEvolution?: (territoryId: string | null) => void;
   onPredictTerritoryPerformance?: (territoryId: string) => void;
   onGenerateImage?: (territoryId: string) => void;
+  onGenerateVideo?: (territoryId: string) => void;
 }
 
 /**
@@ -20,6 +21,7 @@ export const TerritoryActions: React.FC<TerritoryActionsProps> = ({
   onSelectTerritoryForEvolution,
   onPredictTerritoryPerformance,
   onGenerateImage,
+  onGenerateVideo,
 }) => {
   return (
     <>
@@ -32,6 +34,18 @@ export const TerritoryActions: React.FC<TerritoryActionsProps> = ({
         >
           <span>🎨</span>
           Image
+        </button>
+      )}
+
+      {/* Video Generation Button */}
+      {onGenerateVideo && (
+        <button
+          onClick={() => onGenerateVideo(territoryId)}
+          className="text-sm bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 px-2 py-1 rounded-lg text-purple-600 transition-all flex items-center gap-1"
+          title="Generate video for this territory"
+        >
+          <span>🎬</span>
+          Video
         </button>
       )}
 

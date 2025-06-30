@@ -3,6 +3,7 @@ import { useTemplateWorkflowStore } from '../../stores/templateWorkflowStore';
 import { useGenerationStore } from '../../stores/generationStore';
 import { TerritoryOutput } from '../territory/TerritoryOutput';
 import { ImageGenerationModal } from '../territory/ImageGenerationModal';
+import { VideoGenerationModal } from '../territory/VideoGenerationModal';
 import { Territory, EnhancedTerritory } from '../../types';
 
 interface StreamlinedTerritoryGeneratorProps {
@@ -20,6 +21,9 @@ export const StreamlinedTerritoryGenerator: React.FC<StreamlinedTerritoryGenerat
   const [selectedTerritoryForImage, setSelectedTerritoryForImage] =
     useState<EnhancedTerritory | null>(null);
   const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedTerritoryForVideo, setSelectedTerritoryForVideo] =
+    useState<EnhancedTerritory | null>(null);
+  const [showVideoModal, setShowVideoModal] = useState(false);
 
   // Auto-generate territories when component mounts if we have the required data
   // Note: Using server-side Netlify functions, so no client-side API key needed
@@ -47,9 +51,23 @@ export const StreamlinedTerritoryGenerator: React.FC<StreamlinedTerritoryGenerat
     }
   };
 
+  const handleGenerateVideo = (territoryId: string) => {
+    // Find the territory by ID from the generated output
+    const territory = generatedOutput?.territories?.find(t => t.id === territoryId);
+    if (territory) {
+      setSelectedTerritoryForVideo(territory as EnhancedTerritory);
+      setShowVideoModal(true);
+    }
+  };
+
   const handleCloseImageModal = () => {
     setShowImageModal(false);
     setSelectedTerritoryForImage(null);
+  };
+
+  const handleCloseVideoModal = () => {
+    setShowVideoModal(false);
+    setSelectedTerritoryForVideo(null);
   };
 
   return (
@@ -136,6 +154,7 @@ export const StreamlinedTerritoryGenerator: React.FC<StreamlinedTerritoryGenerat
           onToggleHeadlineStarred={() => {}}
           starredItems={{ territories: [], headlines: {} }}
           onGenerateImage={handleGenerateImage}
+          onGenerateVideo={handleGenerateVideo}
         />
       )}
 
@@ -146,6 +165,16 @@ export const StreamlinedTerritoryGenerator: React.FC<StreamlinedTerritoryGenerat
           brief={briefText}
           isOpen={showImageModal}
           onClose={handleCloseImageModal}
+        />
+      )}
+
+      {/* Video Generation Modal */}
+      {showVideoModal && selectedTerritoryForVideo && (
+        <VideoGenerationModal
+          territory={selectedTerritoryForVideo}
+          brief={briefText}
+          isOpen={showVideoModal}
+          onClose={handleCloseVideoModal}
         />
       )}
     </div>

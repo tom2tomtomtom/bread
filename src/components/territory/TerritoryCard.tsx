@@ -15,6 +15,7 @@ interface TerritoryCardProps {
   onSelectTerritoryForEvolution?: (territoryId: string | null) => void;
   onPredictTerritoryPerformance?: (territoryId: string) => void;
   onGenerateImage?: (territoryId: string) => void;
+  onGenerateVideo?: (territoryId: string) => void;
   territoryEvolutions?: TerritoryEvolution[];
   performancePrediction?: PerformancePrediction;
 }
@@ -43,6 +44,7 @@ const TerritoryCardComponent: React.FC<TerritoryCardProps> = ({
   onSelectTerritoryForEvolution,
   onPredictTerritoryPerformance,
   onGenerateImage,
+  onGenerateVideo,
   territoryEvolutions,
   performancePrediction,
 }) => {
@@ -122,6 +124,7 @@ const TerritoryCardComponent: React.FC<TerritoryCardProps> = ({
             onSelectTerritoryForEvolution={onSelectTerritoryForEvolution}
             onPredictTerritoryPerformance={onPredictTerritoryPerformance}
             onGenerateImage={onGenerateImage}
+            onGenerateVideo={onGenerateVideo}
           />
         </div>
 
