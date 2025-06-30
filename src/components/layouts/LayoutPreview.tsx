@@ -27,10 +27,6 @@ export const LayoutPreview: React.FC<LayoutPreviewProps> = ({
 
   // Calculate scale factor to fit the layout in preview
   const targetFormat = layout.channelOptimization[0];
-  if (!targetFormat) {
-    // Handle case where no channel optimization is available
-    return <div className="text-red-500">No channel optimization available</div>;
-  }
   const originalWidth = getFormatWidth(targetFormat);
   const originalHeight = getFormatHeight(targetFormat);
   const scale = Math.min(width / originalWidth, height / originalHeight);
@@ -125,7 +121,7 @@ export const LayoutPreview: React.FC<LayoutPreviewProps> = ({
         document.removeEventListener('mouseup', handleMouseUp);
       };
     }
-    return undefined;
+    return;
   }, [isDragging, selectedElement]);
 
   const renderImageElement = (image: ImagePlacement) => {
@@ -222,6 +218,11 @@ export const LayoutPreview: React.FC<LayoutPreviewProps> = ({
       </div>
     );
   };
+
+  // Handle case where no channel optimization is available
+  if (!targetFormat) {
+    return <div className="text-red-500">No channel optimization available</div>;
+  }
 
   return (
     <div className="space-y-4">

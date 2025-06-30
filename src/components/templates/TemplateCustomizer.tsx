@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useAppStore } from '../../stores/appStore';
+import { useTemplateStore } from '../../stores/templateStore';
 import {
   CampaignTemplate,
   TemplateCustomization,
@@ -33,7 +33,7 @@ export const TemplateCustomizer: React.FC<TemplateCustomizerProps> = ({
     validateTemplateCustomizations,
     generateTemplatePreview,
     saveTemplateConfiguration,
-  } = useAppStore();
+  } = useTemplateStore();
 
   const [activeTab, setActiveTab] = useState<'basic' | 'brand' | 'channels' | 'preview'>('basic');
   const [selectedChannels, setSelectedChannels] = useState<ChannelFormat[]>(['instagram_post']);

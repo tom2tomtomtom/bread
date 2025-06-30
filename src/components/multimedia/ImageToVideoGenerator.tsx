@@ -7,7 +7,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAssetStore } from '../../stores/assetStore';
-import { useAppStore } from '../../stores/appStore';
 import {
   ImageToVideoRequest,
   AnimationType,

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useAssetStore } from '../../stores/assetStore';
-import { useAppStore } from '../../stores/appStore';
 import { LayoutGenerator } from './LayoutGenerator';
 import { LayoutPreview } from './LayoutPreview';
 import { ExportManager } from './ExportManager';
@@ -54,6 +53,7 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
   };
 
   const handleLayoutDelete = (layoutId: string) => {
+    // eslint-disable-next-line no-restricted-globals
     if (confirm('Are you sure you want to delete this layout?')) {
       deleteLayout(layoutId);
       if (currentLayout?.id === layoutId && layouts.length > 1) {
@@ -72,6 +72,7 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
 
   const handleBulkAction = (action: 'delete' | 'export') => {
     if (action === 'delete') {
+      // eslint-disable-next-line no-restricted-globals
       if (confirm(`Delete ${selectedLayouts.length} selected layouts?`)) {
         selectedLayouts.forEach(id => deleteLayout(id));
         setSelectedLayouts([]);
@@ -127,6 +128,7 @@ export const LayoutDashboard: React.FC<LayoutDashboardProps> = ({ onClose }) => 
               {layouts.length > 0 && (
                 <button
                   onClick={() => {
+                    // eslint-disable-next-line no-restricted-globals
                     if (confirm('Clear all layouts? This cannot be undone.')) {
                       clearLayouts();
                       setActiveTab('generate');

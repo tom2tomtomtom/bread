@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct Video Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: white;
+        }
+        .container {
+            background: #16213e;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #3730a3;
+        }
+        .success {
+            background: #065f46;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .error {
+            background: #7f1d1d;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .log {
+            background: #374151;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #4f46e5;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎬 Direct Video Test</h1>
+    <p>This will test the video generation directly by injecting JavaScript into the live site.</p>
+    
+    <div class="container">
+        <h2>Test Controls</h2>
+        <button onclick="openSiteAndTest()">🚀 Open Site & Test Video</button>
+        <button onclick="testVideoAPI()">🔧 Test Video API</button>
+        <button onclick="clearLog()">🗑️ Clear Log</button>
+    </div>
+    
+    <div class="container">
+        <h2>Test Log</h2>
+        <div id="log" class="log"></div>
+    </div>
+    
+    <div class="container">
+        <h2>Site Frame</h2>
+        <iframe id="siteFrame" src="https://aideas-redbaez.netlify.app"></iframe>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : '';
+            logDiv.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        async function testVideoAPI() {
+            log('🔧 Testing video API endpoint...');
+            
+            try {
+                // Test the video renderer API
+                const mockTemplate = {
+                    templateId: 'test-template',
+                    name: 'Test Template',
+                    category: 'promotional',
+                    description: 'Test video template',
+                    thumbnail: '',
+                    frames: [
+                        { frameNumber: 1, duration: 3000, elements: {}, backgroundColor: '#667eea' },
+                        { frameNumber: 2, duration: 3000, elements: {}, backgroundColor: '#f093fb' },
+                        { frameNumber: 3, duration: 2000, elements: {}, backgroundColor: '#4facfe' }
+                    ],
+                    totalDuration: 8000,
+                    aspectRatio: '9:16',
+                    tags: ['test'],
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                };
+
+                const mockContent = {
+                    templateId: 'test-template',
+                    frame1Content: {
+                        headline: 'Experience True Wireless Freedom',
+                        logo: ''
+                    },
+                    frame2Content: {
+                        bodyText: 'Charge devices from 3 meters away',
+                        supportingImage: '',
+                        dataPoints: ['✓ No cables needed', '✓ Multiple devices', '✓ Safe technology']
+                    },
+                    frame3Content: {
+                        ctaText: 'Pre-order Now',
+                        logo: '',
+                        contactInfo: '',
+                        website: ''
+                    },
+                    brandColors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        text: '#ffffff'
+                    }
+                };
+
+                const exportSettings = {
+                    format: 'mp4',
+                    quality: 'hd',
+                    fps: 30,
+                    compression: 'medium',
+                    watermark: false
+                };
+
+                log('📦 Mock video request created');
+                log(`Template: ${mockTemplate.name}, Duration: ${mockTemplate.totalDuration}ms`);
+                log(`Content: ${mockContent.frame1Content.headline}`);
+                
+                // Simulate the video renderer
+                log('🎬 Simulating video generation...');
+                
+                setTimeout(() => {
+                    log('✅ Mock video generation completed!', 'success');
+                    log('📥 Would download: redbaez-airwave-test.mp4 (simulated)', 'success');
+                }, 2000);
+
+            } catch (error) {
+                log(`❌ API test failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function openSiteAndTest() {
+            log('🚀 Starting direct site test...');
+            
+            const iframe = document.getElementById('siteFrame');
+            
+            // Reload the iframe to start fresh
+            iframe.src = 'https://aideas-redbaez.netlify.app';
+            
+            log('⏳ Waiting for site to load...');
+            
+            iframe.onload = async function() {
+                log('✅ Site loaded in iframe');
+                
+                try {
+                    // Wait a bit for the site to fully initialize
+                    setTimeout(() => {
+                        testSiteInteraction();
+                    }, 3000);
+                    
+                } catch (error) {
+                    log(`❌ Site test failed: ${error.message}`, 'error');
+                }
+            };
+        }
+
+        function testSiteInteraction() {
+            log('🔍 Testing site interaction...');
+            
+            const iframe = document.getElementById('siteFrame');
+            
+            try {
+                // Try to access the iframe content
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                
+                if (iframeDoc) {
+                    log('✅ Can access iframe content');
+                    
+                    // Look for key elements
+                    const title = iframeDoc.title;
+                    log(`📄 Page title: ${title}`);
+                    
+                    const buttons = iframeDoc.querySelectorAll('button');
+                    log(`🔘 Found ${buttons.length} buttons on page`);
+                    
+                    // Look for workflow elements
+                    const workflowElements = iframeDoc.querySelectorAll('[class*="workflow"], [class*="step"]');
+                    log(`⚡ Found ${workflowElements.length} workflow elements`);
+                    
+                    // Look for video-related elements
+                    const videoElements = iframeDoc.querySelectorAll('[class*="video"], [text*="video"], [text*="Video"]');
+                    log(`🎬 Found ${videoElements.length} video-related elements`);
+                    
+                    // Try to find specific elements
+                    const exportBtn = Array.from(buttons).find(btn => 
+                        btn.textContent?.includes('Export') || btn.textContent?.includes('📤')
+                    );
+                    
+                    if (exportBtn) {
+                        log('📤 Found Export button!', 'success');
+                        log(`Export button text: "${exportBtn.textContent}"`);
+                    } else {
+                        log('❌ Export button not found', 'error');
+                    }
+                    
+                    const videoBtn = Array.from(buttons).find(btn => 
+                        btn.textContent?.includes('Video') || btn.textContent?.includes('🎬')
+                    );
+                    
+                    if (videoBtn) {
+                        log('🎬 Found Video button!', 'success');
+                        log(`Video button text: "${videoBtn.textContent}"`);
+                    } else {
+                        log('❌ Video button not found', 'error');
+                    }
+                    
+                } else {
+                    log('❌ Cannot access iframe content (CORS restriction)', 'error');
+                    log('ℹ️ This is expected for cross-origin iframes');
+                    
+                    // Alternative: Open in new window
+                    log('🔗 Opening site in new window for manual testing...');
+                    window.open('https://aideas-redbaez.netlify.app', '_blank');
+                }
+                
+            } catch (error) {
+                log(`❌ Site interaction failed: ${error.message}`, 'error');
+                log('🔗 Opening site in new window for manual testing...');
+                window.open('https://aideas-redbaez.netlify.app', '_blank');
+            }
+        }
+
+        // Auto-start
+        log('🎬 Direct Video Test Ready');
+        log('📝 Manual Test Steps:');
+        log('1. Click "Open Site & Test Video" button');
+        log('2. Register/Login on the site');
+        log('3. Fill brief: "RedBaez Airwave wireless charging"');
+        log('4. Navigate through workflow to Video Template');
+        log('5. Select template and fill content');
+        log('6. Go to Export & Download');
+        log('7. Click Generate Video');
+        log('8. Download the video file');
+        log('');
+        log('🎯 Expected: MP4 video file downloads successfully');
+    </script>
+</body>
+</html>

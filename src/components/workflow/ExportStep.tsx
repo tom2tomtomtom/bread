@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ExportManager } from '../territory/ExportManager';
+import { VideoExporter } from '../video/VideoExporter';
+import { useVideoTemplateStore } from '../../stores/videoTemplateStore';
 
 interface ExportStepProps {
   onComplete?: () => void;
@@ -19,38 +21,44 @@ export const ExportStep: React.FC<ExportStepProps> = ({ onComplete, onBack }) =>
           </p>
         </div>
 
-        <ExportManager
-          generatedOutput={{
-            territories: [
-              {
-                id: 'workflow-territory',
-                title: 'Generated Territory',
-                positioning: 'From workflow integration',
-                tone: 'Professional',
-                headlines: [
-                  { text: 'Generated content', followUp: '', reasoning: '', confidence: 90 },
-                ],
-                confidence: {
-                  marketFit: 90,
-                  complianceConfidence: 90,
-                  audienceResonance: 90,
-                  riskLevel: 'LOW' as const,
+        {/* Video Export Section */}
+        <VideoExporter />
+
+        {/* Traditional Export Manager */}
+        <div className="mt-12">
+          <ExportManager
+            generatedOutput={{
+              territories: [
+                {
+                  id: 'workflow-territory',
+                  title: 'Generated Territory',
+                  positioning: 'From workflow integration',
+                  tone: 'Professional',
+                  headlines: [
+                    { text: 'Generated content', followUp: '', reasoning: '', confidence: 90 },
+                  ],
+                  confidence: {
+                    marketFit: 90,
+                    complianceConfidence: 90,
+                    audienceResonance: 90,
+                    riskLevel: 'LOW' as const,
+                  },
                 },
+              ],
+              overallConfidence: 90,
+              compliance: {
+                powerBy: ['workflow-integration'],
+                output: 'Campaign generation completed successfully',
+                notes: ['Generated through integrated workflow'],
               },
-            ],
-            overallConfidence: 90,
-            compliance: {
-              powerBy: ['workflow-integration'],
-              output: 'Campaign generation completed successfully',
-              notes: ['Generated through integrated workflow'],
-            },
-            metadata: {
-              generatedAt: new Date(),
-              model: 'workflow',
-              processingTime: 1000,
-            },
-          }}
-        />
+              metadata: {
+                generatedAt: new Date(),
+                model: 'workflow',
+                processingTime: 1000,
+              },
+            }}
+          />
+        </div>
 
         <div className="flex justify-between mt-8">
           <button

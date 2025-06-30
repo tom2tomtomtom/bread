@@ -3,6 +3,7 @@ import { VideoTemplate, VideoContent } from '../../types/videoTemplates';
 import { VideoTemplateSelector } from '../video/VideoTemplateSelector';
 import { VideoFrameEditor } from '../video/VideoFrameEditor';
 import { useTemplateWorkflowStore } from '../../stores/templateWorkflowStore';
+import { useVideoTemplateStore } from '../../stores/videoTemplateStore';
 import { useGenerationStore } from '../../stores';
 
 interface VideoTemplateStepProps {
@@ -16,15 +17,19 @@ export const VideoTemplateStep: React.FC<VideoTemplateStepProps> = ({ onContinue
   const [currentStep, setCurrentStep] = useState<'select' | 'edit'>('select');
 
   const { markStepCompleted } = useTemplateWorkflowStore();
+  const { setSelectedTemplate: setStoreTemplate, setVideoContent: setStoreContent } =
+    useVideoTemplateStore();
   const { generatedOutput } = useGenerationStore();
 
   const handleTemplateSelected = (template: VideoTemplate) => {
     setSelectedTemplate(template);
+    setStoreTemplate(template);
     setCurrentStep('edit');
   };
 
   const handleContentUpdate = (content: VideoContent) => {
     setVideoContent(content);
+    setStoreContent(content);
   };
 
   const handleContinue = () => {

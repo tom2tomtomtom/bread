@@ -48,8 +48,13 @@ export const MotivationGenerator: React.FC<MotivationGeneratorProps> = ({
     clearError,
   } = useMotivationStore();
 
-  const { selectedTemplate, brief, targetAudience, campaignGoal, markStepCompleted } =
+  const { selectedTemplate, briefText, parsedBrief, markStepCompleted } =
     useTemplateWorkflowStore();
+
+  // Extract data from parsed brief or fall back to legacy fields
+  const brief = briefText || '';
+  const targetAudience = parsedBrief?.targetAudience || '';
+  const campaignGoal = parsedBrief?.goal || '';
 
   const [hasGenerated, setHasGenerated] = useState(false);
 

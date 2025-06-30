@@ -1,0 +1,73 @@
+{
+  "template": {
+    "templateId": "redbaez-airwave-template",
+    "name": "RedBaez Airwave Template",
+    "category": "promotional",
+    "description": "Professional wireless charging product video",
+    "thumbnail": "",
+    "frames": [
+      {
+        "frameNumber": 1,
+        "duration": 3000,
+        "elements": {},
+        "backgroundColor": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+      },
+      {
+        "frameNumber": 2,
+        "duration": 3000,
+        "elements": {},
+        "backgroundColor": "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+      },
+      {
+        "frameNumber": 3,
+        "duration": 2000,
+        "elements": {},
+        "backgroundColor": "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
+      }
+    ],
+    "totalDuration": 8000,
+    "aspectRatio": "9:16",
+    "tags": [
+      "wireless",
+      "charging",
+      "technology"
+    ],
+    "createdAt": "2025-06-29T05:15:33.540Z",
+    "updatedAt": "2025-06-29T05:15:33.540Z"
+  },
+  "content": {
+    "templateId": "redbaez-airwave-template",
+    "frame1Content": {
+      "heroImage": "",
+      "headline": "Experience True Wireless Freedom",
+      "logo": ""
+    },
+    "frame2Content": {
+      "bodyText": "Charge devices from 3 meters away with RedBaez Airwave",
+      "supportingImage": "",
+      "dataPoints": [
+        "✓ No cables needed",
+        "✓ Multiple devices",
+        "✓ Safe technology"
+      ]
+    },
+    "frame3Content": {
+      "ctaText": "Pre-order Now",
+      "logo": "",
+      "contactInfo": "redbaez.com",
+      "website": "redbaez.com"
+    },
+    "brandColors": {
+      "primary": "#6366f1",
+      "secondary": "#8b5cf6",
+      "text": "#ffffff"
+    }
+  },
+  "exportSettings": {
+    "format": "mp4",
+    "quality": "hd",
+    "fps": 30,
+    "compression": "medium",
+    "watermark": false
+  }
+}

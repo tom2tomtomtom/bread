@@ -1,0 +1,58 @@
+# Page snapshot
+
+```yaml
+- link "Skip to main content":
+  - /url: "#main-content"
+- main:
+  - heading "AIDEAS" [level=1]
+  - paragraph: Complete AI-Powered Ad Creation Workflow
+  - paragraph: From template selection to final export - create professional advertisements using psychology-driven copy, compelling visuals, and proven templates. All powered by advanced AI technology.
+  - button "Get Started Free"
+  - button "Sign In"
+  - heading "Complete 8-Step Ad Creation Process" [level=2]
+  - text: 📝
+  - heading "Input Brief" [level=3]
+  - paragraph: Define your campaign
+  - text: 🗺️
+  - heading "Generate Territories" [level=3]
+  - paragraph: Strategic positioning
+  - text: 🧠
+  - heading "Generate Motivations" [level=3]
+  - paragraph: AI psychology insights
+  - text: ✍️
+  - heading "Create Copy" [level=3]
+  - paragraph: AI-powered headlines
+  - text: 🖼️
+  - heading "Select Assets" [level=3]
+  - paragraph: Review generated content
+  - text: 🎬
+  - heading "Video Template" [level=3]
+  - paragraph: 3-frame video ads
+  - text: 🎨
+  - heading "Populate Template" [level=3]
+  - paragraph: Combine everything
+  - text: 📤
+  - heading "Export & Download" [level=3]
+  - paragraph: Get final ads
+  - text: 🎯
+  - heading "Strategic Territories" [level=3]
+  - paragraph: Generate compelling creative territories from your brand briefs with AI-powered insights.
+  - text: 🎨
+  - heading "Visual Creation" [level=3]
+  - paragraph: Transform concepts into stunning images and engaging video content automatically.
+  - text: ⚡
+  - heading "Lightning Fast" [level=3]
+  - paragraph: Complete creative workflows in minutes, not hours. From brief to final assets.
+  - button:
+    - img
+  - heading "Welcome Back" [level=2]
+  - paragraph: Sign in to your BREAD account
+  - text: Email Address
+  - textbox "Email Address": test-1751208696749@example.com
+  - text: Password
+  - textbox "Password": TestPassword123!
+  - button "Sign In"
+  - paragraph:
+    - text: Don't have an account?
+    - button "Sign up here"
+```

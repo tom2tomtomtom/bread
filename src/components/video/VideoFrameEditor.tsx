@@ -60,7 +60,7 @@ export const VideoFrameEditor: React.FC<VideoFrameEditorProps> = ({
   // Notify parent of content changes
   useEffect(() => {
     onContentUpdate(content);
-  }, [content, onContentUpdate]);
+  }, [content]); // Remove onContentUpdate from dependencies to prevent infinite loop
 
   const updateFrameContent = (frame: 1 | 2 | 3, key: string, value: string) => {
     const frameKey = `frame${frame}Content` as keyof VideoContent;

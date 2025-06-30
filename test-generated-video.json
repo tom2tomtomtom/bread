@@ -1,0 +1,17 @@
+{
+  "title": "RedBaez Airwave Video",
+  "duration": "8 seconds",
+  "frames": [
+    "Frame 1: Experience True Wireless Freedom",
+    "Frame 2: Charge devices from 3 meters away",
+    "Frame 3: Pre-order Now"
+  ],
+  "settings": {
+    "format": "mp4",
+    "quality": "hd",
+    "fps": 30,
+    "compression": "medium",
+    "watermark": false
+  },
+  "generated": "2025-06-29T05:16:34.821Z"
+}

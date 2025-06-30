@@ -6,7 +6,8 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { useAppStore } from '../../stores/appStore';
+import { useTemplateStore } from '../../stores/templateStore';
+import { useGenerationStore } from '../../stores/generationStore';
 import { CampaignTemplate, CampaignTemplateType, TemplateRecommendation } from '../../types';
 
 interface TemplateSelectorProps {
@@ -44,13 +45,13 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
     templateRecommendations,
     isLoadingTemplates,
     isGeneratingRecommendations,
-    templateError,
-    brief,
-    enhancedBriefAnalysis,
     loadAvailableTemplates,
     generateTemplateRecommendations,
     selectTemplate,
-  } = useAppStore();
+  } = useTemplateStore();
+
+  // Get brief and analysis from generation store
+  const { brief, enhancedBriefAnalysis, error: templateError } = useGenerationStore();
 
   const [selectedType, setSelectedType] = useState<CampaignTemplateType | 'all'>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');

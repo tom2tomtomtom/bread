@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
-import { useAppStore } from '../../stores/appStore';
+import { useConfigStore } from '../../stores/configStore';
+import { useUIStore } from '../../stores/uiStore';
 import { APP_CONFIG } from '../../config/app';
 
 interface ConfigurationProviderProps {
@@ -28,8 +29,10 @@ export const ConfigurationProvider: React.FC<ConfigurationProviderProps> = ({ ch
     updateApiKey,
     setApiKeysSaved,
     setGenerateImages,
-    showToastMessage,
-  } = useAppStore();
+  } = useConfigStore();
+
+  // Get toast functionality from UI store
+  const { showToastMessage } = useUIStore();
 
   // Configuration Handlers
   const handlePromptUpdate = (promptType: keyof typeof prompts, value: string) => {
@@ -118,7 +121,7 @@ export const ConfigurationProvider: React.FC<ConfigurationProviderProps> = ({ ch
 
 // Hook for accessing configuration in child components
 export const useConfiguration = () => {
-  const { prompts, apiKeys, apiKeysSaved, generateImages } = useAppStore();
+  const { prompts, apiKeys, apiKeysSaved, generateImages } = useConfigStore();
 
   return {
     prompts,

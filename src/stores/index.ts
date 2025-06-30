@@ -28,6 +28,7 @@ import { useTerritoryStore } from './territoryStore';
 import { useStarredStore } from './starredStore';
 import { useAssetStore } from './assetStore';
 import { useAuthStore } from './authStore';
+import { useTemplateStore } from './templateStore';
 
 // Export all focused stores
 export { useGenerationStore } from './generationStore';
@@ -37,9 +38,9 @@ export { useTerritoryStore } from './territoryStore';
 export { useStarredStore } from './starredStore';
 export { useAssetStore } from './assetStore';
 export { useAuthStore } from './authStore';
+export { useTemplateStore } from './templateStore';
 
-// Keep the old store for backward compatibility during migration
-export { useAppStore } from './appStore';
+// Legacy appStore removed - migration complete!
 
 // Store migration utilities
 export { migrateFromAppStore, createStoreHooks } from './migration';

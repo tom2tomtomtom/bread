@@ -1,5 +1,5 @@
 import React from 'react';
-import { ConnectedGenerationController } from '../generation/ConnectedGenerationController';
+import { StreamlinedTerritoryGenerator } from './StreamlinedTerritoryGenerator';
 import { useTemplateWorkflowStore } from '../../stores/templateWorkflowStore';
 
 interface TerritoryGenerationStepProps {
@@ -31,7 +31,7 @@ export const TerritoryGenerationStep: React.FC<TerritoryGenerationStepProps> = (
           </p>
         </div>
 
-        <ConnectedGenerationController onTerritoryGenerated={handleTerritoryGenerated} />
+        <StreamlinedTerritoryGenerator onTerritoryGenerated={handleTerritoryGenerated} />
 
         <div className="flex justify-between mt-8">
           <button

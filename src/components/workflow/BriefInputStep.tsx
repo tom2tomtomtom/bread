@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTemplateWorkflowStore } from '../../stores/templateWorkflowStore';
+import { ShoppingMoments } from '../ShoppingMoments';
 
 interface BriefInputStepProps {
   onContinue: () => void;
@@ -27,6 +28,16 @@ export const BriefInputStep: React.FC<BriefInputStepProps> = ({ onContinue, onBa
   const handleContinue = () => {
     setParsedBrief(briefText, parsedFields);
     onContinue();
+  };
+
+  const handleMomentSelect = (moment: { name: string; date: string; brief: string }) => {
+    setBriefText(moment.brief);
+    // Auto-parse some basic fields from the brief
+    setParsedFields({
+      ...parsedFields,
+      goal: `${moment.name} campaign`,
+      productDetails: `Products and services for ${moment.name}`,
+    });
   };
 
   return (
@@ -111,6 +122,11 @@ export const BriefInputStep: React.FC<BriefInputStepProps> = ({ onContinue, onBa
                 placeholder="e.g., Modern, trustworthy, innovative..."
               />
             </div>
+          </div>
+
+          {/* Shopping Moments Quick Start */}
+          <div className="mt-8">
+            <ShoppingMoments onMomentSelect={handleMomentSelect} />
           </div>
 
           <div className="flex justify-end">

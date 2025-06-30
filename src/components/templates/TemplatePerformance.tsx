@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useAppStore } from '../../stores/appStore';
+import { useTemplateStore } from '../../stores/templateStore';
 import { CampaignTemplate, CampaignTemplateType, ChannelFormat } from '../../types';
 
 interface TemplatePerformanceProps {
@@ -53,10 +53,10 @@ export const TemplatePerformance: React.FC<TemplatePerformanceProps> = ({
 }) => {
   const {
     availableTemplates,
-    templatePerformanceData,
+    templatePerformance: templatePerformanceData,
     templateUsageHistory,
     getTemplatePerformanceInsights,
-  } = useAppStore();
+  } = useTemplateStore();
 
   const [selectedTemplate, setSelectedTemplate] = useState<CampaignTemplate | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'channels' | 'optimization' | 'history'>(
