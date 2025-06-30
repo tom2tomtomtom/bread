@@ -296,7 +296,15 @@ export const MultimediaWorkflow: React.FC<MultimediaWorkflowProps> = ({ onComple
                       className="p-3 border border-gray-200 rounded-lg hover:border-blue-500 transition-colors"
                     >
                       <div className="text-center">
-                        <div className="text-2xl mb-2">{asset.type === 'image' ? '🎨' : '🎬'}</div>
+                        <div className="w-12 h-12 mx-auto mb-2 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+                          {asset.type === 'image' ? (
+                            <div className="w-8 h-8 bg-blue-400/40 rounded border border-blue-400/20"></div>
+                          ) : (
+                            <div className="w-8 h-6 bg-purple-400/40 rounded border border-purple-400/20 relative">
+                              <div className="absolute inset-1 bg-purple-400/20 rounded-sm"></div>
+                            </div>
+                          )}
+                        </div>
                         <div className="text-xs text-gray-600 truncate">
                           {asset.type} • {asset.quality}
                         </div>

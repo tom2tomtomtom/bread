@@ -57,21 +57,55 @@ export const VideoTemplateSelector: React.FC<VideoTemplateSelectorProps> = ({
 
           {/* Frame content preview */}
           <div className="absolute inset-2 flex flex-col justify-center items-center">
-            {Object.entries(frame.elements).map(([key, element]) => (
-              <div
-                key={key}
-                className="text-[6px] text-white/60 text-center truncate w-full"
-                title={`${key}: ${element.slot}`}
-              >
-                {element.slot === 'text' && key.includes('headline') && '📰'}
-                {element.slot === 'text' && key.includes('body') && '📝'}
-                {element.slot === 'text' && key.includes('cta') && '🔥'}
-                {element.slot === 'image' && '🖼️'}
-                {element.slot === 'logo' && '🏷️'}
-                {element.slot === 'button' && '📱'}
-                {element.slot === 'background' && '🎨'}
-              </div>
-            ))}
+            {Object.entries(frame.elements).map(([key, element]) => {
+              // Create visual representations instead of emoji placeholders
+              const getElementVisual = () => {
+                switch (element.slot) {
+                  case 'text':
+                    if (key.includes('headline')) {
+                      return <div className="w-full h-1 bg-white/60 rounded"></div>;
+                    } else if (key.includes('body')) {
+                      return (
+                        <div className="space-y-0.5">
+                          <div className="w-full h-0.5 bg-white/40 rounded"></div>
+                          <div className="w-3/4 h-0.5 bg-white/40 rounded"></div>
+                        </div>
+                      );
+                    } else if (key.includes('cta')) {
+                      return (
+                        <div className="w-2/3 h-1 bg-orange-400/60 rounded border border-orange-400/40"></div>
+                      );
+                    }
+                    return <div className="w-full h-0.5 bg-white/40 rounded"></div>;
+                  case 'image':
+                    return (
+                      <div className="w-full aspect-square bg-blue-400/40 rounded-sm border border-blue-400/20"></div>
+                    );
+                  case 'logo':
+                    return <div className="w-2/3 h-1 bg-yellow-400/60 rounded-sm"></div>;
+                  case 'button':
+                    return (
+                      <div className="w-1/2 h-1 bg-green-400/60 rounded border border-green-400/40"></div>
+                    );
+                  case 'background':
+                    return (
+                      <div className="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-blue-400/20 rounded"></div>
+                    );
+                  default:
+                    return <div className="w-full h-0.5 bg-gray-400/40 rounded"></div>;
+                }
+              };
+
+              return (
+                <div
+                  key={key}
+                  className="relative text-[6px] text-white/60 text-center truncate w-full flex items-center justify-center p-0.5"
+                  title={`${key}: ${element.slot}`}
+                >
+                  {getElementVisual()}
+                </div>
+              );
+            })}
           </div>
 
           {/* Duration indicator */}

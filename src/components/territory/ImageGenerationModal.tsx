@@ -33,7 +33,7 @@ export const ImageGenerationModal: React.FC<ImageGenerationModalProps> = ({
     try {
       setGeneratedImageUrl(null);
 
-      const queueId = await generateImage({
+      const assetId = await generateImage({
         prompt,
         territory: {
           id: territory.id,
@@ -84,13 +84,24 @@ export const ImageGenerationModal: React.FC<ImageGenerationModalProps> = ({
         quality,
       });
 
-      console.log('✅ Image generation started, queue ID:', queueId);
+      console.log('✅ Image generation completed, asset ID:', assetId);
 
-      // For now, we'll show a success message
-      // In a full implementation, you'd track the queue and show the result
-      setTimeout(() => {
-        setGeneratedImageUrl('/api/placeholder/400/300'); // Placeholder for demo
-      }, 3000);
+      // Get the generated asset from the store to display it
+      const { assets } = useAssetStore.getState();
+      const generatedAsset = assets.find(asset => asset.id.includes(assetId.replace('asset_', '')));
+
+      if (generatedAsset && generatedAsset.url) {
+        setGeneratedImageUrl(generatedAsset.url);
+        console.log('🎨 Displaying generated image:', generatedAsset.url);
+      } else {
+        console.warn('⚠️ Generated asset not found in store, checking again...');
+        // Fallback: try to find the most recent asset
+        const mostRecentAsset = assets[0];
+        if (mostRecentAsset && mostRecentAsset.url) {
+          setGeneratedImageUrl(mostRecentAsset.url);
+          console.log('🎨 Displaying most recent asset:', mostRecentAsset.url);
+        }
+      }
     } catch (error) {
       console.error('❌ Image generation failed:', error);
     }

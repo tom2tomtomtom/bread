@@ -76,7 +76,15 @@ export const MediaPreview: React.FC<MediaPreviewProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
-          <span className="text-2xl">{asset.type === 'image' ? '🎨' : '🎬'}</span>
+          <div className="w-8 h-8 rounded-lg border-2 border-gray-300 flex items-center justify-center">
+            {asset.type === 'image' ? (
+              <div className="w-6 h-6 bg-blue-400/40 rounded border border-blue-400/20"></div>
+            ) : (
+              <div className="w-6 h-4 bg-purple-400/40 rounded border border-purple-400/20 relative">
+                <div className="absolute inset-0.5 bg-purple-400/20 rounded-sm"></div>
+              </div>
+            )}
+          </div>
           <div>
             <h2 className="text-xl font-bold text-gray-900">
               Generated {asset.type.charAt(0).toUpperCase() + asset.type.slice(1)}

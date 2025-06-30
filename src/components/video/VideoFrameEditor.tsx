@@ -162,10 +162,14 @@ export const VideoFrameEditor: React.FC<VideoFrameEditorProps> = ({
               return (
                 <div
                   key={key}
-                  className="mb-1 p-2 bg-gray-700 rounded text-gray-300 text-xs flex items-center justify-center"
+                  className="mb-1 p-2 bg-gray-700 rounded text-gray-300 text-xs flex items-center justify-between"
                   style={{ minHeight: '20px' }}
                 >
-                  🖼️ {key}
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-blue-400/40 rounded border border-blue-400/20 flex-shrink-0"></div>
+                    <span>{key}</span>
+                  </div>
+                  <div className="text-xs text-gray-500">Image</div>
                 </div>
               );
             }

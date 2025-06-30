@@ -43,4 +43,16 @@
   - text: ⚡
   - heading "Lightning Fast" [level=3]
   - paragraph: Complete creative workflows in minutes, not hours. From brief to final assets.
+  - button:
+    - img
+  - heading "Welcome Back" [level=2]
+  - paragraph: Sign in to your BREAD account
+  - text: Email Address
+  - textbox "Email Address": test@example.com
+  - text: Password
+  - textbox "Password": password123
+  - button "Sign In"
+  - paragraph:
+    - text: Don't have an account?
+    - button "Sign up here"
 ```
