@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { AuthModal } from '../components/auth/AuthModal';
 import { WorkflowOrchestrator } from '../components/workflow/WorkflowOrchestrator';
+import { AssetManager } from '../components/assets/AssetManager';
 import { useAuthStore } from '../stores/authStore';
 
 // Authenticated workflow interface component
 const AuthenticatedWorkflow: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   const { user } = useAuthStore();
+  const [showAssets, setShowAssets] = useState(false);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
@@ -19,6 +21,12 @@ const AuthenticatedWorkflow: React.FC<{ onComplete: () => void }> = ({ onComplet
             <span className="ml-4 text-sm text-gray-400">AI-Powered Ad Creation Platform</span>
           </div>
           <div className="flex items-center gap-4">
+            <button
+              onClick={() => setShowAssets(true)}
+              className="bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 px-4 py-2 rounded-xl text-white transition-all duration-300"
+            >
+              📁 ASSETS
+            </button>
             <span className="text-sm text-gray-300">
               Welcome, {user?.name || user?.email || 'User'}
             </span>
@@ -34,6 +42,33 @@ const AuthenticatedWorkflow: React.FC<{ onComplete: () => void }> = ({ onComplet
 
       {/* Integrated Workflow */}
       <WorkflowOrchestrator onComplete={onComplete} />
+
+      {/* Asset Manager Modal */}
+      {showAssets && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 rounded-xl border border-white/10 w-full max-w-7xl h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between p-6 border-b border-white/10">
+              <h2 className="text-2xl font-bold text-white">Asset Manager</h2>
+              <button
+                onClick={() => setShowAssets(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6 h-full overflow-auto">
+              <AssetManager />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useTemplateWorkflowStore } from '../../stores/templateWorkflowStore';
 import { useGenerationStore } from '../../stores/generationStore';
 import { TerritoryOutput } from '../territory/TerritoryOutput';
-import { Territory } from '../../types';
+import { ImageGenerationModal } from '../territory/ImageGenerationModal';
+import { Territory, EnhancedTerritory } from '../../types';
 
 interface StreamlinedTerritoryGeneratorProps {
   onTerritoryGenerated?: () => void;
@@ -16,6 +17,9 @@ export const StreamlinedTerritoryGenerator: React.FC<StreamlinedTerritoryGenerat
     useGenerationStore();
 
   const [hasGenerated, setHasGenerated] = useState(false);
+  const [selectedTerritoryForImage, setSelectedTerritoryForImage] =
+    useState<EnhancedTerritory | null>(null);
+  const [showImageModal, setShowImageModal] = useState(false);
 
   // Auto-generate territories when component mounts if we have the required data
   // Note: Using server-side Netlify functions, so no client-side API key needed
@@ -32,6 +36,20 @@ export const StreamlinedTerritoryGenerator: React.FC<StreamlinedTerritoryGenerat
     await generate();
     setShowOutput(true);
     onTerritoryGenerated?.();
+  };
+
+  const handleGenerateImage = (territoryId: string) => {
+    // Find the territory by ID from the generated output
+    const territory = generatedOutput?.territories?.find(t => t.id === territoryId);
+    if (territory) {
+      setSelectedTerritoryForImage(territory as EnhancedTerritory);
+      setShowImageModal(true);
+    }
+  };
+
+  const handleCloseImageModal = () => {
+    setShowImageModal(false);
+    setSelectedTerritoryForImage(null);
   };
 
   return (
@@ -117,7 +135,17 @@ export const StreamlinedTerritoryGenerator: React.FC<StreamlinedTerritoryGenerat
           onToggleTerritoryStarred={() => {}}
           onToggleHeadlineStarred={() => {}}
           starredItems={{ territories: [], headlines: {} }}
-          onGenerateImage={() => {}}
+          onGenerateImage={handleGenerateImage}
+        />
+      )}
+
+      {/* Image Generation Modal */}
+      {showImageModal && selectedTerritoryForImage && (
+        <ImageGenerationModal
+          territory={selectedTerritoryForImage}
+          brief={briefText}
+          isOpen={showImageModal}
+          onClose={handleCloseImageModal}
         />
       )}
     </div>

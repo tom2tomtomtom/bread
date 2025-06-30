@@ -3,6 +3,7 @@ import { useAssetStore } from '../../stores/assetStore';
 import { UploadedAsset, SortBy, SortOrder } from '../../types';
 import { AssetCard } from './AssetCard';
 import { AssetFilters } from './AssetFilters';
+import { AssetUpload } from './AssetUpload';
 
 interface AssetLibraryProps {
   onAssetSelect?: (asset: UploadedAsset) => void;
@@ -261,6 +262,11 @@ const AssetLibraryComponent: React.FC<AssetLibraryProps> = ({
           </div>
         </div>
       )}
+
+      {/* Asset Upload Section */}
+      <div className="mb-8">
+        <AssetUpload />
+      </div>
 
       {/* Asset Grid/List */}
       {filteredAndSortedAssets.length === 0 ? (
